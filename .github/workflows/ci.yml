@@ -86,10 +86,9 @@ jobs:
         run: mix dialyzer
       - name: Run Tests and Coverage Report
         run: mix coveralls.lcov
-      - name: Code Coverage
-        uses: zgosalvez/github-actions-report-lcov@v3
+      - name: Tests & Coverage
+        uses: josecfreittas/elixir-coverage-feedback-action@v0.3.1
         with:
-          coverage-files: cover/lcov.info
-          minimum-coverage: 50
-          artifact-name: code-coverage-report
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          coverage_threshold: 50
+          coverage_tool: excoveralls

@@ -48,7 +48,7 @@ defmodule BasketWeb.Router do
   if Mix.env() == :dev do
     scope "/" do
       pipe_through :browser
-      surface_catalogue "/catalogue"
+      surface_catalogue("/catalogue")
     end
   end
 end

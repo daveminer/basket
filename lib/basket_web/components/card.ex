@@ -27,28 +27,28 @@ defmodule BasketWeb.Components.Card do
     ~F"""
     <style>
       .card {
-        @apply overflow-hidden shadow-md;
+      @apply overflow-hidden shadow-md;
       }
       .content {
-        @apply px-6 py-4 text-gray-700 text-base;
+      @apply px-6 py-4 text-gray-700 text-base;
       }
       .header {
-        @apply p-6 font-semibold text-2xl text-brand w-full bg-gray-200;
+      @apply p-6 font-semibold text-2xl text-brand w-full bg-gray-200;
       }
       .footer {
-        @apply px-6 py-4;
+      @apply px-6 py-4;
       }
     </style>
 
     <div class={"card", "max-w-#{@max_width}", "rounded-2xl": @rounded}>
       <div class="header">
-        <#slot {@header}/>
+        <#slot {@header} />
       </div>
       <div class="content">
-        <#slot/>
+        <#slot />
       </div>
       <div class="footer">
-        <#slot {@footer}/>
+        <#slot {@footer} />
       </div>
     </div>
     """

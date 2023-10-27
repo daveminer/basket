@@ -87,7 +87,7 @@ jobs:
       - name: Run Tests and Coverage Report
         run: mix coveralls.lcov
       - name: Code Coverage
-        uses: zgosalvez/github-actions-report-lcov@v1
+        uses: zgosalvez/github-actions-report-lcov@v3
         with:
           coverage-files: cover/lcov.info
           minimum-coverage: 50

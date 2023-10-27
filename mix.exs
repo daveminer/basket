@@ -10,7 +10,15 @@ defmodule Basket.MixProject do
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps(),
-      compilers: Mix.compilers() ++ [:surface]
+      compilers: Mix.compilers() ++ [:surface],
+      deps: deps(),
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [
+        coveralls: :test,
+        "coveralls.detail": :test,
+        "coveralls.post": :test,
+        "coveralls.html": :test
+      ]
     ]
   end
 
@@ -56,7 +64,11 @@ defmodule Basket.MixProject do
       {:surface, "~> 0.11.0"},
       # for surface.init
       {:sourceror, "~> 0.12.0"},
-      {:surface_catalogue, "~> 0.6.0"}
+      {:surface_catalogue, "~> 0.6.0"},
+      {:excoveralls, "~> 0.18", only: :test},
+      {:sobelow, "~> 0.13.0", only: [:dev, :test], runtime: false},
+      {:credo, "~> 1.7.1", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.4.2", runtime: false}
     ]
   end
 

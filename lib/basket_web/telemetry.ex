@@ -1,3 +1,6 @@
+@moduledoc """
+Telemetry configuration
+"""
 defmodule BasketWeb.Telemetry do
   use Supervisor
   import Telemetry.Metrics

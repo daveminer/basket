@@ -1,3 +1,4 @@
+@moduledoc false
 defmodule BasketWeb.Demo do
   use BasketWeb, :surface_live_view
 

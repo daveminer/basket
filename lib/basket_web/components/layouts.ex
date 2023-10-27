@@ -1,3 +1,4 @@
+@moduledoc false
 defmodule BasketWeb.Layouts do
   use BasketWeb, :html
 

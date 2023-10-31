@@ -1,5 +1,5 @@
-@moduledoc false
 defmodule BasketWeb.Demo do
+  @moduledoc false
   use BasketWeb, :surface_live_view
 
   alias BasketWeb.Components.Card

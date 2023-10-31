@@ -16,8 +16,9 @@ defmodule BasketWeb.CoreComponents do
   """
   use Phoenix.Component
 
-  alias Phoenix.LiveView.JS
   alias Phoenix.HTML.Form
+  alias Phoenix.LiveView.JS
+
   import BasketWeb.Gettext
 
   @doc """

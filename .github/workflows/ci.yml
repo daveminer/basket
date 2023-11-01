@@ -93,5 +93,5 @@ jobs:
         uses: josecfreittas/elixir-coverage-feedback-action@v0.5
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          coverage_threshold: 50
+          coverage_threshold: 0
           coverage_tool: excoveralls

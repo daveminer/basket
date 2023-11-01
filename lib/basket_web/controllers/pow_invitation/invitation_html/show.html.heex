@@ -9,7 +9,11 @@
   <div class="space-y-8 bg-white mt-10">
     <div class="flex items-center gap-1 text-sm leading-6 text-zinc-600">
       <.input name="invite-url" type="text" id="invite-url" value={@url} class="mt-0" readonly />
-      <.button phx-click={JS.dispatch("phx:share", to: "#invite-url")} aria-label={"Share"} class="mt-2">
+      <.button
+        phx-click={JS.dispatch("phx:share", to: "#invite-url")}
+        aria-label="Share"
+        class="mt-2"
+      >
         <.icon name="hero-arrow-up-on-square" class="w-6 h-6" />
       </.button>
     </div>

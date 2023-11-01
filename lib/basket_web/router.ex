@@ -2,6 +2,9 @@ defmodule BasketWeb.Router do
   use BasketWeb, :router
   use Pow.Phoenix.Router
 
+  use Pow.Extension.Phoenix.Router,
+    extensions: [PowResetPassword, PowEmailConfirmation, PowInvitation, PowPersistentSession]
+
   import Surface.Catalogue.Router
 
   pipeline :browser do
@@ -21,6 +24,7 @@ defmodule BasketWeb.Router do
     pipe_through :browser
 
     pow_routes()
+    pow_extension_routes()
   end
 
   scope "/", BasketWeb do

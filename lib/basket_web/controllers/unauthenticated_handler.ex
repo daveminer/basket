@@ -1,4 +1,6 @@
 defmodule BasketWeb.UnauthenticatedHandler do
+  @moduledoc false
+
   use BasketWeb, :controller
 
   alias Pow.Phoenix.Routes

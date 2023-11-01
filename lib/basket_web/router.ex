@@ -20,6 +20,10 @@ defmodule BasketWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :authenticated do
+    plug Pow.Plug.RequireAuthenticated, error_handler: BasketWeb.UnauthenticatedHandler
+  end
+
   scope "/" do
     pipe_through :browser
 
@@ -28,7 +32,7 @@ defmodule BasketWeb.Router do
   end
 
   scope "/", BasketWeb do
-    pipe_through :browser
+    pipe_through [:browser, :authenticated]
 
     get "/", PageController, :home
     live "/demo", Demo

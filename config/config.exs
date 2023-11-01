@@ -73,7 +73,7 @@ config :basket, :pow,
   repo: Basket.Repo,
   extensions: [PowResetPassword, PowEmailConfirmation],
   controller_callbacks: Pow.Extension.Phoenix.ControllerCallbacks,
-  mailer: MyAppWeb.Pow.Mailer
+  mailer_backend: MyAppWeb.Pow.Mailer
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

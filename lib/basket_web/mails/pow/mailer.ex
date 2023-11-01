@@ -1,4 +1,8 @@
 defmodule MyAppWeb.Pow.Mailer do
+  @moduledoc """
+  Stub mailer implementation for initial Pow config
+  """
+
   use Pow.Phoenix.Mailer
   require Logger
 

@@ -1,4 +1,6 @@
 defmodule BasketWeb.PowInvitationMail do
+  @moduledoc false
+
   use BasketWeb, :mail
 
   def invitation(assigns) do

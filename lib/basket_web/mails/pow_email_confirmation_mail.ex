@@ -1,4 +1,6 @@
 defmodule BasketWeb.PowEmailConfirmationMail do
+  @moduledoc false
+
   use BasketWeb, :mail
 
   def email_confirmation(assigns) do

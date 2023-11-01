@@ -1,4 +1,6 @@
 defmodule BasketWeb.PowResetPasswordMail do
+  @moduledoc false
+
   use BasketWeb, :mail
 
   def reset_password(assigns) do

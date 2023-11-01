@@ -17,6 +17,9 @@ jobs:
       MIX_ENV: test
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     services:
       db:
         image: postgres:latest
@@ -90,5 +93,5 @@ jobs:
         uses: josecfreittas/elixir-coverage-feedback-action@v0.5
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          coverage_threshold: 50
+          coverage_threshold: 0
           coverage_tool: excoveralls

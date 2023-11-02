@@ -74,7 +74,8 @@ defmodule Basket.MixProject do
       {:credo, "~> 1.7.1", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.4.2", runtime: false},
       {:mix_audit, "~> 2.1.1", runtime: false},
-      {:pow, "~> 1.0.34"}
+      {:pow, "~> 1.0.34"},
+      {:websockex, "~> 0.4.3"}
     ]
   end
 

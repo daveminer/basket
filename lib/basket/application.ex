@@ -17,7 +17,8 @@ defmodule Basket.Application do
       # Start a worker by calling: Basket.Worker.start_link(arg)
       # {Basket.Worker, arg},
       # Start to serve requests, typically the last entry
-      BasketWeb.Endpoint
+      BasketWeb.Endpoint,
+      Basket.Alpaca.WsClient
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

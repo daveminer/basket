@@ -68,7 +68,7 @@ defmodule Basket.MixProject do
       {:surface, "~> 0.11.0"},
       # for surface.init; possible to remove.
       {:sourceror, "~> 0.12.0"},
-      {:surface_catalogue, "~> 0.6.0"},
+      {:surface_catalogue, "~> 0.6.1"},
       {:excoveralls, "~> 0.18", only: :test},
       {:sobelow, "~> 0.13.0", only: [:dev, :test], runtime: false},
       {:credo, "~> 1.7.1", only: [:dev, :test], runtime: false},

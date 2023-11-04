@@ -20,12 +20,10 @@ defmodule BasketWeb.Components.Overview do
   def render(assigns) do
     ~F"""
     <div>
-      <SearchInput.render id="stock-search-input" name="stock-search-input" placeholder="APPL">
-      </SearchInput.render>
-      <.table id="ticker-list" rows={@tickers}>
-        <:col :let={ticker} label="id">{ticker}</:col>
-      </.table>
     </div>
     """
   end
 end
+
+# <SearchInput.render id="stock-search-input" name="stock-search-input" tickers={@tickers}>
+# </SearchInput.render>

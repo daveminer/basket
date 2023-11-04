@@ -3,18 +3,19 @@ defmodule BasketWeb.Overview do
 
   require Logger
 
-  alias BasketWeb.Components.Overview
+  alias BasketWeb.Components.SearchInput
+
+  # alias BasketWeb.Components.Overview
 
   prop tickers, :list, default: []
 
-  def mount(%{"id" => id}, _, socket) do
-    {:ok,
-     socket
-     |> assign(:org, AsyncResult.loading())
-     |> start_async(:fetch_tickers, fn -> fetch_org!(id) end)}
+  def mount(_, _, socket) do
+    {:ok, assign(socket, tickers: [])}
+    # |> assign(:org, AsyncResult.loading())
+    # |> start_async(:fetch_tickers, fn -> fetch_org!(id) end)}
   end
 
-  def handle_event("ticker-search", %{"search_field" => %{"query" => query}}, socket) do
+  def handle_event("ticker-search", %{"search_field" => %{"query" => _query}}, socket) do
     # IO.inspect("HANDLE EVENT: #{query}")
 
     {_status, tickers} =
@@ -41,12 +42,14 @@ defmodule BasketWeb.Overview do
 
     IO.inspect("HERE: #{inspect(tickers)}")
 
-    {:noreply, assign(socket, :tickers, tickers)}
+    {:reply, %{}, assign(socket, :tickers, tickers)}
   end
 
   def render(assigns) do
     ~F"""
-    <Overview id="1" tickers={@tickers} />/>
+    <.live_component module={SearchInput} id="stock-search-input" tickers={@tickers} />
     """
   end
 end
+
+# <Overview id="1" tickers={@tickers} />

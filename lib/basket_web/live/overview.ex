@@ -56,11 +56,21 @@ defmodule BasketWeb.Overview do
     {:reply, %{}, assign(socket, :basket, socket.assigns.basket ++ [ticker])}
   end
 
+  def handle_event("ticker-remove", %{"ticker" => ticker}, socket) do
+    {:reply, %{},
+     assign(socket, :basket, Enum.filter(socket.assigns.basket, fn t -> t != ticker end))}
+  end
+
   def render(assigns) do
     ~F"""
     <.live_component module={SearchInput} id="stock-search-input" tickers={@tickers} />
     <.table id="ticker-list" rows={@basket}>
       <:col :let={ticker} label="ticker">{ticker}</:col>
+      <:col :let={ticker} label="remove">
+        <.button phx-click="ticker-remove" phx-value-ticker={ticker}>
+          Remove
+        </.button>
+      </:col>
     </.table>
     """
   end

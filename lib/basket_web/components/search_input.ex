@@ -11,6 +11,7 @@ defmodule BasketWeb.Components.SearchInput do
   prop ticker_search_form, :string, default: ""
 
   def mount(socket) do
+    # TODO: make ticker call async
     form = to_form(%{"ticker_search_field" => ""})
     socket = assign(socket, :ticker_search_form, form)
     socket = assign(socket, :tickers, [])
@@ -21,7 +22,7 @@ defmodule BasketWeb.Components.SearchInput do
   def render(assigns) do
     ~F"""
     <div>
-      <.simple_form for={@ticker_search_form} phx-change="ticker-search">
+      <.simple_form for={@ticker_search_form} phx-change="ticker-search" phx-submit="ticker-add">
         <.input
           name="selected-ticker"
           value=""
@@ -36,10 +37,12 @@ defmodule BasketWeb.Components.SearchInput do
             <option value={ticker}>{ticker}</option>
           {/for}
         </datalist>
+        <:actions>
+          <.button>
+            Add ticker
+          </.button>
+        </:actions>
       </.simple_form>
-      <.button>
-        Add ticker
-      </.button>
     </div>
     """
   end

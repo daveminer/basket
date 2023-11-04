@@ -1,6 +1,8 @@
 defmodule BasketWeb.Overview do
   use Surface.LiveView
 
+  import BasketWeb.CoreComponents
+
   require Logger
 
   alias BasketWeb.Components.SearchInput
@@ -8,7 +10,9 @@ defmodule BasketWeb.Overview do
   prop tickers, :list, default: []
 
   def mount(_, _, socket) do
-    {:ok, assign(socket, tickers: [])}
+    socket = assign(socket, tickers: [])
+    socket = assign(socket, basket: [])
+    {:ok, socket}
     # |> assign(:org, AsyncResult.loading())
     # |> start_async(:fetch_tickers, fn -> fetch_org!(id) end)}
   end
@@ -47,9 +51,17 @@ defmodule BasketWeb.Overview do
     end
   end
 
+  def handle_event("ticker-add", %{"selected-ticker" => ticker}, socket) do
+    IO.inspect("TICKER: #{ticker}")
+    {:reply, %{}, assign(socket, :basket, socket.assigns.basket ++ [ticker])}
+  end
+
   def render(assigns) do
     ~F"""
     <.live_component module={SearchInput} id="stock-search-input" tickers={@tickers} />
+    <.table id="ticker-list" rows={@basket}>
+      <:col :let={ticker} label="ticker">{ticker}</:col>
+    </.table>
     """
   end
 end

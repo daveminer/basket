@@ -18,7 +18,8 @@ defmodule Basket.Application do
       # {Basket.Worker, arg},
       # Start to serve requests, typically the last entry
       BasketWeb.Endpoint,
-      Basket.Alpaca.WsClient
+      Basket.Alpaca.WsClient,
+      {Cachex, name: :assets}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

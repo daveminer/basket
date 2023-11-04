@@ -68,9 +68,10 @@ config :basket, BasketWeb.Endpoint,
 config :basket, dev_routes: true
 
 config :basket, :alpaca,
-  api_key: "api-key-here",
-  api_secret: "secret-here",
-  ws_server_url: "wss://stream.data.alpaca.markets/v2"
+  api_key: "AKI55BR1BTU9PWT3LWBT",
+  api_secret: "TdBGXubqV9HwWG6YZmF8GxiCEBHrp8pLaCPultdc",
+  market_http_url: "https://api.alpaca.markets",
+  market_ws_url: "wss://stream.data.alpaca.markets/v2"
 
 # Do not include metadata nor timestamps in development logs
 config :logger, :console, format: "[$level] $message\n"

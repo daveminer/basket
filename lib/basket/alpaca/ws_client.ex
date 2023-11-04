@@ -33,7 +33,7 @@ defmodule Basket.Alpaca.WsClient do
   """
   @spec handle_frame(WebSockex.Frame.frame(), bitstring()) :: {:ok, bitstring()}
   def handle_frame({_type, @connection_success_msg}, state) do
-    Logger.info("Connection Message Received.")
+    Logger.info("Connection message received.")
 
     {:ok, state}
   end
@@ -45,29 +45,36 @@ defmodule Basket.Alpaca.WsClient do
   end
 
   def handle_frame({_type, msg}, state) do
-    message =
-      case Jason.decode(msg) do
-        {:ok, message} -> message
-        {:error, reason} -> Logger.error("Error decoding message.", reason: reason)
-      end
+    IO.inspect("MSGG: #{msg}")
 
-    if message["T"] == "q", do: handle_quote_message(message),
-      else: Logger.info("Message received: #{message}")
+    case Jason.decode(msg) do
+      {:ok, message} ->
+        Logger.info("MESSS: #{inspect(message)}")
+
+        if Map.get(List.first(message), "T") == "q" do
+          handle_quote_message(List.first(message))
+        else
+          Logger.info("Message received: #{inspect(message)}")
+        end
+
+      {:error, reason} ->
+        Logger.error("Error decoding message.", reason: reason)
+    end
 
     {:ok, state}
   end
 
   defp handle_quote_message(message) do
-    Logger.info("Quote Message: #{message}")
+    Logger.info("Quote message: #{inspect(message)}")
   end
 
   defp auth_headers, do: [{"APCA-API-KEY-ID", api_key()}, {"APCA-API-SECRET-KEY", api_secret()}]
 
-  defp iex_feed, do: "#{ws_server_url()}/iex"
+  defp iex_feed, do: "#{url()}/iex"
 
-  defp ws_server_url, do: Application.fetch_env!(:basket, :alpaca)[:ws_server_url]
+  defp url, do: Application.fetch_env!(:basket, :alpaca)[:market_ws_url]
 
   defp api_key, do: Application.fetch_env!(:basket, :alpaca)[:api_key]
 
   defp api_secret, do: Application.fetch_env!(:basket, :alpaca)[:api_secret]
-end()
+end

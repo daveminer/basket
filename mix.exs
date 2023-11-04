@@ -75,7 +75,9 @@ defmodule Basket.MixProject do
       {:dialyxir, "~> 1.4.2", runtime: false},
       {:mix_audit, "~> 2.1.1", runtime: false},
       {:pow, "~> 1.0.34"},
-      {:websockex, "~> 0.4.3"}
+      {:websockex, "~> 0.4.3"},
+      {:httpoison, "~> 2.1.0"},
+      {:cachex, "~> 3.6"}
     ]
   end
 

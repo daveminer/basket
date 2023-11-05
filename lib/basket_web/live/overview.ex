@@ -5,6 +5,7 @@ defmodule BasketWeb.Overview do
 
   require Logger
 
+  alias Basket.Alpaca.Websocket
   alias BasketWeb.Components.SearchInput
 
   prop tickers, :list, default: []
@@ -18,19 +19,13 @@ defmodule BasketWeb.Overview do
   end
 
   def handle_event("ticker-search", %{"selected-ticker" => _query}, socket) do
-    # IO.inspect("SOCKET: #{inspect(socket.assigns)}")
-
     if length(socket.assigns.tickers) > 0 do
       {:noreply, socket}
     else
       {_status, tickers} =
         Cachex.fetch(:assets, "all", fn _key ->
-          IO.inspect("REACTIVE")
-
           case Basket.Alpaca.HttpClient.list_assets() do
             {:ok, result} ->
-              IO.inspect("OK")
-
               tickers =
                 Enum.map(result, fn asset ->
                   asset["symbol"]
@@ -39,20 +34,18 @@ defmodule BasketWeb.Overview do
               {:commit, tickers}
 
             {:error, error} ->
-              IO.inspect("ERR:  #{inspect(error)}")
               Logger.error("Could not fetch tickers", error: error.reason)
               {:ignore, []}
           end
         end)
-
-      IO.inspect("HERE: #{inspect(tickers)}")
 
       {:reply, %{}, assign(socket, :tickers, tickers)}
     end
   end
 
   def handle_event("ticker-add", %{"selected-ticker" => ticker}, socket) do
-    IO.inspect("TICKER: #{ticker}")
+    # subscribe to ticker
+    Websocket.Client.subscribe_to_market_data(%{bars: [ticker], quotes: [], trades: []})
     {:reply, %{}, assign(socket, :basket, socket.assigns.basket ++ [ticker])}
   end
 

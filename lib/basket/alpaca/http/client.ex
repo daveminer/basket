@@ -1,42 +1,35 @@
 defmodule Basket.Alpaca.HttpClient do
-  alias Mint.HTTPError
   use HTTPoison.Base
 
   require Logger
 
-  @resource "/v2/assets"
+  @assets_resource "/v2/assets"
+  @latest_quotes_resource "/v2/stocks/quotes/latest"
 
   def process_request_headers(headers) do
     headers ++ [{"APCA-API-KEY-ID", api_key()}, {"APCA-API-SECRET-KEY", api_secret()}]
   end
 
+  # @spec asset_quotes(list(String.t())) :: {:error, any()} | {:ok, map()}
+  # def asset_quotes(ticker_list) do
+  #   case get(@latest_quotes_resource, [], params: %{symbols: Enum.join(ticker_list, ",")}) do
+  #     {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+  #       {:ok, body}
+
+  #     {:error, error} ->
+  #       {:error, error}
+  #   end
+  # end
+
   @spec list_assets() :: {:error, any()} | {:ok, list(map())}
   def list_assets() do
-    case get(@resource) do
+    case get(@assets_resource, [], params: %{status: "active", asset_class: "us_equity"}) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
         {:ok, body}
 
       {:error, error} ->
         {:error, error}
     end
-  end
-
-  @spec list_tickers() :: list(String.t()) | {:error, any()}
-  def list_tickers() do
-    case list_assets() do
-      {:ok, body} ->
-        Enum.map(body, fn asset ->
-          asset["symbol"]
-        end)
-
-      {:error, error} ->
-        {:error, error}
-    end
-  end
-
-  def process_request_params(params) do
-    Map.put(params, :status, "active")
-    |> Map.put(:asset_class, "us_equity")
   end
 
   def process_request_url(resource) do

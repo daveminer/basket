@@ -68,8 +68,8 @@ config :basket, BasketWeb.Endpoint,
 config :basket, dev_routes: true
 
 config :basket, :alpaca,
-  api_key: "AKI55BR1BTU9PWT3LWBT",
-  api_secret: "TdBGXubqV9HwWG6YZmF8GxiCEBHrp8pLaCPultdc",
+  api_key: System.get_env("ALPACA_API_KEY"),
+  api_secret: System.get_env("ALPACA_API_SECRET"),
   market_http_url: "https://api.alpaca.markets",
   market_ws_url: "wss://stream.data.alpaca.markets/v2"
 

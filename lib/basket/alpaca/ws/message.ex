@@ -1,8 +1,24 @@
 defmodule Basket.Alpaca.Websocket.Message do
   require Logger
 
-  # @default_subscription_msg "{\"action\":\"subscribe\",\"trades\":[\"AAPL\"],\"quotes\":[\"AMD\",\"CLDR\"],\
-  #         \"bars\":[\"*\"]}"
+  @spec process(bitstring())
+  def process(messages) do
+    Enum.map(messages, fn message ->
+      case Map.get(message, "T") do
+        "b" ->
+          handle_bars(message)
+
+        "d" ->
+          handle_daily_bars(message)
+
+        "u" ->
+          handle_bar_updates(message)
+
+        "error" ->
+          Logger.error("Error message from Alpaca websocket connection.", message: message)
+      end
+    end)
+  end
 
   @spec market_data_subscription(%{
           :bars => list(String.t()),
@@ -17,7 +33,7 @@ defmodule Basket.Alpaca.Websocket.Message do
     }
 
     message = if bars, do: Map.put(message, :bars, bars), else: message
-    message = if bars, do: Map.put(message, :quotes, quotes), else: message
+    message = if quotes, do: Map.put(message, :quotes, quotes), else: message
     message = if trades, do: Map.put(message, :trades, trades), else: message
 
     case Jason.encode(message) do
@@ -29,5 +45,18 @@ defmodule Basket.Alpaca.Websocket.Message do
 
         {:error, reason}
     end
+  end
+
+  defp handle_bars(message) do
+    # TODO: send to Liveview
+    Logger.info("Bars message received", message: message)
+  end
+
+  defp handle_daily_bars(message) do
+    Logger.info("Daily bars message received", message: message)
+  end
+
+  defp handle_bar_updates(message) do
+    Logger.info("Bar updates message received", message: message)
   end
 end

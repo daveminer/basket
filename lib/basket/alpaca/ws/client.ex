@@ -14,13 +14,6 @@ defmodule Basket.Alpaca.Websocket.Client do
     WebSockex.start_link(iex_feed(), __MODULE__, state, extra_headers: auth_headers())
   end
 
-  def handle_cast(msg, state) do
-    IO.inspect("handle_cast: #{inspect(msg)}")
-    res = super(msg, state)
-    IO.inspect(res, label: "RES")
-    res
-  end
-
   @spec handle_connect(WebsockEx.Conn.t(), bitstring()) :: {:ok, bitstring()}
   def handle_connect(_conn, state) do
     Logger.info("Alpaca websocket connected.")
@@ -48,20 +41,13 @@ defmodule Basket.Alpaca.Websocket.Client do
   def handle_frame({_type, @auth_success}, state) do
     Logger.info("Alpaca websocket authenticated.")
 
-    # {:reply, {type, Message.default_subscription()}, state}
     {:ok, state}
   end
 
-  def handle_frame({_type, msg}, state) do
-    IO.inspect("handle_frame: #{inspect(msg)}")
-
+  def handle_frame({_tpe, msg}, state) do
     case Jason.decode(msg) do
       {:ok, message} ->
-        if Map.get(List.first(message), "T") == "q" do
-          handle_quote_message(List.first(message))
-        else
-          Logger.info("Message received: #{inspect(message)}")
-        end
+        Message.process(message)
 
       {:error, reason} ->
         Logger.error("Error decoding message.", reason: reason)
@@ -79,7 +65,7 @@ defmodule Basket.Alpaca.Websocket.Client do
     case Message.market_data_subscription(tickers) do
       {:ok, message} ->
         Logger.info("Sending subscription message: #{inspect(message)}")
-        # pid = Process.whereis(Basket.Alpaca.Websocket.Client)
+
         pid =
           Supervisor.which_children(Basket.Supervisor)
           |> Enum.find(fn c ->
@@ -93,18 +79,12 @@ defmodule Basket.Alpaca.Websocket.Client do
           end)
           |> elem(1)
 
-        IO.inspect("PROCESS: #{inspect(pid)}")
-        # WebSockex.cast(pid, {:text, message})
         WebSockex.send_frame(pid, {:text, message})
         Logger.info("Subscription message sent.")
 
       {:error, reason} ->
         Logger.error("Error sending subscription message.", reason: reason)
     end
-  end
-
-  defp handle_quote_message(message) do
-    Logger.info("Quote message: #{inspect(message)}")
   end
 
   defp auth_headers, do: [{"APCA-API-KEY-ID", api_key()}, {"APCA-API-SECRET-KEY", api_secret()}]

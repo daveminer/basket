@@ -5,14 +5,17 @@ defmodule BasketWeb.Overview do
 
   require Logger
 
-  alias Basket.Alpaca.Websocket
+  alias Basket.Alpaca.Websocket.{Client, Message}
   alias BasketWeb.Components.SearchInput
 
   prop tickers, :list, default: []
 
   def mount(_, _, socket) do
+    BasketWeb.Endpoint.subscribe(Message.bars_topic())
+
     socket = assign(socket, tickers: [])
     socket = assign(socket, basket: [])
+
     {:ok, socket}
     # |> assign(:org, AsyncResult.loading())
     # |> start_async(:fetch_tickers, fn -> fetch_org!(id) end)}
@@ -44,23 +47,47 @@ defmodule BasketWeb.Overview do
   end
 
   def handle_event("ticker-add", %{"selected-ticker" => ticker}, socket) do
-    # subscribe to ticker
-    Websocket.Client.subscribe_to_market_data(%{bars: [ticker], quotes: [], trades: []})
-    {:reply, %{}, assign(socket, :basket, socket.assigns.basket ++ [ticker])}
+    :ok = Client.subscribe_to_market_data(%{bars: [ticker], quotes: [], trades: []})
+
+    socket =
+      case Basket.Alpaca.HttpClient.latest_quote(ticker) do
+        {:ok, response} ->
+          %{"bars" => %{^ticker => bars}} = response
+          assign(socket, :basket, socket.assigns.basket ++ [Map.merge(bars, %{"S" => ticker})])
+
+        {:error, error} ->
+          Logger.error("Could not subscribe to ticker", reason: error.reason)
+          socket
+      end
+
+    {:reply, %{}, socket}
   end
 
   def handle_event("ticker-remove", %{"ticker" => ticker}, socket) do
+    :ok = Client.unsubscribe_to_market_data(%{bars: [ticker], quotes: [], trades: []})
+
     {:reply, %{},
-     assign(socket, :basket, Enum.filter(socket.assigns.basket, fn t -> t != ticker end))}
+     assign(socket, :basket, Enum.filter(socket.assigns.basket, fn t -> t["S"] != ticker end))}
+  end
+
+  def handle_event("ticker-update", message, socket) do
+    IO.inspect("GOT IT CLIENT: #{inspect(message)}")
+    {:noreply, socket}
   end
 
   def render(assigns) do
     ~F"""
     <.live_component module={SearchInput} id="stock-search-input" tickers={@tickers} />
     <.table id="ticker-list" rows={@basket}>
-      <:col :let={ticker} label="ticker">{ticker}</:col>
+      <:col :let={ticker} label="ticker">{ticker["S"]}</:col>
+      <:col :let={ticker} label="open">{ticker["o"]}</:col>
+      <:col :let={ticker} label="high">{ticker["h"]}</:col>
+      <:col :let={ticker} label="low">{ticker["l"]}</:col>
+      <:col :let={ticker} label="close">{ticker["c"]}</:col>
+      <:col :let={ticker} label="volume">{ticker["v"]}</:col>
+      <:col :let={ticker} label="timestamp">{ticker["t"]}</:col>
       <:col :let={ticker} label="remove">
-        <.button phx-click="ticker-remove" phx-value-ticker={ticker}>
+        <.button phx-click="ticker-remove" phx-value-ticker={ticker["S"]}>
           Remove
         </.button>
       </:col>

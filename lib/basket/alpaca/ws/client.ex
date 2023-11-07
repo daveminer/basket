@@ -45,6 +45,8 @@ defmodule Basket.Alpaca.Websocket.Client do
   end
 
   def handle_frame({_tpe, msg}, state) do
+    IO.inspect("MESSAGEEEE: #{msg}")
+
     case Jason.decode(msg) do
       {:ok, message} ->
         Message.process(message)
@@ -56,34 +58,29 @@ defmodule Basket.Alpaca.Websocket.Client do
     {:ok, state}
   end
 
-  @spec subscribe_to_market_data(%{
-          :bars => list(String.t()),
-          :quotes => list(String.t()),
-          :trades => list(String.t())
-        }) :: :ok
+  @spec subscribe_to_market_data(Message.subscription_fields()) :: :ok
   def subscribe_to_market_data(tickers) do
     case Message.market_data_subscription(tickers) do
       {:ok, message} ->
-        Logger.info("Sending subscription message: #{inspect(message)}")
+        WebSockex.send_frame(client_pid(), {:text, message})
+        Logger.info("Subscription message sent.", message: inspect(message))
 
-        pid =
-          Supervisor.which_children(Basket.Supervisor)
-          |> Enum.find(fn c ->
-            case c do
-              {Basket.Alpaca.Websocket.Client, _pid, :worker, [Basket.Alpaca.Websocket.Client]} ->
-                true
+      {:error, error} ->
+        Logger.error("Error sending subscription message.", error: error)
+    end
+  end
 
-              _ ->
-                false
-            end
-          end)
-          |> elem(1)
+  @spec unsubscribe_to_market_data(Message.subscription_fields()) :: :ok
+  def unsubscribe_to_market_data(tickers) do
+    case Message.market_data_remove_subscription(tickers) do
+      {:ok, message} ->
+        Logger.info("Sending subscription removal message: #{inspect(message)}")
 
-        WebSockex.send_frame(pid, {:text, message})
-        Logger.info("Subscription message sent.")
+        WebSockex.send_frame(client_pid(), {:text, message})
+        Logger.info("Subscription removal message sent.", message: inspect(message))
 
-      {:error, reason} ->
-        Logger.error("Error sending subscription message.", reason: reason)
+      {:error, error} ->
+        Logger.error("Error sending subscription removal message.", error: error)
     end
   end
 
@@ -96,4 +93,18 @@ defmodule Basket.Alpaca.Websocket.Client do
   defp api_key, do: Application.fetch_env!(:basket, :alpaca)[:api_key]
 
   defp api_secret, do: Application.fetch_env!(:basket, :alpaca)[:api_secret]
+
+  defp client_pid,
+    do:
+      Supervisor.which_children(Basket.Supervisor)
+      |> Enum.find(fn c ->
+        case c do
+          {Basket.Alpaca.Websocket.Client, _pid, :worker, [Basket.Alpaca.Websocket.Client]} ->
+            true
+
+          _ ->
+            false
+        end
+      end)
+      |> elem(1)
 end

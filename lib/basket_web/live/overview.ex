@@ -13,6 +13,7 @@ defmodule BasketWeb.Overview do
   def mount(_, _, socket) do
     BasketWeb.Endpoint.subscribe(Message.bars_topic())
 
+    IO.inspect("SOCKASH: #{inspect(socket)}")
     socket = assign(socket, tickers: [])
     socket = assign(socket, basket: [])
 
@@ -22,6 +23,8 @@ defmodule BasketWeb.Overview do
   end
 
   def handle_event("ticker-search", %{"selected-ticker" => _query}, socket) do
+    IO.inspect(socket, limit: :infinity)
+
     if length(socket.assigns.tickers) > 0 do
       {:noreply, socket}
     else
@@ -53,7 +56,14 @@ defmodule BasketWeb.Overview do
       case Basket.Alpaca.HttpClient.latest_quote(ticker) do
         {:ok, response} ->
           %{"bars" => %{^ticker => bars}} = response
-          assign(socket, :basket, socket.assigns.basket ++ [Map.merge(bars, %{"S" => ticker})])
+
+          initial_bars = for {k, v} <- bars, into: %{}, do: {k, {v, ""}}
+
+          assign(
+            socket,
+            :basket,
+            socket.assigns.basket ++ [Map.merge(initial_bars, %{"S" => {ticker, ""}})]
+          )
 
         {:error, error} ->
           Logger.error("Could not subscribe to ticker", reason: error.reason)
@@ -67,31 +77,138 @@ defmodule BasketWeb.Overview do
     :ok = Client.unsubscribe_to_market_data(%{bars: [ticker], quotes: [], trades: []})
 
     {:reply, %{},
-     assign(socket, :basket, Enum.filter(socket.assigns.basket, fn t -> t["S"] != ticker end))}
+     assign(
+       socket,
+       :basket,
+       Enum.filter(socket.assigns.basket, fn t -> Enum.at(t["S"], 0) != ticker end)
+     )}
   end
 
-  def handle_event("ticker-update", message, socket) do
-    IO.inspect("GOT IT CLIENT: #{inspect(message)}")
-    {:noreply, socket}
+  # def handle_event("ticker-update", message, socket) do
+  #   IO.inspect("GOT IT CLIENT: #{inspect(message)}")
+  #   {:noreply, socket}
+  # end
+
+  # Test Message : "MESSAGEEEE: [{\"T\":\"b\",\"S\":\"AAPL\",\"o\":182.675,\"h\":182.73,\"l\":182.665,\"c\":182.73,\"v\":2802,\"t\":\"2023-11-08T20:25:00Z\",\"n\":36,\"vw\":182.694461}]"
+  bars = %{
+    "T" => {"b", ""},
+    "S" => {"AAPL", ""},
+    "o" => {82.675, ""},
+    "h" => {182.73, ""},
+    "l" => {182.665, ""},
+    "c" => {182.73, ""},
+    "v" => {2802, ""},
+    "t" => {"2023-11-08T20:25:00Z", ""},
+    "n" => {36, ""},
+    "vw" => {182.694461, ""}
+  }
+
+  socket = %{
+    assigns: %{
+      __changed__: %{
+        __context__: true
+      },
+      __context__: %{},
+      flash: %{},
+      live_action: nil,
+      basket: [
+        %{
+          "S" => {"AAPL", ""},
+          "c" => {182.89, ""},
+          "h" => {182.99, ""},
+          "l" => {182.89, ""},
+          "n" => {412, ""},
+          "o" => {182.935, ""},
+          "t" => {"2023-11-08T20:59:00Z", ""},
+          "v" => {43514, ""},
+          "vw" => {182.956702, ""}
+        }
+      ]
+    }
+  }
+
+  # BasketWeb.Overview.handle_info(%Phoenix.Socket.Broadcast{topic: "bars", event: "ticker-update", payload: bars}, socket)
+  def handle_info(
+        %Phoenix.Socket.Broadcast{topic: "bars", event: "ticker-update", payload: bars},
+        socket
+      ) do
+    IO.inspect("HANDLE_INFO: #{inspect(bars)}")
+    # Get the old ticker data
+    old_ticker =
+      Enum.find(socket.assigns.basket, fn t -> elem(t["S"], 0) == elem(bars["S"], 0) end)
+
+    IO.inspect("OLD TICK #{inspect(old_ticker)}")
+
+    bars_with_changes =
+      for {k, v} <- bars, into: %{} do
+        {val, _change} = {k, {v, ""}}
+
+        if k in ["S", "T", "t", "n"] do
+          {k, {val, ""}}
+        else
+          IO.inspect("K IS: #{k}")
+          {k, {val, diff_direction(old_ticker[k], bars[k])}}
+        end
+      end
+
+    IO.inspect(
+      "HANDLE_INFO: #{inspect(socket.assigns.basket ++ [Map.merge(bars_with_changes, %{"S" => bars["S"]})])}"
+    )
+
+    # directions = %{
+    #   "o_change" => diff_direction(old_ticker["o"], bars["o"]),
+    #   "c_change" => diff_direction(old_ticker["c"], bars["c"]),
+    #   "h_change" => diff_direction(old_ticker["h"], bars["h"]),
+    #   "l_change" => diff_direction(old_ticker["l"], bars["l"]),
+    #   "v_change" => diff_direction(old_ticker["v"], bars["v"]),
+    #   "vw_change" => diff_direction(old_ticker["vw"], bars["vw"])
+    # }
+
+    # socket = assign(socket, :basket, Map.merge(bars, directions))
+    # IO.inspect("BASKET IS: #{inspect(socket.assigns.basket)}")
+
+    new_basket =
+      Enum.map(socket.assigns.basket, fn row ->
+        if elem(row["S"], 0) == elem(bars["S"], 0),
+          do: Map.merge(bars_with_changes, %{"S" => bars["S"]}),
+          else: row
+      end)
+
+    IO.inspect("NB: #{inspect(new_basket)}")
+
+    {:noreply,
+     assign(
+       socket,
+       :basket,
+       new_basket
+     )}
   end
 
   def render(assigns) do
     ~F"""
     <.live_component module={SearchInput} id="stock-search-input" tickers={@tickers} />
     <.table id="ticker-list" rows={@basket}>
-      <:col :let={ticker} label="ticker">{ticker["S"]}</:col>
-      <:col :let={ticker} label="open">{ticker["o"]}</:col>
-      <:col :let={ticker} label="high">{ticker["h"]}</:col>
-      <:col :let={ticker} label="low">{ticker["l"]}</:col>
-      <:col :let={ticker} label="close">{ticker["c"]}</:col>
-      <:col :let={ticker} label="volume">{ticker["v"]}</:col>
-      <:col :let={ticker} label="timestamp">{ticker["t"]}</:col>
+      <:col :let={ticker} key="S" label="ticker">{elem(ticker["c"], 0)}</:col>
+      <:col :let={ticker} key="o" label="open">{elem(ticker["o"], 0)}</:col>
+      <:col :let={ticker} key="h" label="high">{elem(ticker["h"], 0)}</:col>
+      <:col :let={ticker} key="l" label="low">{elem(ticker["l"], 0)}</:col>
+      <:col :let={ticker} key="c" label="close">{elem(ticker["c"], 0)}</:col>
+      <:col :let={ticker} key="v" label="volume">{elem(ticker["v"], 0)}</:col>
+      <:col :let={ticker} key="t" label="timestamp">{elem(ticker["t"], 0)}</:col>
       <:col :let={ticker} label="remove">
-        <.button phx-click="ticker-remove" phx-value-ticker={ticker["S"]}>
+        <.button phx-click="ticker-remove" phx-value-ticker={elem(ticker["S"], 0)}>
           Remove
         </.button>
-      </:col>
+      </:col>"
     </.table>
     """
+  end
+
+  defp diff_direction(old, new) do
+    cond do
+      elem(old, 0) > elem(new, 0) -> "up"
+      elem(old, 0) < elem(new, 0) -> "down"
+      true -> "same"
+    end
   end
 end

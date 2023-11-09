@@ -494,7 +494,11 @@ defmodule BasketWeb.CoreComponents do
             <td
               :for={{col, i} <- Enum.with_index(@col)}
               phx-click={@row_click && @row_click.(row)}
-              class={["relative p-0", @row_click && "hover:cursor-pointer"]}
+              class={[
+                "relative p-0",
+                @row_click && "hover:cursor-pointer",
+                diff_color(col, row)
+              ]}
             >
               <div class="block py-4 pr-6">
                 <span class="absolute -inset-y-px right-0 -left-4 group-hover:bg-zinc-50 sm:rounded-l-xl" />
@@ -672,5 +676,24 @@ defmodule BasketWeb.CoreComponents do
   """
   def translate_errors(errors, field) when is_list(errors) do
     for {^field, {msg, opts}} <- errors, do: translate_error({msg, opts})
+  end
+
+  def diff_color(col, row) do
+    IO.inspect("COL: #{inspect(col)}")
+    IO.inspect("ROW: #{inspect(row)}")
+
+    if is_map(row) do
+      color_change_key = "#{col["key"]}_change"
+
+      IO.inspect("ROWCOLORCHANGE: #{row[color_change_key]}")
+
+      case row[color_change_key] do
+        "up" -> "bg-emerald-50 text-emerald-900"
+        "down" -> "bg-rose-50 text-rose-900"
+        _ -> ""
+      end
+    else
+      IO.inspect("TODO:NOTAMAP: #{inspect(row)}")
+    end
   end
 end

@@ -11,6 +11,8 @@ defmodule Basket.Alpaca.Websocket.Message do
 
   @spec process(bitstring()) :: :ok
   def process(messages) do
+    IO.inspect("MESSAGES: #{inspect(messages)}")
+
     Enum.map(messages, fn message ->
       case Map.get(message, "T") do
         "b" ->
@@ -103,9 +105,6 @@ defmodule Basket.Alpaca.Websocket.Message do
        ) do
     Logger.info("Bars message received", message: message)
     BasketWeb.Endpoint.broadcast_from(self(), @bars_topic, "ticker-update", message)
-    # push_event(BasketWeb.Endpoint, "overview:handle_event", %{
-    #   message: message
-    # })
   end
 
   defp handle_daily_bars(message) do

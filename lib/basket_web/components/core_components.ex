@@ -685,8 +685,6 @@ defmodule BasketWeb.CoreComponents do
     if is_map(row) do
       color_change_key = "#{col["key"]}_change"
 
-      IO.inspect("ROWCOLORCHANGE: #{row[color_change_key]}")
-
       case row[color_change_key] do
         "up" -> "bg-emerald-50 text-emerald-900"
         "down" -> "bg-rose-50 text-rose-900"

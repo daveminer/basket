@@ -91,16 +91,16 @@ defmodule BasketWeb.Overview do
 
   # Test Message : "MESSAGEEEE: [{\"T\":\"b\",\"S\":\"AAPL\",\"o\":182.675,\"h\":182.73,\"l\":182.665,\"c\":182.73,\"v\":2802,\"t\":\"2023-11-08T20:25:00Z\",\"n\":36,\"vw\":182.694461}]"
   bars = %{
-    "T" => {"b", ""},
-    "S" => {"AAPL", ""},
-    "o" => {82.675, ""},
-    "h" => {182.73, ""},
-    "l" => {182.665, ""},
-    "c" => {182.73, ""},
-    "v" => {2802, ""},
-    "t" => {"2023-11-08T20:25:00Z", ""},
-    "n" => {36, ""},
-    "vw" => {182.694461, ""}
+    "T" => "b",
+    "S" => "AAPL",
+    "o" => 82.675,
+    "h" => 182.73,
+    "l" => 182.665,
+    "c" => 182.73,
+    "v" => 2802,
+    "t" => "2023-11-08T20:25:00Z",
+    "n" => 36,
+    "vw" => 182.694461
   }
 
   socket = %{
@@ -134,20 +134,16 @@ defmodule BasketWeb.Overview do
       ) do
     IO.inspect("HANDLE_INFO: #{inspect(bars)}")
     # Get the old ticker data
-    old_ticker =
-      Enum.find(socket.assigns.basket, fn t -> elem(t["S"], 0) == elem(bars["S"], 0) end)
-
-    IO.inspect("OLD TICK #{inspect(old_ticker)}")
+    old_ticker = Enum.find(socket.assigns.basket, fn t -> elem(t["S"], 0) == bars["S"] end)
 
     bars_with_changes =
       for {k, v} <- bars, into: %{} do
-        {val, _change} = {k, {v, ""}}
-
         if k in ["S", "T", "t", "n"] do
-          {k, {val, ""}}
+          {k, {v, ""}}
         else
           IO.inspect("K IS: #{k}")
-          {k, {val, diff_direction(old_ticker[k], bars[k])}}
+          IO.inspect("DIFFDIR: #{diff_direction(old_ticker[k], bars[k])}")
+          {k, {v, diff_direction(old_ticker[k], bars[k])}}
         end
       end
 
@@ -155,22 +151,10 @@ defmodule BasketWeb.Overview do
       "HANDLE_INFO: #{inspect(socket.assigns.basket ++ [Map.merge(bars_with_changes, %{"S" => bars["S"]})])}"
     )
 
-    # directions = %{
-    #   "o_change" => diff_direction(old_ticker["o"], bars["o"]),
-    #   "c_change" => diff_direction(old_ticker["c"], bars["c"]),
-    #   "h_change" => diff_direction(old_ticker["h"], bars["h"]),
-    #   "l_change" => diff_direction(old_ticker["l"], bars["l"]),
-    #   "v_change" => diff_direction(old_ticker["v"], bars["v"]),
-    #   "vw_change" => diff_direction(old_ticker["vw"], bars["vw"])
-    # }
-
-    # socket = assign(socket, :basket, Map.merge(bars, directions))
-    # IO.inspect("BASKET IS: #{inspect(socket.assigns.basket)}")
-
     new_basket =
       Enum.map(socket.assigns.basket, fn row ->
-        if elem(row["S"], 0) == elem(bars["S"], 0),
-          do: Map.merge(bars_with_changes, %{"S" => bars["S"]}),
+        if elem(row["S"], 0) == bars["S"],
+          do: Map.merge(bars_with_changes, %{"S" => {bars["S"], ""}}),
           else: row
       end)
 
@@ -188,7 +172,7 @@ defmodule BasketWeb.Overview do
     ~F"""
     <.live_component module={SearchInput} id="stock-search-input" tickers={@tickers} />
     <.table id="ticker-list" rows={@basket}>
-      <:col :let={ticker} key="S" label="ticker">{elem(ticker["c"], 0)}</:col>
+      <:col :let={ticker} key="S" label="ticker">{elem(ticker["S"], 0)}</:col>
       <:col :let={ticker} key="o" label="open">{elem(ticker["o"], 0)}</:col>
       <:col :let={ticker} key="h" label="high">{elem(ticker["h"], 0)}</:col>
       <:col :let={ticker} key="l" label="low">{elem(ticker["l"], 0)}</:col>
@@ -206,8 +190,8 @@ defmodule BasketWeb.Overview do
 
   defp diff_direction(old, new) do
     cond do
-      elem(old, 0) > elem(new, 0) -> "up"
-      elem(old, 0) < elem(new, 0) -> "down"
+      elem(old, 0) > new -> "up"
+      elem(old, 0) < new -> "down"
       true -> "same"
     end
   end

@@ -682,16 +682,19 @@ defmodule BasketWeb.CoreComponents do
     IO.inspect("COL: #{inspect(col)}")
     IO.inspect("ROW: #{inspect(row)}")
 
-    if is_map(row) do
-      color_change_key = "#{col["key"]}_change"
+    key = Map.get(col, :key)
 
-      case row[color_change_key] do
-        "up" -> "bg-emerald-50 text-emerald-900"
-        "down" -> "bg-rose-50 text-rose-900"
+    if is_map(row) && key do
+      field = row[key]
+      IO.inspect("FIELD: #{inspect(field)}")
+
+      case elem(field, 1) do
+        "up" -> "bg-emerald-200 text-emerald-900"
+        "down" -> "bg-rose-200 text-rose-900"
         _ -> ""
       end
     else
-      IO.inspect("TODO:NOTAMAP: #{inspect(row)}")
+      IO.inspect("TODO:NOTAMAPORNILKEY: #{inspect(row)}")
     end
   end
 end

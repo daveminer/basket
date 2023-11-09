@@ -190,6 +190,7 @@ defmodule BasketWeb.Overview do
 
   defp diff_direction(old, new) do
     cond do
+      !is_tuple(old) -> "same"
       elem(old, 0) > new -> "up"
       elem(old, 0) < new -> "down"
       true -> "same"

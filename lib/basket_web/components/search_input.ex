@@ -21,7 +21,7 @@ defmodule BasketWeb.Components.SearchInput do
 
   def render(assigns) do
     ~F"""
-    <div>
+    <div class="flex-row">
       <.simple_form for={@ticker_search_form} phx-change="ticker-search" phx-submit="ticker-add">
         <.input
           name="selected-ticker"

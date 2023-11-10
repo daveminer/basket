@@ -479,7 +479,7 @@ defmodule BasketWeb.CoreComponents do
       <table class="w-[40rem] mt-11 sm:w-full">
         <thead class="text-sm text-left leading-6 text-zinc-500">
           <tr>
-            <th :for={col <- @col} class="p-0 pb-4 pr-6 font-normal"><%= col[:label] %></th>
+            <th :for={col <- @col} class="p-0 pb-4 pr-6 text-center font-normal"><%= col[:label] %></th>
             <th :if={@action != []} class="relative p-0 pb-4">
               <span class="sr-only"><%= gettext("Actions") %></span>
             </th>
@@ -487,6 +487,7 @@ defmodule BasketWeb.CoreComponents do
         </thead>
         <tbody
           id={@id}
+          phx-hook="BarTableUpdated"
           phx-update={match?(%Phoenix.LiveView.LiveStream{}, @rows) && "stream"}
           class="relative divide-y divide-zinc-100 border-t border-zinc-200 text-sm leading-6 text-zinc-700"
         >
@@ -496,6 +497,7 @@ defmodule BasketWeb.CoreComponents do
               phx-click={@row_click && @row_click.(row)}
               class={[
                 "relative p-0",
+                "text-center",
                 @row_click && "hover:cursor-pointer",
                 diff_color(col, row)
               ]}
@@ -679,22 +681,18 @@ defmodule BasketWeb.CoreComponents do
   end
 
   def diff_color(col, row) do
-    IO.inspect("COL: #{inspect(col)}")
-    IO.inspect("ROW: #{inspect(row)}")
-
     key = Map.get(col, :key)
 
     if is_map(row) && key do
       field = row[key]
-      IO.inspect("FIELD: #{inspect(field)}")
 
       case elem(field, 1) do
-        "up" -> "bg-emerald-200 text-emerald-900"
-        "down" -> "bg-rose-200 text-rose-900"
+        "up" -> "bg-emerald-300 text-emerald-900"
+        "down" -> "bg-rose-300 text-rose-900"
         _ -> ""
       end
     else
-      IO.inspect("TODO:NOTAMAPORNILKEY: #{inspect(row)}")
+      IO.inspect("TODO:NOTAMAP OR NIL KEY: #{inspect(row)}")
     end
   end
 end

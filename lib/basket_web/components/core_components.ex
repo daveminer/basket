@@ -177,7 +177,6 @@ defmodule BasketWeb.CoreComponents do
     """
   end
 
-
   @doc """
   Renders an inline form.
 

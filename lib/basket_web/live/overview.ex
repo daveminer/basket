@@ -50,7 +50,7 @@ defmodule BasketWeb.Overview do
           )
 
         {:error, error} ->
-          Logger.error("Could not subscribe to ticker", reason: error.reason)
+          Logger.error("Could not subscribe to ticker: #{error}")
           socket
       end
 
@@ -144,7 +144,8 @@ defmodule BasketWeb.Overview do
         {:commit, tickers}
 
       {:error, error} ->
-        Logger.error("Could not fetch tickers", error: error.reason)
+        Logger.error("Could not fetch tickers: #{error}")
+
         {:ignore, []}
     end
   end

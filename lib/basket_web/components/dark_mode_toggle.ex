@@ -16,7 +16,7 @@ defmodule BasketWeb.Components.DarkModeToggle do
   def render(assigns) do
     ~F"""
     <div class="justify-center">
-      <input type="checkbox" name="light-switch" class="light-switch sr-only" />
+      <input type="checkbox" name="light-switch" class="light-switch sr-only">
       <label class="relative cursor-pointer p-2" for="light-switch">
         <.icon name="hero-sun-solid" class="dark:hidden w-8 h-8" />
         <.icon name="hero-moon-solid" class="hidden dark:block w-8 h-8" />

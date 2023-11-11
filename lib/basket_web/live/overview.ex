@@ -117,7 +117,7 @@ defmodule BasketWeb.Overview do
     ~F"""
     <div class="flex-col p-8">
       <NavRow />
-      <div class="w-1/4" >
+      <div class="w-1/4">
         <.live_component module={SearchInput} id="stock-search-input" tickers={@tickers} />
       </div>
       <.table id="ticker-list" rows={@basket}>

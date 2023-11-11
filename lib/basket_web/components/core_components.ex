@@ -721,16 +721,12 @@ defmodule BasketWeb.CoreComponents do
   def diff_color(col, row) do
     key = Map.get(col, :key)
 
-    if is_map(row) && key do
-      field = row[key]
+    field = row[key]
 
-      case elem(field, 1) do
-        "up" -> "bg-emerald-300 text-emerald-900"
-        "down" -> "bg-rose-300 text-rose-900"
-        _ -> ""
-      end
-    else
-      Logger.error("Should be a map: #{row}")
+    case elem(field, 1) do
+      "up" -> "bg-emerald-300 text-emerald-900"
+      "down" -> "bg-rose-300 text-rose-900"
+      _ -> ""
     end
   end
 end

@@ -8,10 +8,9 @@ defmodule BasketWeb.Overview do
 
   require Logger
 
-  alias BasketWeb.Components.NavRow
-  alias Basket.Alpaca.Websocket.{Client, Message}
   alias Basket.Alpaca.HttpClient
-  alias BasketWeb.Components.SearchInput
+  alias Basket.Alpaca.Websocket.{Client, Message}
+  alias BasketWeb.Components.{NavRow, SearchInput}
 
   prop tickers, :list, default: []
 

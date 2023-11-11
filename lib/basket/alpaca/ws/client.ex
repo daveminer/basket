@@ -19,7 +19,7 @@ defmodule Basket.Alpaca.Websocket.Client do
     WebSockex.start_link(iex_feed(), __MODULE__, state, extra_headers: auth_headers())
   end
 
-  @spec handle_connect(WebsockEx.Conn.t(), bitstring()) :: {:ok, bitstring()}
+  @spec handle_connect(Websockex.Conn.t(), bitstring()) :: {:ok, bitstring()}
   def handle_connect(_conn, state) do
     Logger.info("Alpaca websocket connected.")
     {:ok, state}

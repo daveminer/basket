@@ -730,7 +730,7 @@ defmodule BasketWeb.CoreComponents do
         _ -> ""
       end
     else
-      IO.inspect("TODO:NOTAMAP OR NIL KEY: #{inspect(row)}")
+      Logger.error("Should be a map: #{row}")
     end
   end
 end

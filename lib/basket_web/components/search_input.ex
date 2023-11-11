@@ -22,7 +22,7 @@ defmodule BasketWeb.Components.SearchInput do
   def render(assigns) do
     ~F"""
     <div class="flex-row">
-      <.simple_form for={@ticker_search_form} phx-change="ticker-search" phx-submit="ticker-add">
+      <.inline_form for={@ticker_search_form} phx-change="ticker-search" phx-submit="ticker-add">
         <.input
           name="selected-ticker"
           value=""
@@ -38,18 +38,12 @@ defmodule BasketWeb.Components.SearchInput do
           {/for}
         </datalist>
         <:actions>
-          <.button>
-            Add ticker
+          <.button class="whitespace-nowrap">
+            Add
           </.button>
         </:actions>
-      </.simple_form>
+      </.inline_form>
     </div>
     """
   end
 end
-
-# {text_input(:search_field, :query,
-#   autofocus: true,
-#   list: "tickers",
-#   "phx-debounce": "300"
-# )}

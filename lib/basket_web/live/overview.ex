@@ -5,6 +5,7 @@ defmodule BasketWeb.Overview do
 
   require Logger
 
+  alias BasketWeb.Components.NavRow
   alias Basket.Alpaca.Websocket.{Client, Message}
   alias BasketWeb.Components.SearchInput
 
@@ -13,7 +14,6 @@ defmodule BasketWeb.Overview do
   def mount(_, _, socket) do
     BasketWeb.Endpoint.subscribe(Message.bars_topic())
 
-    IO.inspect("SOCKASH: #{inspect(socket)}")
     socket = assign(socket, tickers: [])
     socket = assign(socket, basket: [])
 
@@ -23,8 +23,6 @@ defmodule BasketWeb.Overview do
   end
 
   def handle_event("ticker-search", %{"selected-ticker" => _query}, socket) do
-    IO.inspect(socket, limit: :infinity)
-
     if length(socket.assigns.tickers) > 0 do
       {:noreply, socket}
     else
@@ -84,55 +82,10 @@ defmodule BasketWeb.Overview do
      )}
   end
 
-  # def handle_event("ticker-update", message, socket) do
-  #   IO.inspect("GOT IT CLIENT: #{inspect(message)}")
-  #   {:noreply, socket}
-  # end
-
-  # Test Message : "MESSAGEEEE: [{\"T\":\"b\",\"S\":\"AAPL\",\"o\":182.675,\"h\":182.73,\"l\":182.665,\"c\":182.73,\"v\":2802,\"t\":\"2023-11-08T20:25:00Z\",\"n\":36,\"vw\":182.694461}]"
-  bars = %{
-    "T" => "b",
-    "S" => "AAPL",
-    "o" => 82.675,
-    "h" => 182.73,
-    "l" => 182.665,
-    "c" => 182.73,
-    "v" => 2802,
-    "t" => "2023-11-08T20:25:00Z",
-    "n" => 36,
-    "vw" => 182.694461
-  }
-
-  socket = %{
-    assigns: %{
-      __changed__: %{
-        __context__: true
-      },
-      __context__: %{},
-      flash: %{},
-      live_action: nil,
-      basket: [
-        %{
-          "S" => {"AAPL", ""},
-          "c" => {182.89, ""},
-          "h" => {182.99, ""},
-          "l" => {182.89, ""},
-          "n" => {412, ""},
-          "o" => {182.935, ""},
-          "t" => {"2023-11-08T20:59:00Z", ""},
-          "v" => {43514, ""},
-          "vw" => {182.956702, ""}
-        }
-      ]
-    }
-  }
-
-  # BasketWeb.Overview.handle_info(%Phoenix.Socket.Broadcast{topic: "bars", event: "ticker-update", payload: bars}, socket)
   def handle_info(
         %Phoenix.Socket.Broadcast{topic: "bars", event: "ticker-update", payload: bars},
         socket
       ) do
-    IO.inspect("HANDLE_INFO: #{inspect(bars)}")
     # Get the old ticker data
     old_ticker = Enum.find(socket.assigns.basket, fn t -> elem(t["S"], 0) == bars["S"] end)
 
@@ -141,15 +94,9 @@ defmodule BasketWeb.Overview do
         if k in ["S", "T", "t", "n"] do
           {k, {v, ""}}
         else
-          IO.inspect("K IS: #{k}")
-          IO.inspect("DIFFDIR: #{diff_direction(old_ticker[k], bars[k])}")
           {k, {v, diff_direction(old_ticker[k], bars[k])}}
         end
       end
-
-    IO.inspect(
-      "HANDLE_INFO: #{inspect(socket.assigns.basket ++ [Map.merge(bars_with_changes, %{"S" => bars["S"]})])}"
-    )
 
     new_basket =
       Enum.map(socket.assigns.basket, fn row ->
@@ -157,8 +104,6 @@ defmodule BasketWeb.Overview do
           do: Map.merge(bars_with_changes, %{"S" => {bars["S"], ""}}),
           else: row
       end)
-
-    IO.inspect("NB: #{inspect(new_basket)}")
 
     {:noreply,
      assign(
@@ -171,6 +116,7 @@ defmodule BasketWeb.Overview do
   def render(assigns) do
     ~F"""
     <div class="flex-col p-8">
+      <NavRow />
       <div class="w-1/4" >
         <.live_component module={SearchInput} id="stock-search-input" tickers={@tickers} />
       </div>

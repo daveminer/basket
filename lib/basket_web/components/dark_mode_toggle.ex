@@ -6,13 +6,6 @@ defmodule BasketWeb.Components.DarkModeToggle do
 
   import BasketWeb.CoreComponents
 
-  @doc """
-  The max width.
-
-  sm: `max-w-sm`, md: `max-w-md`, lg: `max-w-lg`
-  """
-  prop max_width, :string, values: ["sm", "md", "lg"]
-
   def render(assigns) do
     ~F"""
     <div class="justify-center">

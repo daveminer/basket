@@ -1,4 +1,7 @@
 defmodule BasketWeb.Overview do
+  @moduledoc """
+  Home page shows a list of assets and updates them in realtime via websockets.
+  """
   use Surface.LiveView
 
   import BasketWeb.CoreComponents
@@ -7,6 +10,7 @@ defmodule BasketWeb.Overview do
 
   alias BasketWeb.Components.NavRow
   alias Basket.Alpaca.Websocket.{Client, Message}
+  alias Basket.Alpaca.HttpClient
   alias BasketWeb.Components.SearchInput
 
   prop tickers, :list, default: []
@@ -18,30 +22,13 @@ defmodule BasketWeb.Overview do
     socket = assign(socket, basket: [])
 
     {:ok, socket}
-    # |> assign(:org, AsyncResult.loading())
-    # |> start_async(:fetch_tickers, fn -> fetch_org!(id) end)}
   end
 
   def handle_event("ticker-search", %{"selected-ticker" => _query}, socket) do
     if length(socket.assigns.tickers) > 0 do
       {:noreply, socket}
     else
-      {_status, tickers} =
-        Cachex.fetch(:assets, "all", fn _key ->
-          case Basket.Alpaca.HttpClient.list_assets() do
-            {:ok, result} ->
-              tickers =
-                Enum.map(result, fn asset ->
-                  asset["symbol"]
-                end)
-
-              {:commit, tickers}
-
-            {:error, error} ->
-              Logger.error("Could not fetch tickers", error: error.reason)
-              {:ignore, []}
-          end
-        end)
+      {_status, tickers} = Cachex.fetch(:assets, "all", fn _key -> load_tickers() end)
 
       {:reply, %{}, assign(socket, :tickers, tickers)}
     end
@@ -51,7 +38,7 @@ defmodule BasketWeb.Overview do
     :ok = Client.subscribe_to_market_data(%{bars: [ticker], quotes: [], trades: []})
 
     socket =
-      case Basket.Alpaca.HttpClient.latest_quote(ticker) do
+      case HttpClient.latest_quote(ticker) do
         {:ok, response} ->
           %{"bars" => %{^ticker => bars}} = response
 
@@ -144,6 +131,22 @@ defmodule BasketWeb.Overview do
       elem(old, 0) > new -> "up"
       elem(old, 0) < new -> "down"
       true -> "same"
+    end
+  end
+
+  defp load_tickers do
+    case HttpClient.list_assets() do
+      {:ok, result} ->
+        tickers =
+          Enum.map(result, fn asset ->
+            asset["symbol"]
+          end)
+
+        {:commit, tickers}
+
+      {:error, error} ->
+        Logger.error("Could not fetch tickers", error: error.reason)
+        {:ignore, []}
     end
   end
 end

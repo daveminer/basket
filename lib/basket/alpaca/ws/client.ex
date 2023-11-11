@@ -1,11 +1,16 @@
 defmodule Basket.Alpaca.Websocket.Client do
+  @moduledoc """
+  Instantiates an Alpaca websocket connection and processes the incoming messages.
+  Currently only handles "bars" messages.
+  """
+
   use WebSockex
   require Logger
 
   alias Basket.Alpaca.Websocket.Message
 
-  @auth_success "[{\"T\":\"success\",\"msg\":\"authenticated\"}]"
-  @connection_success "[{\"T\":\"success\",\"msg\":\"connected\"}]"
+  @auth_success ~s([{\"T\":\"success\",\"msg\":\"authenticated\"}])
+  @connection_success ~s([{\"T\":\"success\",\"msg\":\"connected\"}])
 
   @spec start_link(bitstring()) :: {:error, any()} | {:ok, pid()}
   def start_link(state) do
@@ -45,14 +50,12 @@ defmodule Basket.Alpaca.Websocket.Client do
   end
 
   def handle_frame({_tpe, msg}, state) do
-    IO.inspect("MESSAGEEEE: #{msg}")
-
     case Jason.decode(msg) do
       {:ok, message} ->
         Message.process(message)
 
-      {:error, reason} ->
-        Logger.error("Error decoding message.", reason: reason)
+      {:error, error} ->
+        Logger.error("Error decoding message: #{inspect(error)}")
     end
 
     {:ok, state}
@@ -63,10 +66,10 @@ defmodule Basket.Alpaca.Websocket.Client do
     case Message.market_data_subscription(tickers) do
       {:ok, message} ->
         WebSockex.send_frame(client_pid(), {:text, message})
-        Logger.info("Subscription message sent.", message: inspect(message))
+        Logger.debug("Subscription message sent: #{inspect(message)}")
 
       {:error, error} ->
-        Logger.error("Error sending subscription message.", error: error)
+        Logger.error("Error sending subscription message: #{inspect(error)}")
     end
   end
 
@@ -77,10 +80,10 @@ defmodule Basket.Alpaca.Websocket.Client do
         Logger.info("Sending subscription removal message: #{inspect(message)}")
 
         WebSockex.send_frame(client_pid(), {:text, message})
-        Logger.info("Subscription removal message sent.", message: inspect(message))
+        Logger.info("Subscription removal message sent: #{inspect(message)}")
 
       {:error, error} ->
-        Logger.error("Error sending subscription removal message.", error: error)
+        Logger.error("Error sending subscription removal message: #{inspect(error)}")
     end
   end
 

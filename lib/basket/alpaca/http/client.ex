@@ -1,4 +1,8 @@
 defmodule Basket.Alpaca.HttpClient do
+  @moduledoc """
+  HTTP client for Alpaca API.
+  """
+
   use HTTPoison.Base
 
   require Logger
@@ -24,7 +28,7 @@ defmodule Basket.Alpaca.HttpClient do
   end
 
   @spec list_assets() :: {:error, any()} | {:ok, list(map())}
-  def list_assets() do
+  def list_assets do
     case get("#{market_url()}#{@assets_resource}", [],
            params: %{status: "active", asset_class: "us_equity"}
          ) do
@@ -39,8 +43,6 @@ defmodule Basket.Alpaca.HttpClient do
   def process_response_body(body) do
     Jason.decode!(body)
   end
-
-  # TODO: separate
 
   defp data_url, do: Application.fetch_env!(:basket, :alpaca)[:data_http_url]
 

@@ -1,4 +1,7 @@
 defmodule Basket.Alpaca.Websocket.Message do
+  @moduledoc """
+  Handles messages from anS Alpaca websocket connection.
+  """
   require Logger
 
   @bars_topic "bars"
@@ -11,9 +14,7 @@ defmodule Basket.Alpaca.Websocket.Message do
 
   @spec process(bitstring()) :: :ok
   def process(messages) do
-    IO.inspect("MESSAGES: #{inspect(messages)}")
-
-    Enum.map(messages, fn message ->
+    Enum.each(messages, fn message ->
       case Map.get(message, "T") do
         "b" ->
           handle_bars(message)
@@ -25,13 +26,13 @@ defmodule Basket.Alpaca.Websocket.Message do
           handle_bar_updates(message)
 
         "error" ->
-          Logger.error("Error message from Alpaca websocket connection.", message: message)
+          Logger.error("Error message from Alpaca websocket connection: #{message}")
 
         "subscription" ->
-          Logger.info("Subscription message from Alpaca websocket connection.", message: message)
+          Logger.info("Subscription message from Alpaca websocket connection: #{message}")
 
         _ ->
-          Logger.info("Unhandled websocket message", message: message)
+          Logger.info("Unhandled websocket message: #{message}")
       end
     end)
 
@@ -54,10 +55,10 @@ defmodule Basket.Alpaca.Websocket.Message do
       {:ok, encoded_message} ->
         {:ok, encoded_message}
 
-      {:error, reason} ->
-        Logger.error("Error encoding market subscription message", reason: reason)
+      {:error, error} ->
+        Logger.error("Error encoding market subscription message: #{error}")
 
-        {:error, reason}
+        {:error, error}
     end
   end
 
@@ -77,10 +78,10 @@ defmodule Basket.Alpaca.Websocket.Message do
       {:ok, encoded_message} ->
         {:ok, encoded_message}
 
-      {:error, reason} ->
-        Logger.error("Error encoding market subscription message", reason: reason)
+      {:error, error} ->
+        Logger.error("Error encoding market subscription message: #{error}")
 
-        {:error, reason}
+        {:error, error}
     end
   end
 
@@ -103,15 +104,15 @@ defmodule Basket.Alpaca.Websocket.Message do
            "t" => _timestamp
          } = message
        ) do
-    Logger.info("Bars message received", message: message)
+    Logger.info("Bars message received")
     BasketWeb.Endpoint.broadcast_from(self(), @bars_topic, "ticker-update", message)
   end
 
-  defp handle_daily_bars(message) do
-    Logger.info("Daily bars message received", message: message)
+  defp handle_daily_bars(_message) do
+    Logger.info("Daily bars message received.")
   end
 
-  defp handle_bar_updates(message) do
-    Logger.info("Bar updates message received", message: message)
+  defp handle_bar_updates(_message) do
+    Logger.info("Bar updates message received")
   end
 end

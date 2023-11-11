@@ -1,4 +1,9 @@
 defmodule BasketWeb.Components.SearchInput do
+  @moduledoc """
+  Allows the user to search for and add a ticker to the table. Will make an HTTP call
+  if the ticker list is not populated, otherwise it will pull the list from the cache.
+  """
+
   use Surface.LiveComponent
 
   import BasketWeb.CoreComponents
@@ -11,7 +16,6 @@ defmodule BasketWeb.Components.SearchInput do
   prop ticker_search_form, :string, default: ""
 
   def mount(socket) do
-    # TODO: make ticker call async
     form = to_form(%{"ticker_search_field" => ""})
     socket = assign(socket, :ticker_search_form, form)
     socket = assign(socket, :tickers, [])

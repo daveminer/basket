@@ -77,7 +77,8 @@ defmodule Basket.MixProject do
       {:pow, "~> 1.0.34"},
       {:websockex, "~> 0.4.3"},
       {:httpoison, "~> 2.1.0"},
-      {:cachex, "~> 3.6"}
+      {:cachex, "~> 3.6"},
+      {:mox, "1.1.0", only: :test}
     ]
   end
 

@@ -1,4 +1,4 @@
-defmodule Basket.Alpaca.Websocket.Message do
+defmodule Basket.Alpaca.Websocket.Client.Message do
   @moduledoc """
   Handles messages from anS Alpaca websocket connection.
   """

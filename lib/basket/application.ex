@@ -18,7 +18,7 @@ defmodule Basket.Application do
       # {Basket.Worker, arg},
       # Start to serve requests, typically the last entry
       BasketWeb.Endpoint,
-      Basket.Alpaca.Websocket.Client,
+      Basket.Websocket.Alpaca,
       {Cachex, name: :assets}
     ]
 

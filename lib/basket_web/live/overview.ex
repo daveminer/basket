@@ -9,7 +9,7 @@ defmodule BasketWeb.Overview do
   require Logger
 
   alias Basket.Alpaca.HttpClient
-  alias Basket.Alpaca.Websocket.{Client, Message}
+  alias Basket.Websocket.{Alpaca, Message}
   alias BasketWeb.Components.{NavRow, SearchInput}
 
   prop tickers, :list, default: []
@@ -34,7 +34,7 @@ defmodule BasketWeb.Overview do
   end
 
   def handle_event("ticker-add", %{"selected-ticker" => ticker}, socket) do
-    :ok = Client.subscribe_to_market_data(%{bars: [ticker], quotes: [], trades: []})
+    :ok = Alpaca.subscribe(%{bars: [ticker], quotes: [], trades: []})
 
     socket =
       case HttpClient.latest_quote(ticker) do
@@ -58,7 +58,7 @@ defmodule BasketWeb.Overview do
   end
 
   def handle_event("ticker-remove", %{"ticker" => ticker}, socket) do
-    :ok = Client.unsubscribe_to_market_data(%{bars: [ticker], quotes: [], trades: []})
+    :ok = Alpaca.unsubscribe(%{bars: [ticker], quotes: [], trades: []})
 
     {:reply, %{},
      assign(

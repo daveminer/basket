@@ -719,14 +719,20 @@ defmodule BasketWeb.CoreComponents do
   end
 
   def diff_color(col, row) do
+    IO.inspect("COL: #{inspect(col)}")
+    IO.inspect("ROW: #{inspect(row)}")
     key = Map.get(col, :key)
 
     field = row[key]
 
-    case elem(field, 1) do
-      "up" -> "bg-emerald-300 text-emerald-900"
-      "down" -> "bg-rose-300 text-rose-900"
-      _ -> ""
+    if is_nil(field) do
+      ""
+    else
+      case elem(field, 1) do
+        "up" -> "bg-emerald-300 text-emerald-900"
+        "down" -> "bg-rose-300 text-rose-900"
+        _ -> ""
+      end
     end
   end
 end

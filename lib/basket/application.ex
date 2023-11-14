@@ -18,9 +18,15 @@ defmodule Basket.Application do
       # {Basket.Worker, arg},
       # Start to serve requests, typically the last entry
       BasketWeb.Endpoint,
-      Basket.Websocket.Alpaca,
       {Cachex, name: :assets}
     ]
+
+    children =
+      unless Mix.env() == :test do
+        children ++ [Basket.Websocket.Alpaca]
+      else
+        children
+      end
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options

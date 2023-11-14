@@ -9,13 +9,13 @@ defmodule BasketWeb.Overview do
   require Logger
 
   alias Basket.Alpaca.HttpClient
-  alias Basket.Websocket.{Alpaca, Message}
+  alias Basket.Websocket.Alpaca
   alias BasketWeb.Components.{NavRow, SearchInput}
 
   prop tickers, :list, default: []
 
   def mount(_, _, socket) do
-    BasketWeb.Endpoint.subscribe(Message.bars_topic())
+    BasketWeb.Endpoint.subscribe(Alpaca.bars_topic())
 
     socket = assign(socket, tickers: [])
     socket = assign(socket, basket: [])

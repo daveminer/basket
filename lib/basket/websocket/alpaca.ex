@@ -8,10 +8,21 @@ defmodule Basket.Websocket.Alpaca do
 
   require Logger
 
+  @type subscription_fields :: %{
+          :bars => list(String.t()),
+          :quotes => list(String.t()),
+          :trades => list(String.t())
+        }
+
   @auth_success ~s([{\"T\":\"success\",\"msg\":\"authenticated\"}])
   @connection_success ~s([{\"T\":\"success\",\"msg\":\"connected\"}])
-
   @bars_topic "bars"
+  @subscribe_message %{
+    action: :subscribe
+  }
+  @unsubscribe_message %{
+    action: :unsubscribe
+  }
 
   def start_link(state) do
     Logger.info("Starting Alpaca websocket client.")
@@ -44,39 +55,23 @@ defmodule Basket.Websocket.Alpaca do
     end)
   end
 
-  @impl true
+  @spec subscribe(subscription_fields()) :: :ok
   def subscribe(tickers) do
-    message =
-      build_message(
-        %{
-          action: :subscribe
-        },
-        tickers
-      )
-
-    decoded_message = Jason.encode!(message)
+    decoded_message = Jason.encode!(build_message(@subscribe_message, tickers))
 
     case WebSockex.send_frame(client_pid(), {:text, decoded_message}) do
-      :ok -> Logger.debug("Subscription message sent: #{inspect(message)}")
+      :ok -> Logger.debug("Subscription message sent: #{inspect(decoded_message)}")
       {:error, error} -> Logger.error("Error sending subscription message: #{inspect(error)}")
     end
   end
 
-  @impl true
+  @spec unsubscribe(subscription_fields()) :: :ok
   def unsubscribe(tickers) do
-    message =
-      build_message(
-        %{
-          action: :unsubscribe
-        },
-        tickers
-      )
-
-    decoded_message = Jason.encode!(message)
+    decoded_message = Jason.encode!(build_message(@unsubscribe_message, tickers))
 
     case WebSockex.send_frame(client_pid(), {:text, decoded_message}) do
       :ok ->
-        Logger.debug("Subscription removal message sent: #{inspect(message)}")
+        Logger.debug("Subscription removal message sent: #{inspect(decoded_message)}")
 
       {:error, error} ->
         Logger.error("Error sending subscription removal message: #{inspect(error)}")

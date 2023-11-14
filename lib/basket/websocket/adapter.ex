@@ -9,8 +9,6 @@ defmodule Basket.Websocket.Adapter do
   subscription once the authorization acknowledgement method is received.
   """
   @callback on_msg(WebSockex.Frame.frame(), bitstring()) :: :ok
-  @callback subscribe(Message.subscription_fields()) :: :ok
-  @callback unsubscribe(Message.subscription_fields()) :: :ok
 
   defmacro __using__(_) do
     quote location: :keep do

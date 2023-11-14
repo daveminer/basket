@@ -64,7 +64,7 @@ defmodule BasketWeb.Overview do
      assign(
        socket,
        :basket,
-       Enum.filter(socket.assigns.basket, fn t -> Enum.at(t["S"], 0) != ticker end)
+       Enum.filter(socket.assigns.basket, fn t -> elem(t["S"], 0) != ticker end)
      )}
   end
 

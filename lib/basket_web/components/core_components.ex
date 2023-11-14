@@ -719,12 +719,11 @@ defmodule BasketWeb.CoreComponents do
   end
 
   def diff_color(col, row) do
-    IO.inspect("COL: #{inspect(col)}")
-    IO.inspect("ROW: #{inspect(row)}")
     key = Map.get(col, :key)
 
     field = row[key]
 
+    # For the "remove" button
     if is_nil(field) do
       ""
     else

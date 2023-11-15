@@ -15,6 +15,7 @@ defmodule BasketWeb.Overview do
   prop tickers, :list, default: []
 
   def mount(_, _, socket) do
+    IO.inspect("SOCKET: #{inspect(socket)}")
     BasketWeb.Endpoint.subscribe(Alpaca.bars_topic())
 
     socket = assign(socket, tickers: [])

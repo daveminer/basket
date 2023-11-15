@@ -34,7 +34,8 @@ defmodule BasketWeb.Router do
   scope "/", BasketWeb do
     pipe_through [:browser, :authenticated]
 
-    get "/", PageController, :home
+    # get "/", PageController, :home
+    live "/", Overview
     live "/demo", Demo
   end
 

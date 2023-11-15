@@ -26,8 +26,7 @@ config :basket, BasketWeb.Endpoint,
   secret_key_base: "gRiKl5rvtc1Mgj3hhDzBzjHgmPE+PiG47uS8Pxk8KwjZhaaR3WxJ/I6czbmXr0j9",
   watchers: [
     esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]},
-    tailwind: {Tailwind, :install_and_run, [:default, ~w(--watch)]},
-    esbuild: {Esbuild, :install_and_run, [:catalogue, ~w(--sourcemap=inline --watch)]}
+    tailwind: {Tailwind, :install_and_run, [:default, ~w(--watch)]}
   ]
 
 # ## SSL Support
@@ -67,6 +66,13 @@ config :basket, BasketWeb.Endpoint,
 
 # Enable dev routes for dashboard and mailbox
 config :basket, dev_routes: true
+
+config :basket, :alpaca,
+  api_key: System.get_env("ALPACA_API_KEY"),
+  api_secret: System.get_env("ALPACA_API_SECRET"),
+  data_http_url: "https://data.alpaca.markets",
+  market_http_url: "https://api.alpaca.markets",
+  market_ws_url: "wss://stream.data.alpaca.markets/v2"
 
 # Do not include metadata nor timestamps in development logs
 config :logger, :console, format: "[$level] $message\n"

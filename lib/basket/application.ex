@@ -17,8 +17,16 @@ defmodule Basket.Application do
       # Start a worker by calling: Basket.Worker.start_link(arg)
       # {Basket.Worker, arg},
       # Start to serve requests, typically the last entry
-      BasketWeb.Endpoint
+      BasketWeb.Endpoint,
+      {Cachex, name: :assets}
     ]
+
+    children =
+      if Mix.env() != :test do
+        children ++ [Basket.Websocket.Alpaca]
+      else
+        children
+      end
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options

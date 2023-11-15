@@ -31,3 +31,10 @@ config :logger, level: :warning
 
 # Initialize plugs at runtime for faster test compilation
 config :phoenix, :plug_init_mode, :runtime
+
+config :basket, :alpaca,
+  api_key: "api-key",
+  api_secret: "api-secret",
+  data_http_url: "https://test-suite-data.alpaca.markets",
+  market_http_url: "https://test-suite-api.alpaca.markets",
+  market_ws_url: "wss://test-suite-stream.data.alpaca.markets/v2"

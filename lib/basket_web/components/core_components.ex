@@ -114,7 +114,7 @@ defmodule BasketWeb.CoreComponents do
     <div
       :if={msg = render_slot(@inner_block) || Phoenix.Flash.get(@flash, @kind)}
       id={@id}
-      phx-click={JS.push("lv:clear-flash", value: %{key: @kind}) |> hide("##{@id}")}
+      phx-click={JS.push("lv:clear-flash", value: %{key: @kind}) |> hide("#{@id}")}
       role="alert"
       class={[
         "fixed top-2 right-2 mr-2 w-80 sm:w-96 z-50 rounded-lg p-3 ring-1",
@@ -174,6 +174,42 @@ defmodule BasketWeb.CoreComponents do
         <.icon name="hero-arrow-path" class="ml-1 h-3 w-3 animate-spin" />
       </.flash>
     </div>
+    """
+  end
+
+  @doc """
+  Renders an inline form.
+
+  ## Examples
+
+      <.inline_form for={@form} phx-change="validate" phx-submit="save">
+        <.input field={@form[:email]} label="Email"/>
+        <.input field={@form[:username]} label="Username" />
+        <:actions>
+          <.button>Save</.button>
+        </:actions>
+      </.inline_form>
+  """
+  attr :for, :any, required: true, doc: "the datastructure for the form"
+  attr :as, :any, default: nil, doc: "the server side parameter to collect all input under"
+
+  attr :rest, :global,
+    include: ~w(autocomplete name rel action enctype method novalidate target multipart),
+    doc: "the arbitrary HTML attributes to apply to the form tag"
+
+  slot :inner_block, required: true
+  slot :actions, doc: "the slot for form actions, such as a submit button"
+
+  def inline_form(assigns) do
+    ~H"""
+    <.form :let={f} for={@for} as={@as} {@rest}>
+      <div class="flex bg-white">
+        <div :for={action <- @actions} class="mt-2 mr-4 flex items-center justify-between gap-6">
+          <%= render_slot(action, f) %>
+        </div>
+        <%= render_slot(@inner_block, f) %>
+      </div>
+    </.form>
     """
   end
 
@@ -479,7 +515,9 @@ defmodule BasketWeb.CoreComponents do
       <table class="w-[40rem] mt-11 sm:w-full">
         <thead class="text-sm text-left leading-6 text-zinc-500">
           <tr>
-            <th :for={col <- @col} class="p-0 pb-4 pr-6 font-normal"><%= col[:label] %></th>
+            <th :for={col <- @col} class="p-0 pb-4 pr-6 text-center font-normal">
+              <%= col[:label] %>
+            </th>
             <th :if={@action != []} class="relative p-0 pb-4">
               <span class="sr-only"><%= gettext("Actions") %></span>
             </th>
@@ -487,6 +525,7 @@ defmodule BasketWeb.CoreComponents do
         </thead>
         <tbody
           id={@id}
+          phx-hook="BarTableUpdated"
           phx-update={match?(%Phoenix.LiveView.LiveStream{}, @rows) && "stream"}
           class="relative divide-y divide-zinc-100 border-t border-zinc-200 text-sm leading-6 text-zinc-700"
         >
@@ -494,7 +533,12 @@ defmodule BasketWeb.CoreComponents do
             <td
               :for={{col, i} <- Enum.with_index(@col)}
               phx-click={@row_click && @row_click.(row)}
-              class={["relative p-0", @row_click && "hover:cursor-pointer"]}
+              class={[
+                "relative p-0",
+                "text-center",
+                @row_click && "hover:cursor-pointer",
+                diff_color(col, row)
+              ]}
             >
               <div class="block py-4 pr-6">
                 <span class="absolute -inset-y-px right-0 -left-4 group-hover:bg-zinc-50 sm:rounded-l-xl" />
@@ -672,5 +716,22 @@ defmodule BasketWeb.CoreComponents do
   """
   def translate_errors(errors, field) when is_list(errors) do
     for {^field, {msg, opts}} <- errors, do: translate_error({msg, opts})
+  end
+
+  def diff_color(col, row) do
+    key = Map.get(col, :key)
+
+    field = row[key]
+
+    # For the "remove" button
+    if is_nil(field) do
+      ""
+    else
+      case elem(field, 1) do
+        "up" -> "bg-emerald-300 text-emerald-900"
+        "down" -> "bg-rose-300 text-rose-900"
+        _ -> ""
+      end
+    end
   end
 end

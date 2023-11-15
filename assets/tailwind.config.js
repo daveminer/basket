@@ -1,6 +1,7 @@
 // See the Tailwind configuration guide for advanced usage
 // https://tailwindcss.com/docs/configuration
 
+const colors = require('tailwindcss/colors')
 const plugin = require("tailwindcss/plugin")
 const fs = require("fs")
 const path = require("path")
@@ -11,11 +12,24 @@ module.exports = {
     "../lib/basket_web.ex",
     "../lib/basket_web/**/*.*ex"
   ],
+  darkMode: "class",
   theme: {
     extend: {
       colors: {
-        brand: "#FD4F00",
-      }
+        primary: {
+          light: colors.emerald-800,
+          dark: colors.emerald-800
+        },
+          secondary: '#7a869a',
+        accent: '#ff5630',
+        background: {
+          light: colors.white,
+          dark: colors.emerald-800
+        },
+        surface: '#2c313a',
+        onSurface: '#ffffff',
+        error: '#de350b',
+      },
     },
   },
   plugins: [

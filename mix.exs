@@ -56,7 +56,7 @@ defmodule Basket.MixProject do
       {:floki, ">= 0.30.0", only: :test},
       {:phoenix_live_dashboard, "~> 0.8.2"},
       {:esbuild, "~> 0.7", runtime: Mix.env() == :dev},
-      {:tailwind, "~> 0.2.0", runtime: Mix.env() == :dev},
+      {:tailwind, "~> 0.2.1", runtime: Mix.env() == :dev},
       {:swoosh, "~> 1.3"},
       {:finch, "~> 0.13"},
       {:telemetry_metrics, "~> 0.6"},
@@ -68,13 +68,17 @@ defmodule Basket.MixProject do
       {:surface, "~> 0.11.0"},
       # for surface.init; possible to remove.
       {:sourceror, "~> 0.12.0"},
-      {:surface_catalogue, "~> 0.6.0"},
+      {:surface_catalogue, "~> 0.6.1"},
       {:excoveralls, "~> 0.18", only: :test},
       {:sobelow, "~> 0.13.0", only: [:dev, :test], runtime: false},
       {:credo, "~> 1.7.1", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.4.2", runtime: false},
       {:mix_audit, "~> 2.1.1", runtime: false},
-      {:pow, "~> 1.0.34"}
+      {:pow, "~> 1.0.34"},
+      {:websockex, "~> 0.4.3"},
+      {:httpoison, "~> 2.1.0"},
+      {:cachex, "~> 3.6"},
+      {:mox, "1.1.0", only: :test}
     ]
   end
 

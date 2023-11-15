@@ -22,7 +22,7 @@ defmodule Basket.Application do
     ]
 
     children =
-      unless Mix.env() == :test do
+      if Mix.env() != :test do
         children ++ [Basket.Websocket.Alpaca]
       else
         children

@@ -1,4 +1,8 @@
 defmodule Basket.Websocket.Alpaca.Impl do
+  @moduledoc """
+  Implementation of the Alpaca websocket client.
+  """
+
   require Logger
 
   @subscribe_message %{

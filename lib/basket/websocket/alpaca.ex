@@ -64,27 +64,7 @@ defmodule Basket.Websocket.Alpaca do
     case Jason.decode(msg) do
       {:ok, decoded_message} ->
         Enum.each(decoded_message, fn message ->
-          case Map.get(message, "T") do
-            "b" ->
-              handle_bars(message)
-
-            "d" ->
-              handle_daily_bars(message)
-
-            "u" ->
-              handle_bar_updates(message)
-
-            "error" ->
-              Logger.error("Error message from Alpaca websocket connection: #{inspect(message)}")
-
-            "subscription" ->
-              Logger.info(
-                "Subscription message from Alpaca websocket connection: #{inspect(message)}"
-              )
-
-            _ ->
-              Logger.info("Unhandled websocket message: #{inspect(message)}")
-          end
+          process_message(message)
         end)
 
       {:error, error} ->
@@ -92,6 +72,28 @@ defmodule Basket.Websocket.Alpaca do
     end
 
     {:ok, state}
+  end
+
+  defp process_message(message) do
+    case Map.get(message, "T") do
+      "b" ->
+        handle_bars(message)
+
+      "d" ->
+        handle_daily_bars(message)
+
+      "u" ->
+        handle_bar_updates(message)
+
+      "error" ->
+        Logger.error("Error message from Alpaca websocket connection: #{inspect(message)}")
+
+      "subscription" ->
+        Logger.info("Subscription message from Alpaca websocket connection: #{inspect(message)}")
+
+      _ ->
+        Logger.info("Unhandled websocket message: #{inspect(message)}")
+    end
   end
 
   defp handle_bars(

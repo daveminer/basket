@@ -23,6 +23,9 @@ config :basket, BasketWeb.Endpoint,
 # In test we don't send emails.
 config :basket, Basket.Mailer, adapter: Swoosh.Adapters.Test
 
+# config :basket, :alpaca_http_client, Basket.Http.MockAlpaca
+# config :basket, :alpaca_websocket_client, Basket.Websocket.MockAlpaca
+
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false
 

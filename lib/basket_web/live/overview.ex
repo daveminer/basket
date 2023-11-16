@@ -60,7 +60,7 @@ defmodule BasketWeb.Overview do
     end
   end
 
-  def handle_event("ticker-remove", %{"selected-ticker" => ticker}, socket) do
+  def handle_event("ticker-remove", %{"ticker" => ticker}, socket) do
     basket_tickers = tickers(socket)
 
     if ticker not in basket_tickers or String.trim(ticker) == "" do
@@ -115,7 +115,7 @@ defmodule BasketWeb.Overview do
       <div class="w-1/4">
         <.live_component module={SearchInput} id="stock-search-input" tickers={@tickers} />
       </div>
-      <TickerBarTable id="ticker-bar-table" rows={@basket} />
+      <.live_component module={TickerBarTable} id="ticker-bar-table" rows={@basket} />
     </div>
     """
   end

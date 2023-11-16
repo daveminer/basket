@@ -4,14 +4,13 @@ defmodule BasketWeb.OverviewTest do
   require Phoenix.LiveViewTest
 
   import Mox
-  import Phoenix.Component
 
   alias BasketWeb.Overview
 
   @assigns_map %{__changed__: %{__context__: true}}
 
   setup do
-    # Will share the mock with the Cachex fallback.
+    # Shares the mock with the Cachex fallback function.
     Mox.set_mox_global()
 
     {:ok,
@@ -202,7 +201,7 @@ defmodule BasketWeb.OverviewTest do
               }} =
                Overview.handle_event(
                  "ticker-remove",
-                 %{"selected-ticker" => "XYZ"},
+                 %{"ticker" => "XYZ"},
                  Map.merge(@assigns_map, %{assigns: %{tickers: [], basket: basket_with_row}})
                )
     end
@@ -215,7 +214,7 @@ defmodule BasketWeb.OverviewTest do
               }} =
                Overview.handle_event(
                  "ticker-remove",
-                 %{"selected-ticker" => ""},
+                 %{"ticker" => ""},
                  Map.merge(@assigns_map, %{assigns: %{tickers: [], basket: []}})
                )
     end
@@ -228,7 +227,7 @@ defmodule BasketWeb.OverviewTest do
               }} =
                Overview.handle_event(
                  "ticker-remove",
-                 %{"selected-ticker" => "XYZ"},
+                 %{"ticker" => "XYZ"},
                  Map.merge(@assigns_map, %{
                    assigns: %{
                      tickers: [],

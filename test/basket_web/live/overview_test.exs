@@ -4,6 +4,7 @@ defmodule BasketWeb.OverviewTest do
   require Phoenix.LiveViewTest
 
   import Mox
+  import Phoenix.Component
 
   alias BasketWeb.Overview
 
@@ -17,22 +18,36 @@ defmodule BasketWeb.OverviewTest do
      %{
        bars: %{
          "XYZ" => %{
-           "c" => 188.15,
-           "h" => 188.15,
-           "l" => 188.05,
-           "n" => 358,
-           "o" => 188.11,
+           "S" => "XYZ",
+           "c" => 187.15,
+           "h" => 187.15,
+           "l" => 187.05,
+           "n" => 357,
+           "o" => 187.11,
            "t" => "2023-11-15T20:59:00Z",
-           "v" => 43031,
-           "vw" => 188.117416
+           "v" => 43025,
+           "vw" => 187.117416
          }
-       }
+       },
+       basket_with_row: [
+         %{
+           "S" => {"XYZ", ""},
+           "c" => {188.15, ""},
+           "h" => {188.15, ""},
+           "l" => {188.05, ""},
+           "n" => {358, ""},
+           "o" => {188.11, ""},
+           "t" => {"2023-11-15T20:59:00Z", ""},
+           "v" => {43031, ""},
+           "vw" => {188.117416, ""}
+         }
+       ]
      }}
   end
 
   describe "mount/3" do
     test "assigns empty lists to keys" do
-      Basket.Websocket.MockAlpaca |> expect(:start_link, fn state -> {:ok, 1} end)
+      Basket.Websocket.MockAlpaca |> expect(:start_link, fn _state -> {:ok, 1} end)
 
       assert({:ok, socket} = Overview.mount([], %{}, @assigns_map))
 
@@ -49,7 +64,7 @@ defmodule BasketWeb.OverviewTest do
 
   describe "handle_event/3 search" do
     test "ticker search does nothing without search criteria" do
-      assert {:noreply, socket} =
+      assert {:noreply, _socket} =
                Overview.handle_event(
                  "ticker-search",
                  %{"selected-ticker" => "ABC"},
@@ -130,7 +145,7 @@ defmodule BasketWeb.OverviewTest do
               %{
                 __changed__: %{__context__: true, basket: true},
                 assigns: %{tickers: [], basket: []},
-                basket: [bars]
+                basket: [_bars]
               }} =
                Overview.handle_event(
                  "ticker-add",
@@ -140,9 +155,6 @@ defmodule BasketWeb.OverviewTest do
     end
 
     test "does nothing if no ticker is provided" do
-      # expect(Basket.Http.MockAlpaca, :latest_quote, fn _ -> {:ok, %{"bars" => bars}} end)
-      # expect(Basket.Websocket.MockAlpaca, :subscribe, fn _ticker_subs -> :ok end)
-
       assert {:noreply,
               %{
                 __changed__: %{__context__: true},
@@ -155,25 +167,11 @@ defmodule BasketWeb.OverviewTest do
                )
     end
 
-    test "does nothing if the ticker is already present" do
-      basket_with_row = [
-        %{
-          "S" => {"XYZ", ""},
-          "c" => {188.15, ""},
-          "h" => {188.15, ""},
-          "l" => {188.05, ""},
-          "n" => {358, ""},
-          "o" => {188.11, ""},
-          "t" => {"2023-11-15T20:59:00Z", ""},
-          "v" => {43031, ""},
-          "vw" => {188.117416, ""}
-        }
-      ]
-
+    test "does nothing if the ticker is already present", %{basket_with_row: basket_with_row} do
       assert {:noreply,
               %{
                 __changed__: %{__context__: true},
-                assigns: %{tickers: [], basket: [bars]}
+                assigns: %{tickers: [], basket: [_bars]}
               }} =
                Overview.handle_event(
                  "ticker-add",
@@ -183,6 +181,110 @@ defmodule BasketWeb.OverviewTest do
                      tickers: [],
                      basket: basket_with_row
                    }
+                 })
+               )
+    end
+  end
+
+  describe "handle_event/3 remove_ticker" do
+    test "removes a ticker if it is present in the liveview", %{
+      bars: bars,
+      basket_with_row: basket_with_row
+    } do
+      expect(Basket.Http.MockAlpaca, :latest_quote, fn _ -> {:ok, %{"bars" => bars}} end)
+      expect(Basket.Websocket.MockAlpaca, :unsubscribe, fn _ticker_subs -> :ok end)
+
+      assert {:reply, %{},
+              %{
+                __changed__: %{__context__: true, basket: true},
+                assigns: %{tickers: [], basket: ^basket_with_row},
+                basket: []
+              }} =
+               Overview.handle_event(
+                 "ticker-remove",
+                 %{"selected-ticker" => "XYZ"},
+                 Map.merge(@assigns_map, %{assigns: %{tickers: [], basket: basket_with_row}})
+               )
+    end
+
+    test "does nothing if no ticker is provided" do
+      assert {:noreply,
+              %{
+                __changed__: %{__context__: true},
+                assigns: %{tickers: [], basket: []}
+              }} =
+               Overview.handle_event(
+                 "ticker-remove",
+                 %{"selected-ticker" => ""},
+                 Map.merge(@assigns_map, %{assigns: %{tickers: [], basket: []}})
+               )
+    end
+
+    test "does nothing if the ticker is not in the liveview" do
+      assert {:noreply,
+              %{
+                __changed__: %{__context__: true},
+                assigns: %{tickers: [], basket: []}
+              }} =
+               Overview.handle_event(
+                 "ticker-remove",
+                 %{"selected-ticker" => "XYZ"},
+                 Map.merge(@assigns_map, %{
+                   assigns: %{
+                     tickers: [],
+                     basket: []
+                   }
+                 })
+               )
+    end
+  end
+
+  describe "handle_info/3 ticker update" do
+    test "processes a message with new bars", %{
+      basket_with_row: basket_with_row
+    } do
+      assert {
+               :noreply,
+               %{
+                 __changed__: %{__context__: true, basket: true},
+                 assigns: %{
+                   basket: ^basket_with_row,
+                   tickers: []
+                 },
+                 basket: [
+                   %{
+                     "S" => {"XYZ", ""},
+                     "c" => {189.15, "down"},
+                     "h" => {189.15, "down"},
+                     "l" => {189.05, "down"},
+                     "n" => {359, ""},
+                     "o" => {189.11, "down"},
+                     "t" => {"2023-11-15T21:59:00Z", ""},
+                     "v" => {43032, "down"},
+                     "vw" => {189.117416, "down"}
+                   }
+                 ]
+               }
+             } =
+               Overview.handle_info(
+                 %Phoenix.Socket.Broadcast{
+                   topic: "bars",
+                   event: "ticker-update",
+                   payload: %{
+                     "S" => "XYZ",
+                     "c" => 189.15,
+                     "h" => 189.15,
+                     "l" => 189.05,
+                     "n" => 359,
+                     "o" => 189.11,
+                     "t" => "2023-11-15T21:59:00Z",
+                     "v" => 43032,
+                     "vw" => 189.117416
+                   }
+                 },
+                 Map.merge(@assigns_map, %{
+                   assigns: %{tickers: [], basket: basket_with_row},
+                   basket: basket_with_row
                  })
                )
     end

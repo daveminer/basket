@@ -33,9 +33,7 @@ defmodule BasketWeb.Overview do
   end
 
   def handle_event("ticker-add", %{"selected-ticker" => ticker}, socket) do
-    basket_tickers =
-      Enum.map(socket.assigns.basket, &Map.get(&1, "S"))
-      |> Enum.map(fn x -> if is_tuple(x), do: elem(x, 0), else: x end)
+    basket_tickers = tickers(socket)
 
     if ticker in basket_tickers or String.trim(ticker) == "" do
       {:noreply, socket}
@@ -64,15 +62,21 @@ defmodule BasketWeb.Overview do
     end
   end
 
-  def handle_event("ticker-remove", %{"ticker" => ticker}, socket) do
-    :ok = Websocket.Alpaca.unsubscribe(%{bars: [ticker], quotes: [], trades: []})
+  def handle_event("ticker-remove", %{"selected-ticker" => ticker}, socket) do
+    basket_tickers = tickers(socket)
 
-    {:reply, %{},
-     assign(
-       socket,
-       :basket,
-       Enum.filter(socket.assigns.basket, fn t -> elem(t["S"], 0) != ticker end)
-     )}
+    if ticker not in basket_tickers or String.trim(ticker) == "" do
+      {:noreply, socket}
+    else
+      :ok = Websocket.Alpaca.unsubscribe(%{bars: [ticker], quotes: [], trades: []})
+
+      {:reply, %{},
+       assign(
+         socket,
+         :basket,
+         Enum.filter(socket.assigns.basket, fn t -> elem(t["S"], 0) != ticker end)
+       )}
+    end
   end
 
   def handle_info(
@@ -155,5 +159,10 @@ defmodule BasketWeb.Overview do
 
         {:ignore, []}
     end
+  end
+
+  defp tickers(socket) do
+    Enum.map(socket.assigns.basket, &Map.get(&1, "S"))
+    |> Enum.map(fn x -> if is_tuple(x), do: elem(x, 0), else: x end)
   end
 end

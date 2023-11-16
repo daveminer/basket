@@ -4,12 +4,10 @@ defmodule BasketWeb.Overview do
   """
   use Surface.LiveView
 
-  import BasketWeb.CoreComponents
-
   require Logger
 
   alias Basket.{Http, Websocket}
-  alias BasketWeb.Components.{NavRow, SearchInput}
+  alias BasketWeb.Components.{NavRow, SearchInput, TickerBarTable}
 
   prop tickers, :list, default: []
 
@@ -117,20 +115,7 @@ defmodule BasketWeb.Overview do
       <div class="w-1/4">
         <.live_component module={SearchInput} id="stock-search-input" tickers={@tickers} />
       </div>
-      <.table id="ticker-list" rows={@basket}>
-        <:col :let={ticker} key="S" label="ticker">{elem(ticker["S"], 0)}</:col>
-        <:col :let={ticker} key="o" label="open">{elem(ticker["o"], 0)}</:col>
-        <:col :let={ticker} key="h" label="high">{elem(ticker["h"], 0)}</:col>
-        <:col :let={ticker} key="l" label="low">{elem(ticker["l"], 0)}</:col>
-        <:col :let={ticker} key="c" label="close">{elem(ticker["c"], 0)}</:col>
-        <:col :let={ticker} key="v" label="volume">{elem(ticker["v"], 0)}</:col>
-        <:col :let={ticker} key="t" label="timestamp">{elem(ticker["t"], 0)}</:col>
-        <:col :let={ticker} label="remove">
-          <.button phx-click="ticker-remove" phx-value-ticker={elem(ticker["S"], 0)}>
-            Remove
-          </.button>
-        </:col>"
-      </.table>
+      <TickerBarTable id="ticker-bar-table" rows={@basket} />
     </div>
     """
   end

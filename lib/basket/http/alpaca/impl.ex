@@ -1,4 +1,7 @@
 defmodule Basket.Http.Alpaca.Impl do
+  @moduledoc """
+  Implmentation of the Alpaca API HTTP client.
+  """
   use HTTPoison.Base
 
   @behaviour Basket.Http.Alpaca
@@ -8,7 +11,9 @@ defmodule Basket.Http.Alpaca.Impl do
 
   @impl Basket.Http.Alpaca
   def latest_quote(ticker) do
-    case get("#{data_url()}#{@latest_quotes_resource}", [],
+    case get(
+           "#{data_url()}#{@latest_quotes_resource}",
+           [],
            params: %{feed: "iex", symbols: ticker}
          ) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
@@ -21,7 +26,9 @@ defmodule Basket.Http.Alpaca.Impl do
 
   @impl Basket.Http.Alpaca
   def list_assets do
-    case get("#{market_url()}#{@assets_resource}", [],
+    case get(
+           "#{market_url()}#{@assets_resource}",
+           [],
            params: %{status: "active", asset_class: "us_equity"}
          ) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->

@@ -44,14 +44,7 @@ defmodule BasketWeb.Overview do
           {:ok, response} ->
             %{"bars" => ticker_bars} = response
 
-            initial_bars =
-              if ticker_bars == %{} do
-                %{"t" => "Market Closed"}
-              else
-                Enum.reduce(ticker_bars, %{}, fn {k, v}, acc ->
-                  Map.put(acc, k, %TickerBar{value: v})
-                end)
-              end
+            initial_bars = build_ticker_bars(ticker_bars)
 
             assign(
               socket,
@@ -122,6 +115,16 @@ defmodule BasketWeb.Overview do
       <.live_component module={TickerBarTable} id="ticker-bar-table" rows={@basket} />
     </div>
     """
+  end
+
+  defp build_ticker_bars(ticker_bars) do
+    if ticker_bars == %{} do
+      %{"t" => "Market Closed"}
+    else
+      Enum.reduce(ticker_bars, %{}, fn {k, v}, acc ->
+        Map.put(acc, k, %TickerBar{value: v})
+      end)
+    end
   end
 
   defp load_tickers do

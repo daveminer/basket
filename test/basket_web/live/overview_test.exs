@@ -263,7 +263,7 @@ defmodule BasketWeb.OverviewTest do
                        value: "2023-11-15T20:59:00Z",
                        prev_value: "2023-11-15T20:58:00Z"
                      },
-                     "v" => %TickerBar{value: 43031, prev_value: 43025},
+                     "v" => %TickerBar{value: 43_031, prev_value: 43_025},
                      "vw" => %TickerBar{value: 188.117416, prev_value: 187.137416}
                    }
                  ]
@@ -284,7 +284,7 @@ defmodule BasketWeb.OverviewTest do
                        value: "2023-11-15T20:59:00Z",
                        prev_value: "2023-11-15T20:59:00Z"
                      },
-                     "v" => %TickerBar{value: 43031, prev_value: 43031},
+                     "v" => %TickerBar{value: 43_031, prev_value: 43_031},
                      "vw" => %TickerBar{
                        value: 188.117416,
                        prev_value: 187.117416

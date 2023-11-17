@@ -268,7 +268,7 @@ defmodule BasketWeb.CoreComponents do
     <button
       type={@type}
       class={[
-        "phx-submit-loading:opacity-75 rounded-lg bg-zinc-900 hover:bg-zinc-700 py-2 px-3",
+        "phx-submit-loading:opacity-75 rounded-lg py-2 px-3",
         "text-sm font-semibold leading-6 text-white active:text-white/80",
         @class
       ]}
@@ -718,20 +718,19 @@ defmodule BasketWeb.CoreComponents do
     for {^field, {msg, opts}} <- errors, do: translate_error({msg, opts})
   end
 
-  def diff_color(col, row) do
+  defp diff_color(col, row) do
     key = Map.get(col, :key)
 
     field = row[key]
 
-    # For the "remove" button
-    if is_nil(field) do
-      ""
-    else
-      case elem(field, 1) do
-        "up" -> "bg-emerald-300 text-emerald-900"
-        "down" -> "bg-rose-300 text-rose-900"
+    if is_number(field.value) do
+      case field.value - field.prev_value do
+        x when x > 0 -> "bg-emerald-300 text-emerald-900"
+        x when x < 0 -> "bg-rose-300 text-rose-900"
         _ -> ""
       end
+    else
+      ""
     end
   end
 end

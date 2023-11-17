@@ -6,6 +6,7 @@ defmodule BasketWeb.OverviewTest do
   import Mox
 
   alias BasketWeb.Overview
+  alias BasketWeb.Overview.TickerBar
 
   @assigns_map %{__changed__: %{__context__: true}}
 
@@ -30,15 +31,15 @@ defmodule BasketWeb.OverviewTest do
        },
        basket_with_row: [
          %{
-           "S" => {"XYZ", ""},
-           "c" => {188.15, ""},
-           "h" => {188.15, ""},
-           "l" => {188.05, ""},
-           "n" => {358, ""},
-           "o" => {188.11, ""},
-           "t" => {"2023-11-15T20:59:00Z", ""},
-           "v" => {43_031, ""},
-           "vw" => {188.117416, ""}
+           "S" => %TickerBar{value: "XYZ", prev_value: "XYZ"},
+           "c" => %TickerBar{value: 188.15, prev_value: 187.15},
+           "h" => %TickerBar{value: 188.15, prev_value: 187.15},
+           "l" => %TickerBar{value: 188.05, prev_value: 187.15},
+           "n" => %TickerBar{value: 358, prev_value: 357},
+           "o" => %TickerBar{value: 188.11, prev_value: 187.11},
+           "t" => %TickerBar{value: "2023-11-15T20:59:00Z", prev_value: "2023-11-15T20:58:00Z"},
+           "v" => %TickerBar{value: 43_031, prev_value: 43_025},
+           "vw" => %TickerBar{value: 188.117416, prev_value: 187.137416}
          }
        ]
      }}
@@ -245,22 +246,25 @@ defmodule BasketWeb.OverviewTest do
       assert {
                :noreply,
                %{
-                 __changed__: %{__context__: true, basket: true},
+                 __changed__: %{__context__: true},
                  assigns: %{
                    basket: ^basket_with_row,
                    tickers: []
                  },
                  basket: [
                    %{
-                     "S" => {"XYZ", ""},
-                     "c" => {189.15, "down"},
-                     "h" => {189.15, "down"},
-                     "l" => {189.05, "down"},
-                     "n" => {359, ""},
-                     "o" => {189.11, "down"},
-                     "t" => {"2023-11-15T21:59:00Z", ""},
-                     "v" => {43_032, "down"},
-                     "vw" => {189.117416, "down"}
+                     "S" => %TickerBar{value: "XYZ", prev_value: "XYZ"},
+                     "c" => %TickerBar{value: 188.15, prev_value: 187.15},
+                     "h" => %TickerBar{value: 188.15, prev_value: 187.15},
+                     "l" => %TickerBar{value: 188.05, prev_value: 187.15},
+                     "n" => %TickerBar{value: 358, prev_value: 357},
+                     "o" => %TickerBar{value: 188.11, prev_value: 187.11},
+                     "t" => %TickerBar{
+                       value: "2023-11-15T20:59:00Z",
+                       prev_value: "2023-11-15T20:58:00Z"
+                     },
+                     "v" => %TickerBar{value: 43031, prev_value: 43025},
+                     "vw" => %TickerBar{value: 188.117416, prev_value: 187.137416}
                    }
                  ]
                }
@@ -270,15 +274,21 @@ defmodule BasketWeb.OverviewTest do
                    topic: "bars",
                    event: "ticker-update",
                    payload: %{
-                     "S" => "XYZ",
-                     "c" => 189.15,
-                     "h" => 189.15,
-                     "l" => 189.05,
-                     "n" => 359,
-                     "o" => 189.11,
-                     "t" => "2023-11-15T21:59:00Z",
-                     "v" => 43_032,
-                     "vw" => 189.117416
+                     "S" => %TickerBar{value: "XYZ", prev_value: "XYZ"},
+                     "c" => %TickerBar{value: 188.15, prev_value: 187.15},
+                     "h" => %TickerBar{value: 188.15, prev_value: 187.15},
+                     "l" => %TickerBar{value: 188.15, prev_value: 187.15},
+                     "n" => %TickerBar{value: 358, prev_value: 358},
+                     "o" => %TickerBar{value: 188.11, prev_value: 187.15},
+                     "t" => %TickerBar{
+                       value: "2023-11-15T20:59:00Z",
+                       prev_value: "2023-11-15T20:59:00Z"
+                     },
+                     "v" => %TickerBar{value: 43031, prev_value: 43031},
+                     "vw" => %TickerBar{
+                       value: 188.117416,
+                       prev_value: 187.117416
+                     }
                    }
                  },
                  Map.merge(@assigns_map, %{

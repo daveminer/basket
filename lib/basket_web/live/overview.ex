@@ -8,6 +8,7 @@ defmodule BasketWeb.Overview do
 
   alias Basket.{Http, Websocket}
   alias BasketWeb.Components.{NavRow, SearchInput, TickerBarTable}
+  alias BasketWeb.Overview.TickerBar
 
   prop tickers, :list, default: []
 
@@ -41,14 +42,21 @@ defmodule BasketWeb.Overview do
       socket =
         case Http.Alpaca.latest_quote(ticker) do
           {:ok, response} ->
-            %{"bars" => %{^ticker => bars}} = response
+            %{"bars" => ticker_bars} = response
 
-            initial_bars = for {k, v} <- bars, into: %{}, do: {k, {v, ""}}
+            initial_bars =
+              if ticker_bars == %{} do
+                %{"t" => "Market Closed"}
+              else
+                Enum.reduce(ticker_bars, %{}, fn {k, v}, acc ->
+                  Map.put(acc, k, %TickerBar{value: v})
+                end)
+              end
 
             assign(
               socket,
               :basket,
-              socket.assigns.basket ++ [Map.merge(initial_bars, %{"S" => {ticker, ""}})]
+              socket.assigns.basket ++ [initial_bars]
             )
 
           {:error, error} ->
@@ -72,7 +80,7 @@ defmodule BasketWeb.Overview do
        assign(
          socket,
          :basket,
-         Enum.filter(socket.assigns.basket, fn t -> elem(t["S"], 0) != ticker end)
+         Enum.filter(socket.assigns.basket, fn t -> t["S"].value != ticker end)
        )}
     end
   end
@@ -82,21 +90,17 @@ defmodule BasketWeb.Overview do
         socket
       ) do
     # Get the old ticker data
-    old_ticker = Enum.find(socket.assigns.basket, fn t -> elem(t["S"], 0) == bars["S"] end)
+    old_ticker = Enum.find(socket.assigns.basket, fn t -> t["S"].value == bars["S"].value end)
 
     bars_with_changes =
-      for {k, v} <- bars, into: %{} do
-        if k in ["S", "T", "t", "n"] do
-          {k, {v, ""}}
-        else
-          {k, {v, diff_direction(old_ticker[k], bars[k])}}
-        end
-      end
+      Enum.reduce(bars, %{}, fn {k, v}, acc ->
+        Map.put(acc, k, %TickerBar{value: v, prev_value: old_ticker[k].value})
+      end)
 
     new_basket =
       Enum.map(socket.assigns.basket, fn row ->
-        if elem(row["S"], 0) == bars["S"],
-          do: Map.merge(bars_with_changes, %{"S" => {bars["S"], ""}}),
+        if row["S"].value == bars["S"],
+          do: bars_with_changes,
           else: row
       end)
 
@@ -120,15 +124,6 @@ defmodule BasketWeb.Overview do
     """
   end
 
-  defp diff_direction(old, new) do
-    cond do
-      !is_tuple(old) -> "same"
-      elem(old, 0) > new -> "up"
-      elem(old, 0) < new -> "down"
-      true -> "same"
-    end
-  end
-
   defp load_tickers do
     case Http.Alpaca.list_assets() do
       {:ok, result} ->
@@ -146,8 +141,5 @@ defmodule BasketWeb.Overview do
     end
   end
 
-  defp tickers(socket) do
-    Enum.map(socket.assigns.basket, &Map.get(&1, "S"))
-    |> Enum.map(fn x -> if is_tuple(x), do: elem(x, 0), else: x end)
-  end
+  defp tickers(socket), do: Enum.map(socket.assigns.basket, &Map.get(&1, "S").value)
 end

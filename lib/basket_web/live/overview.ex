@@ -11,6 +11,7 @@ defmodule BasketWeb.Overview do
   alias Basket.Alpaca.HttpClient
   alias Basket.Websocket.Alpaca
   alias BasketWeb.Components.{NavRow, SearchInput}
+  alias BasketWeb.Overview.TickerBar
 
   prop tickers, :list, default: []
 
@@ -41,12 +42,18 @@ defmodule BasketWeb.Overview do
         {:ok, response} ->
           %{"bars" => %{^ticker => bars}} = response
 
-          initial_bars = for {k, v} <- bars, into: %{}, do: {k, {v, ""}}
+          initial_bars =
+            Enum.reduce(
+              bars,
+              %{},
+              fn {k, v}, acc -> Map.put(acc, k, %TickerBar{value: v}) end
+            )
+            |> Map.merge(%{"S" => %TickerBar{value: ticker}})
 
           assign(
             socket,
             :basket,
-            socket.assigns.basket ++ [Map.merge(initial_bars, %{"S" => {ticker, ""}})]
+            socket.assigns.basket ++ [initial_bars]
           )
 
         {:error, error} ->
@@ -60,11 +67,13 @@ defmodule BasketWeb.Overview do
   def handle_event("ticker-remove", %{"ticker" => ticker}, socket) do
     :ok = Alpaca.unsubscribe(%{bars: [ticker], quotes: [], trades: []})
 
+    ticker_removed = Enum.filter(socket.assigns.basket, fn t -> t["S"].value != ticker end)
+
     {:reply, %{},
      assign(
        socket,
        :basket,
-       Enum.filter(socket.assigns.basket, fn t -> elem(t["S"], 0) != ticker end)
+       ticker_removed
      )}
   end
 
@@ -73,16 +82,23 @@ defmodule BasketWeb.Overview do
         socket
       ) do
     # Get the old ticker data
-    old_ticker = Enum.find(socket.assigns.basket, fn t -> elem(t["S"], 0) == bars["S"] end)
+    old_ticker = Enum.find(socket.assigns.basket, fn t -> t["S"].value == bars["S"] end)
 
     bars_with_changes =
-      for {k, v} <- bars, into: %{} do
+      Enum.reduce(bars, %{}, fn {k, v}, acc ->
         if k in ["S", "T", "t", "n"] do
-          {k, {v, ""}}
+          Map.put(acc, k, %TickerBar{value: v, prev_value: old_ticker[k].value})
         else
-          {k, {v, diff_direction(old_ticker[k], bars[k])}}
+          Map.put(acc, k, {v, diff_direction(old_ticker[k], bars[k])})
         end
       end
+      # for {k, v} <- bars, into: %{} do
+      #   if k in ["S", "T", "t", "n"] do
+      #     {k, {v, ""}}
+      #   else
+      #     {k, {v, diff_direction(old_ticker[k], bars[k])}}
+      #   end
+      # end
 
     new_basket =
       Enum.map(socket.assigns.basket, fn row ->

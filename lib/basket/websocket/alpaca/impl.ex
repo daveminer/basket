@@ -5,6 +5,8 @@ defmodule Basket.Websocket.Alpaca.Impl do
 
   require Logger
 
+  @behaviour Basket.Websocket.Alpaca
+
   @subscribe_message %{
     action: :subscribe
   }
@@ -12,12 +14,14 @@ defmodule Basket.Websocket.Alpaca.Impl do
     action: :unsubscribe
   }
 
+  @impl true
   def start_link(state) do
     Logger.info("Starting Alpaca websocket client.")
 
     WebSockex.start_link(iex_feed(), Basket.Websocket.Alpaca, state, extra_headers: auth_headers())
   end
 
+  @impl true
   def subscribe(tickers) do
     decoded_message = Jason.encode!(build_message(@subscribe_message, tickers))
 
@@ -27,6 +31,7 @@ defmodule Basket.Websocket.Alpaca.Impl do
     end
   end
 
+  @impl true
   def unsubscribe(tickers) do
     decoded_message = Jason.encode!(build_message(@unsubscribe_message, tickers))
 

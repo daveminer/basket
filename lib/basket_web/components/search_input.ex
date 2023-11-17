@@ -42,8 +42,8 @@ defmodule BasketWeb.Components.SearchInput do
           {/for}
         </datalist>
         <:actions>
-          <.button class="whitespace-nowrap">
-            Add
+          <.button class="bg-green-600 whitespace-nowrap w-12">
+            +
           </.button>
         </:actions>
       </.inline_form>

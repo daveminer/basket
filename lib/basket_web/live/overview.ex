@@ -4,18 +4,15 @@ defmodule BasketWeb.Overview do
   """
   use Surface.LiveView
 
-  import BasketWeb.CoreComponents
-
   require Logger
 
-  alias Basket.Alpaca.HttpClient
-  alias Basket.Websocket.Alpaca
-  alias BasketWeb.Components.{NavRow, SearchInput}
+  alias Basket.{Http, Websocket}
+  alias BasketWeb.Components.{NavRow, SearchInput, TickerBarTable}
 
   prop tickers, :list, default: []
 
   def mount(_, _, socket) do
-    BasketWeb.Endpoint.subscribe(Alpaca.bars_topic())
+    BasketWeb.Endpoint.subscribe(Websocket.Alpaca.bars_topic())
 
     socket = assign(socket, tickers: [])
     socket = assign(socket, basket: [])
@@ -34,38 +31,50 @@ defmodule BasketWeb.Overview do
   end
 
   def handle_event("ticker-add", %{"selected-ticker" => ticker}, socket) do
-    :ok = Alpaca.subscribe(%{bars: [ticker], quotes: [], trades: []})
+    basket_tickers = tickers(socket)
 
-    socket =
-      case HttpClient.latest_quote(ticker) do
-        {:ok, response} ->
-          %{"bars" => %{^ticker => bars}} = response
+    if ticker in basket_tickers or String.trim(ticker) == "" do
+      {:noreply, socket}
+    else
+      :ok = Websocket.Alpaca.subscribe(%{bars: [ticker], quotes: [], trades: []})
 
-          initial_bars = for {k, v} <- bars, into: %{}, do: {k, {v, ""}}
+      socket =
+        case Http.Alpaca.latest_quote(ticker) do
+          {:ok, response} ->
+            %{"bars" => %{^ticker => bars}} = response
 
-          assign(
-            socket,
-            :basket,
-            socket.assigns.basket ++ [Map.merge(initial_bars, %{"S" => {ticker, ""}})]
-          )
+            initial_bars = for {k, v} <- bars, into: %{}, do: {k, {v, ""}}
 
-        {:error, error} ->
-          Logger.error("Could not subscribe to ticker: #{error}")
-          socket
-      end
+            assign(
+              socket,
+              :basket,
+              socket.assigns.basket ++ [Map.merge(initial_bars, %{"S" => {ticker, ""}})]
+            )
 
-    {:reply, %{}, socket}
+          {:error, error} ->
+            Logger.error("Could not subscribe to ticker: #{error}")
+            socket
+        end
+
+      {:reply, %{}, socket}
+    end
   end
 
   def handle_event("ticker-remove", %{"ticker" => ticker}, socket) do
-    :ok = Alpaca.unsubscribe(%{bars: [ticker], quotes: [], trades: []})
+    basket_tickers = tickers(socket)
 
-    {:reply, %{},
-     assign(
-       socket,
-       :basket,
-       Enum.filter(socket.assigns.basket, fn t -> elem(t["S"], 0) != ticker end)
-     )}
+    if ticker not in basket_tickers or String.trim(ticker) == "" do
+      {:noreply, socket}
+    else
+      :ok = Websocket.Alpaca.unsubscribe(%{bars: [ticker], quotes: [], trades: []})
+
+      {:reply, %{},
+       assign(
+         socket,
+         :basket,
+         Enum.filter(socket.assigns.basket, fn t -> elem(t["S"], 0) != ticker end)
+       )}
+    end
   end
 
   def handle_info(
@@ -106,20 +115,7 @@ defmodule BasketWeb.Overview do
       <div class="w-1/4">
         <.live_component module={SearchInput} id="stock-search-input" tickers={@tickers} />
       </div>
-      <.table id="ticker-list" rows={@basket}>
-        <:col :let={ticker} key="S" label="ticker">{elem(ticker["S"], 0)}</:col>
-        <:col :let={ticker} key="o" label="open">{elem(ticker["o"], 0)}</:col>
-        <:col :let={ticker} key="h" label="high">{elem(ticker["h"], 0)}</:col>
-        <:col :let={ticker} key="l" label="low">{elem(ticker["l"], 0)}</:col>
-        <:col :let={ticker} key="c" label="close">{elem(ticker["c"], 0)}</:col>
-        <:col :let={ticker} key="v" label="volume">{elem(ticker["v"], 0)}</:col>
-        <:col :let={ticker} key="t" label="timestamp">{elem(ticker["t"], 0)}</:col>
-        <:col :let={ticker} label="remove">
-          <.button phx-click="ticker-remove" phx-value-ticker={elem(ticker["S"], 0)}>
-            Remove
-          </.button>
-        </:col>"
-      </.table>
+      <.live_component module={TickerBarTable} id="ticker-bar-table" rows={@basket} />
     </div>
     """
   end
@@ -134,7 +130,7 @@ defmodule BasketWeb.Overview do
   end
 
   defp load_tickers do
-    case HttpClient.list_assets() do
+    case Http.Alpaca.list_assets() do
       {:ok, result} ->
         tickers =
           Enum.map(result, fn asset ->
@@ -148,5 +144,10 @@ defmodule BasketWeb.Overview do
 
         {:ignore, []}
     end
+  end
+
+  defp tickers(socket) do
+    Enum.map(socket.assigns.basket, &Map.get(&1, "S"))
+    |> Enum.map(fn x -> if is_tuple(x), do: elem(x, 0), else: x end)
   end
 end

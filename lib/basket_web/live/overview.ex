@@ -32,6 +32,7 @@ defmodule BasketWeb.Overview do
   end
 
   def handle_event("ticker-add", %{"selected-ticker" => ticker}, socket) do
+    IO.inspect("SOCKET: #{inspect(socket.assigns)}")
     basket_tickers = tickers(socket)
 
     if ticker in basket_tickers or String.trim(ticker) == "" do
@@ -43,19 +44,23 @@ defmodule BasketWeb.Overview do
         case Http.Alpaca.latest_quote(ticker) do
           {:ok, response} ->
             %{"bars" => ticker_bars} = response
-
-            initial_bars = build_ticker_bars(ticker_bars)
+            new_ticker_bars = Map.to_list(ticker_bars) |> List.first()
+            initial_bars = build_ticker_bars(elem(new_ticker_bars, 1))
 
             assign(
               socket,
               :basket,
-              socket.assigns.basket ++ [initial_bars]
+              socket.assigns.basket ++
+                [Map.merge(initial_bars, %{"S" => %TickerBar{value: ticker}})]
             )
 
           {:error, error} ->
             Logger.error("Could not subscribe to ticker: #{error}")
             socket
         end
+
+      form = to_form(%{"selected-ticker" => ""})
+      socket = assign(socket, :ticker_search_form, form)
 
       {:reply, %{}, socket}
     end
@@ -82,20 +87,18 @@ defmodule BasketWeb.Overview do
         %Phoenix.Socket.Broadcast{topic: "bars", event: "ticker-update", payload: bars},
         socket
       ) do
-    # Get the old ticker data
-    old_ticker = Enum.find(socket.assigns.basket, fn t -> t["S"].value == bars["S"].value end)
-
-    bars_with_changes =
-      Enum.reduce(bars, %{}, fn {k, v}, acc ->
-        Map.put(acc, k, %TickerBar{value: v, prev_value: old_ticker[k].value})
-      end)
+    IO.inspect("BASKET: #{inspect(socket.assigns.basket)}")
+    IO.inspect("BARS: #{inspect(bars)}")
+    ticker = bars["S"]
 
     new_basket =
       Enum.map(socket.assigns.basket, fn row ->
-        if row["S"].value == bars["S"],
-          do: bars_with_changes,
+        if row["S"].value == ticker,
+          do: new_ticker_row(row, bars),
           else: row
       end)
+
+    IO.inspect("NB: #{inspect(new_basket)}")
 
     {:noreply,
      assign(
@@ -142,6 +145,13 @@ defmodule BasketWeb.Overview do
 
         {:ignore, []}
     end
+  end
+
+  defp new_ticker_row(row, bars) do
+    Enum.reduce(row, %{}, fn {k, v}, acc ->
+      new_value = Map.get(bars, k)
+      Map.put(acc, k, %TickerBar{value: new_value, prev_value: v.value})
+    end)
   end
 
   defp tickers(socket), do: Enum.map(socket.assigns.basket, &Map.get(&1, "S").value)

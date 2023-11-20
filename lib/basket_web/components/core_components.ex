@@ -721,16 +721,20 @@ defmodule BasketWeb.CoreComponents do
   defp diff_color(col, row) do
     key = Map.get(col, :key)
 
-    field = row[key]
-
-    if is_number(field.value) do
-      case field.value - field.prev_value do
-        x when x > 0 -> "bg-emerald-300 text-emerald-900"
-        x when x < 0 -> "bg-rose-300 text-rose-900"
-        _ -> ""
-      end
-    else
+    if is_nil(key) do
       ""
+    else
+      field = row[key]
+
+      if field != nil && is_number(field.value) && is_number(field.prev_value) do
+        case field.value - field.prev_value do
+          x when x > 0 -> "bg-emerald-300 text-emerald-900"
+          x when x < 0 -> "bg-rose-300 text-rose-900"
+          _ -> ""
+        end
+      else
+        ""
+      end
     end
   end
 end

@@ -30,7 +30,7 @@ defmodule BasketWeb.Components.SearchInput do
         <.input
           name="selected-ticker"
           value=""
-          field={@ticker_search_form["ticker_search_field"]}
+          field={assigns.ticker_search_form["ticker_search_field"]}
           list="tickers"
           phx-debounce="500"
           errors={["TODO"]}

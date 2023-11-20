@@ -273,23 +273,38 @@ defmodule BasketWeb.OverviewTest do
                  %Phoenix.Socket.Broadcast{
                    topic: "bars",
                    event: "ticker-update",
-                   payload: %{
-                     "S" => %TickerBar{value: "XYZ", prev_value: "XYZ"},
-                     "c" => %TickerBar{value: 188.15, prev_value: 187.15},
-                     "h" => %TickerBar{value: 188.15, prev_value: 187.15},
-                     "l" => %TickerBar{value: 188.15, prev_value: 187.15},
-                     "n" => %TickerBar{value: 358, prev_value: 358},
-                     "o" => %TickerBar{value: 188.11, prev_value: 187.15},
-                     "t" => %TickerBar{
-                       value: "2023-11-15T20:59:00Z",
-                       prev_value: "2023-11-15T20:59:00Z"
+                   payload: [
+                     %{
+                       "S" => %BasketWeb.Overview.TickerBar{value: "TSLA", prev_value: nil},
+                       "T" => %BasketWeb.Overview.TickerBar{value: "b", prev_value: nil},
+                       "c" => %BasketWeb.Overview.TickerBar{value: 234.32, prev_value: nil},
+                       "h" => %BasketWeb.Overview.TickerBar{value: 234.52, prev_value: nil},
+                       "l" => %BasketWeb.Overview.TickerBar{value: 234.3, prev_value: nil},
+                       "n" => %BasketWeb.Overview.TickerBar{value: 12, prev_value: nil},
+                       "o" => %BasketWeb.Overview.TickerBar{value: 234.52, prev_value: nil},
+                       "t" => %BasketWeb.Overview.TickerBar{
+                         value: "2023-11-20T16:24:00Z",
+                         prev_value: nil
+                       },
+                       "v" => %BasketWeb.Overview.TickerBar{value: 856, prev_value: nil},
+                       "vw" => %BasketWeb.Overview.TickerBar{value: 234.43257, prev_value: nil}
                      },
-                     "v" => %TickerBar{value: 43_031, prev_value: 43_031},
-                     "vw" => %TickerBar{
-                       value: 188.117416,
-                       prev_value: 187.117416
+                     %{
+                       "S" => %BasketWeb.Overview.TickerBar{value: "AAPL", prev_value: nil},
+                       "T" => %BasketWeb.Overview.TickerBar{value: "b", prev_value: nil},
+                       "c" => %BasketWeb.Overview.TickerBar{value: 191.285, prev_value: nil},
+                       "h" => %BasketWeb.Overview.TickerBar{value: 191.37, prev_value: nil},
+                       "l" => %BasketWeb.Overview.TickerBar{value: 191.23, prev_value: nil},
+                       "n" => %BasketWeb.Overview.TickerBar{value: 50, prev_value: nil},
+                       "o" => %BasketWeb.Overview.TickerBar{value: 191.23, prev_value: nil},
+                       "t" => %BasketWeb.Overview.TickerBar{
+                         value: "2023-11-20T16:24:00Z",
+                         prev_value: nil
+                       },
+                       "v" => %BasketWeb.Overview.TickerBar{value: 5433, prev_value: nil},
+                       "vw" => %BasketWeb.Overview.TickerBar{value: 191.328043, prev_value: nil}
                      }
-                   }
+                   ]
                  },
                  Map.merge(@assigns_map, %{
                    assigns: %{tickers: [], basket: basket_with_row},

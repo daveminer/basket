@@ -36,8 +36,6 @@ defmodule Basket.Websocket.Alpaca do
 
   @impl true
   def handle_disconnect(disconnect_map, state) do
-    IO.inspect("DISC: #{inspect(disconnect_map)}")
-    IO.inspect("STATE: #{inspect(state)}")
     Logger.info("Alpaca websocket disconnected.")
     super(disconnect_map, state)
   end
@@ -63,8 +61,6 @@ defmodule Basket.Websocket.Alpaca do
 
   @impl true
   def handle_frame({_tpe, msg}, state) do
-    IO.inspect("FRAME: #{inspect(msg)}")
-
     case Jason.decode(msg) do
       {:ok, decoded_message} ->
         Enum.each(decoded_message, &process_message/1)

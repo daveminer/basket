@@ -20,8 +20,6 @@ defmodule BasketWeb.Components.TickerBarTable do
   end
 
   def render(assigns) do
-    IO.inspect("ROWS: #{@rows}")
-
     ~F"""
     <div>
       <.table id="ticker-list" rows={@rows}>

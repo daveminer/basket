@@ -1,4 +1,4 @@
-defmodule BasketWeb.Overview do
+defmodule BasketWeb.OverviewLive do
   @moduledoc """
   Home page shows a list of assets and updates them in realtime via websockets.
   """
@@ -7,8 +7,9 @@ defmodule BasketWeb.Overview do
   require Logger
 
   alias Basket.{Http, Websocket}
-  alias BasketWeb.Components.{NavRow, SearchInput, TickerBarTable}
-  alias BasketWeb.Overview.TickerBar
+  alias BasketWeb.Components.{NavRow, TickerBarTable}
+  alias BasketWeb.Live.Overview.Search
+  alias BasketWeb.Live.Overview.TickerBar
 
   def mount(_, _, socket) do
     BasketWeb.Endpoint.subscribe(Websocket.Alpaca.bars_topic())
@@ -18,7 +19,8 @@ defmodule BasketWeb.Overview do
     {:ok, socket}
   end
 
-  def handle_event("ticker-add", %{"selected_ticker" => ticker}, socket) do
+  # def handle_event("ticker-add", %{"search_value" => ticker}, socket) do
+  def handle_info({"ticker-add", %{"selected_ticker" => ticker}}, socket) do
     IO.inspect("SOCKET: #{inspect(socket.assigns)}")
     basket_tickers = tickers(socket)
 
@@ -43,34 +45,18 @@ defmodule BasketWeb.Overview do
 
           {:error, error} ->
             Logger.error("Could not subscribe to ticker: #{error}")
-            socket
+            # socket
         end
 
-      send_update(
-        self(),
-        SearchInput,
-        id: "stock-search-input",
-        ticker_search_value: ""
-      )
+      # send_update(
+      #   self(),
+      #   SearchInput,
+      #   id: "stock-search-input",
+      #   ticker_search_value: ""
+      # )
 
-      {:reply, %{}, socket}
-    end
-  end
-
-  def handle_event("ticker-remove", %{"ticker" => ticker}, socket) do
-    basket_tickers = tickers(socket)
-
-    if ticker not in basket_tickers or String.trim(ticker) == "" do
+      # {:reply, %{}, socket}
       {:noreply, socket}
-    else
-      :ok = Websocket.Alpaca.unsubscribe(%{bars: [ticker], quotes: [], trades: []})
-
-      {:reply, %{},
-       assign(
-         socket,
-         :basket,
-         Enum.filter(socket.assigns.basket, fn t -> t["S"].value != ticker end)
-       )}
     end
   end
 
@@ -99,12 +85,39 @@ defmodule BasketWeb.Overview do
      )}
   end
 
+  def handle_event("ticker-remove", %{"ticker" => ticker}, socket) do
+    basket_tickers = tickers(socket)
+
+    if ticker not in basket_tickers or String.trim(ticker) == "" do
+      {:noreply, socket}
+    else
+      :ok = Websocket.Alpaca.unsubscribe(%{bars: [ticker], quotes: [], trades: []})
+
+      {:reply, %{},
+       assign(
+         socket,
+         :basket,
+         Enum.filter(socket.assigns.basket, fn t -> t["S"].value != ticker end)
+       )}
+    end
+  end
+
+  # def handle_event("ticker-search", %{"search_value" => _query}, socket) do
+  #   if length(socket.assigns.tickers) > 0 do
+  #     {:noreply, socket}
+  #   else
+  #     {_status, tickers} = Cachex.fetch(:assets, "all", fn _key -> load_tickers() end)
+
+  #     {:reply, %{}, assign(socket, :tickers, tickers)}
+  #   end
+  # end
+
   def render(assigns) do
     ~F"""
     <div class="flex-col p-8">
       <NavRow />
       <div class="w-1/4">
-        <.live_component module={SearchInput} id="stock-search-input" />
+        <.live_component module={Search} id="stock-search-input" />
       </div>
       <.live_component module={TickerBarTable} id="ticker-bar-table" rows={@basket} />
     </div>

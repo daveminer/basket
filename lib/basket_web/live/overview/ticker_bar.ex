@@ -1,6 +1,6 @@
-defmodule BasketWeb.Overview.TickerBar do
+defmodule BasketWeb.Live.Overview.TickerBar do
   @moduledoc """
-  Stateful representation of a cell on the ticker bar table.
+  Cell on the TickerBarTable.
   """
   alias __MODULE__
 

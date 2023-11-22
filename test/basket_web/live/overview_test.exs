@@ -5,8 +5,8 @@ defmodule BasketWeb.OverviewTest do
 
   import Mox
 
-  alias BasketWeb.Overview
-  alias BasketWeb.Overview.TickerBar
+  alias BasketWeb.Live.Overview
+  alias BasketWeb.Live.Overview.TickerBar
 
   @assigns_map %{__changed__: %{__context__: true}}
 

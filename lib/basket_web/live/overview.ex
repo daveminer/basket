@@ -19,8 +19,8 @@ defmodule BasketWeb.OverviewLive do
     {:ok, socket}
   end
 
-  # def handle_event("ticker-add", %{"search_value" => ticker}, socket) do
-  def handle_info({"ticker-add", %{"selected_ticker" => ticker}}, socket) do
+  def handle_info({"ticker-add", %{"search_value" => ticker}}, socket) do
+    # def handle_info({"ticker-add", %{"selected_ticker" => ticker}}, socket) do
     IO.inspect("SOCKET: #{inspect(socket.assigns)}")
     basket_tickers = tickers(socket)
 
@@ -34,6 +34,7 @@ defmodule BasketWeb.OverviewLive do
           {:ok, response} ->
             %{"bars" => ticker_bars} = response
             new_ticker_bars = Map.to_list(ticker_bars) |> List.first()
+            # TODO: nil not a tuple - AKUMQ
             initial_bars = build_ticker_bars(elem(new_ticker_bars, 1))
 
             assign(
@@ -48,14 +49,6 @@ defmodule BasketWeb.OverviewLive do
             # socket
         end
 
-      # send_update(
-      #   self(),
-      #   SearchInput,
-      #   id: "stock-search-input",
-      #   ticker_search_value: ""
-      # )
-
-      # {:reply, %{}, socket}
       {:noreply, socket}
     end
   end

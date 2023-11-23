@@ -41,41 +41,16 @@ defmodule BasketWeb.Live.Overview.Search do
   #   {:ok, socket}
   # end
 
-  def handle_event("ticker-add", %{"search_value" => _ticker}, socket) do
-    IO.inspect("COMPSOCKET: #{inspect(socket.assigns)}")
-    # basket_tickers = tickers(socket)
-
-    # if ticker in basket_tickers or String.trim(ticker) == "" do
-    #   {:noreply, socket}
-    # else
-    #   :ok = Websocket.Alpaca.subscribe(%{bars: [ticker], quotes: [], trades: []})
-
-    #   socket =
-    #     case Http.Alpaca.latest_quote(ticker) do
-    #       {:ok, response} ->
-    #         %{"bars" => ticker_bars} = response
-    #         new_ticker_bars = Map.to_list(ticker_bars) |> List.first()
-    #         initial_bars = build_ticker_bars(elem(new_ticker_bars, 1))
-
-    #         assign(
-    #           socket,
-    #           :basket,
-    #           socket.assigns.basket ++
-    #             [Map.merge(initial_bars, %{"S" => %TickerBar{value: ticker}})]
-    #         )
-
-    #       {:error, error} ->
-    #         Logger.error("Could not subscribe to ticker: #{error}")
-    #         socket
-    #     end
-    IO.inspect(socket.assigns, label: "SOCKASN")
+  def handle_event("ticker-add", %{"search_value" => ticker}, socket) do
+    IO.inspect(ticker, label: "TICKER ADD")
 
     send(
       self(),
-      {"ticker-add", %{"selected_ticker" => ""}}
+      {"ticker-add", %{"search_value" => ticker}}
     )
 
-    {:noreply, assign(socket, :form, %{"search_value" => ""})}
+    IO.inspect(socket, label: "SOOOOOOO")
+    {:reply, %{}, socket}
   end
 
   def handle_event("ticker-search", %{"search_value" => _query}, socket) do
@@ -94,29 +69,35 @@ defmodule BasketWeb.Live.Overview.Search do
     ~F"""
     <div class="flex">
       <Form
+        id="ticker-form"
         for={@form}
         change="ticker-search"
-        opts={phx_debounce: 500, autocomplete: "off", placeholder: "Search..."}
         submit="ticker-add"
+        opts={phx_debounce: 500, autocomplete: "off", "phx-hook": "ClearInput", placeholder: "Search..."}
         class="flex flex-row-reverse"
       >
         <Form.TextInput
+          id="ticker-input"
           field="search_value"
-          opts={list: "tickers"}
           value={@form["search_value"]}
+          opts={list: "tickers"}
           class="mt-2 mb-2 m-2"
         />
         <datalist id="tickers">
           {#for ticker <- assigns.tickers}
             <option value={ticker}>{ticker}</option>
           {/for}
+          <option value="" />
         </datalist>
 
-        <button class={[
-          "bg-green-600 whitespace-nowrap w-12",
-          "phx-submit-loading:opacity-75 rounded-lg mt-2 mb-2 m-2",
-          "text-sm font-semibold leading-6 text-white active:text-white/80"
-        ]}>
+        <button
+          class={[
+            "bg-green-600 whitespace-nowrap w-12",
+            "phx-submit-loading:opacity-75 rounded-lg mt-2 mb-2 m-2",
+            "text-sm font-semibold leading-6 text-white active:text-white/80"
+          ]}
+          type="submit"
+        >
           +
         </button>
       </Form>

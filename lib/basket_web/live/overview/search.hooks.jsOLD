@@ -1,0 +1,48 @@
+export default {
+  // mounted() {
+  //   this.el.addEventListener("submit", e => {
+
+  //     let ele = document.getElementById('ticker-input');
+  //     console.log(ele, "EL")
+  //     ele.value = "";
+  //     // const input = this.el.querySelector("input");
+  //     // console.log(input, "INPUT")
+  //     // if (input) {
+  //     //   input.value = '';
+  //     // }
+  //   });
+  // }
+  // updated() {
+  //   console.log(this.el, "THISEL")
+  // //   this.el.addEventListener("submit", e => {
+  //   //document.getElementById('ticker-input').value = "";
+  //     let ele = document.getElementById('ticker-input');
+  //     console.log(ele, "EL")
+  //     ele.value = "";
+  // //     // const input = this.el.querySelector("input");
+  // //     // console.log(input, "INPUT")
+  // //     // if (input) {
+  // //     //   input.value = '';
+  // //     // }
+  // //   });
+  // }
+};
+
+let Clear = {
+  updated() {
+    console.log(this.el, "THISEL")
+    //   this.el.addEventListener("submit", e => {
+    //document.getElementById('ticker-input').value = "";
+    let ele = document.getElementById('ticker-input');
+    console.log(ele, "EL")
+    ele.value = "";
+    //     // const input = this.el.querySelector("input");
+    //     // console.log(input, "INPUT")
+    //     // if (input) {
+    //     //   input.value = '';
+    //     // }
+    //   });
+  }
+}
+
+export { Clear}

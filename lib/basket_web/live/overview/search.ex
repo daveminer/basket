@@ -9,16 +9,15 @@ defmodule BasketWeb.Live.Overview.Search do
   require Logger
 
   alias Basket.Http
-  alias Surface.Components.Form
 
   attr :id, :string, required: true
   attr :class, :string, default: nil
 
-  data form, :map, default: %{"search_value" => ""}
+  data form, :map, default: %{"ticker" => ""}
   data tickers, :list, default: []
 
   def mount(socket) do
-    socket = assign(socket, :form, %{"search_value" => ""})
+    socket = assign(socket, :form, %{"ticker" => ""})
     socket = assign(socket, :tickers, [])
 
     {:ok, socket}
@@ -41,19 +40,22 @@ defmodule BasketWeb.Live.Overview.Search do
   #   {:ok, socket}
   # end
 
-  def handle_event("ticker-add", %{"search_value" => ticker}, socket) do
+  def handle_event("ticker-add", %{"ticker" => ticker}, socket) do
     IO.inspect(ticker, label: "TICKER ADD")
 
     send(
       self(),
-      {"ticker-add", %{"search_value" => ticker}}
+      {"ticker-add", %{"ticker" => ticker}}
     )
 
     IO.inspect(socket, label: "SOOOOOOO")
+    socket = assign(socket, :ticker, "")
     {:reply, %{}, socket}
   end
 
-  def handle_event("ticker-search", %{"search_value" => _query}, socket) do
+  def handle_event("ticker-search", %{"ticker" => ticker}, socket) do
+    socket = assign(socket, :form, %{"ticker" => ticker})
+
     if length(socket.assigns.tickers) > 0 do
       {:noreply, socket}
     else
@@ -68,19 +70,23 @@ defmodule BasketWeb.Live.Overview.Search do
 
     ~F"""
     <div class="flex">
-      <Form
-        id="ticker-form"
+      <.form
+        :let={f}
         for={@form}
-        change="ticker-search"
-        submit="ticker-add"
-        opts={phx_debounce: 500, autocomplete: "off", "phx-hook": "ClearInput", placeholder: "Search..."}
+        phx-submit="ticker-add"
+        phx-debounce="500"
+        phx-change="ticker-search"
+        phx-target={@myself}
+        autocomplete="off"
+        placeholder="Search..."
         class="flex flex-row-reverse"
       >
-        <Form.TextInput
+        <input
           id="ticker-input"
-          field="search_value"
-          value={@form["search_value"]}
-          opts={list: "tickers"}
+          name="ticker"
+          value={f["ticker"].value}
+          list="tickers"
+          type="text"
           class="mt-2 mb-2 m-2"
         />
         <datalist id="tickers">
@@ -89,7 +95,6 @@ defmodule BasketWeb.Live.Overview.Search do
           {/for}
           <option value="" />
         </datalist>
-
         <button
           class={[
             "bg-green-600 whitespace-nowrap w-12",
@@ -100,7 +105,7 @@ defmodule BasketWeb.Live.Overview.Search do
         >
           +
         </button>
-      </Form>
+      </.form>
     </div>
     """
   end

@@ -19,7 +19,7 @@ defmodule BasketWeb.OverviewLive do
     {:ok, socket}
   end
 
-  def handle_info({"ticker-add", %{"search_value" => ticker}}, socket) do
+  def handle_info({"ticker-add", %{"ticker" => ticker}}, socket) do
     # def handle_info({"ticker-add", %{"selected_ticker" => ticker}}, socket) do
     IO.inspect("SOCKET: #{inspect(socket.assigns)}")
     basket_tickers = tickers(socket)

@@ -23,33 +23,13 @@ defmodule BasketWeb.Live.Overview.Search do
     {:ok, socket}
   end
 
-  # def update(_assigns, socket) do
-  #   IO.inspect("SOCK BEF: #{inspect(socket)}")
-
-  #   socket =
-  #     assign(
-  #       socket,
-  #       :form,
-  #       to_form(%{
-  #         "search_value" => ""
-  #       })
-  #     )
-
-  #   IO.inspect("SOCK: #{inspect(socket)}")
-
-  #   {:ok, socket}
-  # end
-
   def handle_event("ticker-add", %{"ticker" => ticker}, socket) do
-    IO.inspect(ticker, label: "TICKER ADD")
-
     send(
       self(),
       {"ticker-add", %{"ticker" => ticker}}
     )
 
-    IO.inspect(socket, label: "SOOOOOOO")
-    socket = assign(socket, :ticker, "")
+    socket = assign(socket, :form, %{"ticker" => ""})
     {:reply, %{}, socket}
   end
 
@@ -66,8 +46,6 @@ defmodule BasketWeb.Live.Overview.Search do
   end
 
   def render(assigns) do
-    IO.inspect("TICK: #{inspect(assigns)}")
-
     ~F"""
     <div class="flex">
       <.form
@@ -127,27 +105,3 @@ defmodule BasketWeb.Live.Overview.Search do
     end
   end
 end
-
-# <.inline_form for={assigns.form} phx-submit="ticker-add">
-#   <.input
-#     name="selected_ticker"
-#     field="search_value"
-#     value={assigns.form["search_value"].value}
-#     list="tickers"
-#     phx-change="ticker-search"
-#     phx-debounce="500"
-#     phx-target={@myself}
-#     errors={[]}
-#   />
-
-#   <datalist id="tickers">
-#     {#for ticker <- assigns.tickers}
-#       <option value={ticker}>{ticker}</option>
-#     {/for}
-#   </datalist>
-#   <:actions>
-#     <.button class="bg-green-600 whitespace-nowrap w-12">
-#       +
-#     </.button>
-#   </:actions>
-# </.inline_form>

@@ -20,8 +20,6 @@ defmodule BasketWeb.OverviewLive do
   end
 
   def handle_info({"ticker-add", %{"ticker" => ticker}}, socket) do
-    # def handle_info({"ticker-add", %{"selected_ticker" => ticker}}, socket) do
-    IO.inspect("SOCKET: #{inspect(socket.assigns)}")
     basket_tickers = tickers(socket)
 
     if ticker in basket_tickers or String.trim(ticker) == "" do
@@ -57,8 +55,6 @@ defmodule BasketWeb.OverviewLive do
         %Phoenix.Socket.Broadcast{topic: "bars", event: "ticker-update", payload: bars},
         socket
       ) do
-    IO.inspect("BASKET: #{inspect(socket.assigns.basket)}")
-    IO.inspect("BARS: #{inspect(bars)}")
     ticker = bars["S"]
 
     new_basket =
@@ -67,8 +63,6 @@ defmodule BasketWeb.OverviewLive do
           do: new_ticker_row(row, bars),
           else: row
       end)
-
-    IO.inspect("NB: #{inspect(new_basket)}")
 
     {:noreply,
      assign(
@@ -94,16 +88,6 @@ defmodule BasketWeb.OverviewLive do
        )}
     end
   end
-
-  # def handle_event("ticker-search", %{"search_value" => _query}, socket) do
-  #   if length(socket.assigns.tickers) > 0 do
-  #     {:noreply, socket}
-  #   else
-  #     {_status, tickers} = Cachex.fetch(:assets, "all", fn _key -> load_tickers() end)
-
-  #     {:reply, %{}, assign(socket, :tickers, tickers)}
-  #   end
-  # end
 
   def render(assigns) do
     ~F"""

@@ -6,10 +6,9 @@ defmodule BasketWeb.OverviewLive do
 
   require Logger
 
-  alias Basket.{Http, Websocket}
+  alias Basket.Websocket
   alias BasketWeb.Components.{NavRow, TickerBarTable}
-  alias BasketWeb.Live.Overview.Search
-  alias BasketWeb.Live.Overview.TickerBar
+  alias BasketWeb.Live.Overview.{Search, TickerAdd, TickerBar}
 
   def mount(_, _, socket) do
     BasketWeb.Endpoint.subscribe(Websocket.Alpaca.bars_topic())
@@ -24,25 +23,18 @@ defmodule BasketWeb.OverviewLive do
       {:noreply, socket}
     else
       socket =
-        case Http.Alpaca.latest_quote(ticker) do
-          {:ok, response} ->
-            %{"bars" => ticker_bars} = response
-            new_ticker_bars = Map.to_list(ticker_bars) |> List.first()
-            # TODO: nil not a tuple - AKUMQ
-            initial_bars = build_ticker_bars(elem(new_ticker_bars, 1))
+        case TickerAdd.call(ticker) do
+          row when is_map(row) ->
+            :ok = Websocket.Alpaca.subscribe(%{bars: [ticker], quotes: [], trades: []})
+            assign(socket, :basket, (socket.assigns.basket ++ [row]) |> sort_by_ticker())
 
-            assign(
-              socket,
-              :basket,
-              socket.assigns.basket ++
-                [Map.merge(initial_bars, %{"S" => %TickerBar{value: ticker}})]
-            )
+          :market_closed ->
+            # TODO: add market closed row
+            socket
 
-          {:error, error} ->
-            Logger.error("Could not subscribe to ticker: #{error}")
+          _ ->
+            socket
         end
-
-      :ok = Websocket.Alpaca.subscribe(%{bars: [ticker], quotes: [], trades: []})
 
       {:noreply, socket}
     end
@@ -98,22 +90,18 @@ defmodule BasketWeb.OverviewLive do
     """
   end
 
-  defp build_ticker_bars(ticker_bars) do
-    if ticker_bars == %{} do
-      %{"t" => "Market Closed"}
-    else
-      Enum.reduce(ticker_bars, %{}, fn {k, v}, acc ->
-        Map.put(acc, k, %TickerBar{value: v})
-      end)
-    end
-  end
-
   defp new_ticker_row(row, bars) do
     Enum.reduce(row, %{}, fn {k, v}, acc ->
       new_value = Map.get(bars, k)
       Map.put(acc, k, %TickerBar{value: new_value, prev_value: v.value})
     end)
   end
+
+  defp sort_by_ticker(bars),
+    do:
+      Enum.sort(bars, fn a, b ->
+        a["S"].value < b["S"].value
+      end)
 
   defp tickers(socket), do: Enum.map(socket.assigns.basket, &Map.get(&1, "S").value)
 end

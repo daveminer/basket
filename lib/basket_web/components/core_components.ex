@@ -330,8 +330,6 @@ defmodule BasketWeb.CoreComponents do
   slot :inner_block
 
   def input(%{field: %Phoenix.HTML.FormField{} = field} = assigns) do
-    IO.inspect("ASS: #{assigns}")
-
     assigns
     |> assign(field: nil, id: assigns.id || field.id)
     |> assign(:errors, Enum.map(field.errors, &translate_error(&1)))
@@ -407,8 +405,6 @@ defmodule BasketWeb.CoreComponents do
 
   # All other inputs text, datetime-local, url, password, etc. are handled here...
   def input(assigns) do
-    IO.inspect("DEF: #{inspect(assigns)}")
-
     ~H"""
     <div phx-feedback-for={@name}>
       <.label for={@id}><%= @label %></.label>
@@ -541,7 +537,7 @@ defmodule BasketWeb.CoreComponents do
                 "relative p-0",
                 "text-center",
                 @row_click && "hover:cursor-pointer",
-                diff_color(col, row)
+                diff_cell_color(col, row)
               ]}
             >
               <div class="block py-4 pr-6">
@@ -722,23 +718,19 @@ defmodule BasketWeb.CoreComponents do
     for {^field, {msg, opts}} <- errors, do: translate_error({msg, opts})
   end
 
-  defp diff_color(col, row) do
-    key = Map.get(col, :key)
+  defp diff_cell_color(%{key: nil}, _row), do: ""
 
-    if is_nil(key) do
-      ""
-    else
-      field = row[key]
+  defp diff_cell_color(%{key: key} = _col, row) do
+    field = row[key]
 
-      if field != nil && is_number(field.value) && is_number(field.prev_value) do
-        case field.value - field.prev_value do
-          x when x > 0 -> "bg-emerald-300 text-emerald-900"
-          x when x < 0 -> "bg-rose-300 text-rose-900"
-          _ -> ""
-        end
-      else
-        ""
+    if field != nil && is_number(field.value) && is_number(field.prev_value) do
+      case field.value - field.prev_value do
+        x when x > 0 -> "bg-emerald-300 text-emerald-900"
+        x when x < 0 -> "bg-rose-300 text-rose-900"
+        _ -> ""
       end
+    else
+      ""
     end
   end
 end

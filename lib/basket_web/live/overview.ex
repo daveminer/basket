@@ -20,13 +20,9 @@ defmodule BasketWeb.OverviewLive do
   end
 
   def handle_info({"ticker-add", %{"ticker" => ticker}}, socket) do
-    basket_tickers = tickers(socket)
-
-    if ticker in basket_tickers or String.trim(ticker) == "" do
+    if ticker in tickers(socket) or String.trim(ticker) == "" do
       {:noreply, socket}
     else
-      :ok = Websocket.Alpaca.subscribe(%{bars: [ticker], quotes: [], trades: []})
-
       socket =
         case Http.Alpaca.latest_quote(ticker) do
           {:ok, response} ->
@@ -44,8 +40,9 @@ defmodule BasketWeb.OverviewLive do
 
           {:error, error} ->
             Logger.error("Could not subscribe to ticker: #{error}")
-            # socket
         end
+
+      :ok = Websocket.Alpaca.subscribe(%{bars: [ticker], quotes: [], trades: []})
 
       {:noreply, socket}
     end
@@ -96,7 +93,7 @@ defmodule BasketWeb.OverviewLive do
       <div class="w-1/4">
         <.live_component module={Search} id="stock-search-input" />
       </div>
-      <.live_component module={TickerBarTable} id="ticker-bar-table" rows={@basket} />
+      <TickerBarTable id="ticker-bar-table" rows={@basket} />
     </div>
     """
   end

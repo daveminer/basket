@@ -4,20 +4,12 @@ defmodule BasketWeb.Components.TickerBarTable do
   if the ticker list is not populated, otherwise it will pull the list from the cache.
   """
 
-  use Surface.LiveComponent
+  use Surface.Component
 
   import BasketWeb.CoreComponents
 
+  prop id, :string
   prop rows, :list, default: []
-
-  attr :id, :string, required: true
-  attr :class, :string, default: nil
-
-  def mount(socket) do
-    socket = assign(socket, basket: [])
-
-    {:ok, socket}
-  end
 
   def render(assigns) do
     ~F"""

@@ -7,7 +7,7 @@ defmodule BasketWeb.Live.Overview.TickerBar do
   defstruct value: nil, prev_value: nil
 
   @typedoc """
-  This module is responsible for taking the data from an external call and updating the state of the cell.
+  This module takes the data from an external call and updates the state of the cell.
   """
   @type t(value, prev_value) :: %TickerBar{
           value: value,

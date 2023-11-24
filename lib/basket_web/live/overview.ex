@@ -7,7 +7,7 @@ defmodule BasketWeb.OverviewLive do
   require Logger
 
   alias Basket.Websocket
-  alias BasketWeb.Components.{NavRow, TickerBarTable}
+  alias BasketWeb.Components.NavRow
   alias BasketWeb.Live.Overview.{Search, TickerAdd, TickerBar}
 
   def mount(_, _, socket) do
@@ -90,7 +90,7 @@ defmodule BasketWeb.OverviewLive do
       <div class="w-1/4">
         <.live_component module={Search} id="stock-search-input" />
       </div>
-      <TickerBarTable id="ticker-bar-table" rows={@basket} />
+      <BasketWeb.Components.TickerBarTable id="ticker-bar-table" rows={@basket} />
     </div>
     """
   end

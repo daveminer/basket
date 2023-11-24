@@ -25,7 +25,6 @@ defmodule BasketWeb.Live.Overview.TickerAdd do
   defp build_ticker_bars(%{"bars" => nil}), do: :no_data
 
   defp build_ticker_bars(%{"bars" => ticker_bars}) do
-    # TODO: check first
     new_ticker_bars = Map.to_list(ticker_bars) |> List.first()
 
     case new_ticker_bars do

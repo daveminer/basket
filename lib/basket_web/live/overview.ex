@@ -29,6 +29,7 @@ defmodule BasketWeb.OverviewLive do
             assign(socket, :basket, (socket.assigns.basket ++ [row]) |> sort_by_ticker())
 
           :market_closed ->
+            # credo:disable-for-next-line
             # TODO: add market closed row
             socket
 

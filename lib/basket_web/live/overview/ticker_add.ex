@@ -11,29 +11,18 @@ defmodule BasketWeb.Live.Overview.TickerAdd do
   @doc """
   Creates a row to be added to the ticker bar table.
   """
+  @spec call(ticker :: String.t()) :: :no_data | :market_closed | Map.t()
   def call(ticker) do
     case Http.Alpaca.latest_quote(ticker) do
       {:ok, response} ->
-        case build_ticker_bars(response) do
-          :no_data ->
-            # TODO: info flash
-            :no_data
-
-          :market_closed ->
-            :market_closed
-
-          bars ->
-            bars
-        end
+        build_ticker_bars(response)
 
       {:error, error} ->
-        # TODO: error flash
-        Logger.error("Could not subscribe to ticker: #{error}")
+        {:error, error}
     end
   end
 
-  defp build_ticker_bars(%{"bars" => nil}) do
-  end
+  defp build_ticker_bars(%{"bars" => nil}), do: :no_data
 
   defp build_ticker_bars(%{"bars" => ticker_bars}) do
     # TODO: check first
@@ -43,16 +32,16 @@ defmodule BasketWeb.Live.Overview.TickerAdd do
       nil ->
         :no_data
 
-      %{} ->
+      map when map_size(map) == 0 ->
         :market_closed
 
-      bars ->
-        Enum.reduce(bars, %{}, fn {k, v}, acc ->
-          Map.put(acc, k, %TickerBar{value: v})
-        end)
+      {ticker, bars} ->
+        new_bars =
+          Enum.reduce(bars, %{}, fn {k, v}, acc ->
+            Map.put(acc, k, %TickerBar{value: v})
+          end)
 
-        # TODO: check
-        # Map.merge(new_bars, %{"S" => %TickerBar{value: ticker}})
+        Map.merge(new_bars, %{"S" => %TickerBar{value: ticker}})
     end
   end
 end

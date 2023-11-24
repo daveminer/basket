@@ -32,8 +32,12 @@ defmodule BasketWeb.OverviewLive do
             # TODO: add market closed row
             socket
 
-          _ ->
-            socket
+          :no_data ->
+            put_flash(socket, :info, "No data for ticker: #{ticker}")
+
+          {:error, error} ->
+            Logger.error("Could not subscribe to ticker: #{error}")
+            put_flash(socket, :error, "Something when wrong.")
         end
 
       {:noreply, socket}

@@ -733,4 +733,6 @@ defmodule BasketWeb.CoreComponents do
       ""
     end
   end
+
+  defp diff_cell_color(_col, _row), do: ""
 end

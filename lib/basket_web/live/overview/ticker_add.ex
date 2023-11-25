@@ -9,7 +9,22 @@ defmodule BasketWeb.Live.Overview.TickerAdd do
   require Logger
 
   @doc """
-  Creates a row to be added to the ticker bar table.
+  Creates a row to be added to the ticker bar table. Deserializes the data into TickerBar instances
+  before returning.
+
+  ## Example
+    iex> Mox.expect(Basket.Http.MockAlpaca, :latest_quote, fn _ -> {:ok, %{"bars" => %{"XYZ" => %{"o" => "100.0"}}}} end)
+    iex> TickerAdd.call("XYZ")
+    %{"S" => %TickerBar{value: "XYZ", prev_value: nil}, "o" => %TickerBar{value: "100.0", prev_value: nil}}
+
+    iex> Mox.expect(Basket.Http.MockAlpaca, :latest_quote, fn _ -> {:ok, %{"bars" => nil}} end)
+    iex> TickerAdd.call("XYZ")
+    :no_data
+
+    iex> Mox.expect(Basket.Http.MockAlpaca, :latest_quote, fn _ -> {:ok, %{"bars" => %{}}} end)
+    iex> TickerAdd.call("XYZ")
+    :market_closed
+
   """
   @spec call(ticker :: String.t()) :: :no_data | :market_closed | map() | {:error, String.t()}
   def call(ticker) do
@@ -29,9 +44,6 @@ defmodule BasketWeb.Live.Overview.TickerAdd do
 
     case new_ticker_bars do
       nil ->
-        :no_data
-
-      map when map_size(map) == 0 ->
         :market_closed
 
       {ticker, bars} ->

@@ -1,7 +1,7 @@
-defmodule Basket.Websocket.AlpacaTest do
+defmodule Basket.Http.AlpacaTest do
   use ExUnit.Case, async: true
 
-  alias Basket.Websocket.Alpaca
+  alias Basket.Http.Alpaca
 
   doctest Alpaca.Impl, import: true
 end

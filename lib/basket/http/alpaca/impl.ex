@@ -9,6 +9,14 @@ defmodule Basket.Http.Alpaca.Impl do
   @assets_resource "/v2/assets"
   @latest_quotes_resource "/v2/stocks/bars/latest"
 
+  @doc """
+  Returns the latest quote for a ticker from the Alpaca API
+
+  ## Example
+
+      iex> Basket.Http.Alpaca.Impl.latest_quote("AAPL")
+      {:ok, %{"AAPL" => %{"c" => "101.0"}}}
+  """
   @impl Basket.Http.Alpaca
   def latest_quote(ticker) do
     case get(

@@ -11,7 +11,7 @@ defmodule BasketWeb.Live.Overview.TickerAdd do
   @doc """
   Creates a row to be added to the ticker bar table.
   """
-  @spec call(ticker :: String.t()) :: :no_data | :market_closed | Map.t()
+  @spec call(ticker :: String.t()) :: :no_data | :market_closed | map()
   def call(ticker) do
     case Http.Alpaca.latest_quote(ticker) do
       {:ok, response} ->

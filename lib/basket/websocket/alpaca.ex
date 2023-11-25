@@ -63,9 +63,7 @@ defmodule Basket.Websocket.Alpaca do
   def handle_frame({_tpe, msg}, state) do
     case Jason.decode(msg) do
       {:ok, decoded_message} ->
-        Enum.each(decoded_message, fn message ->
-          process_message(message)
-        end)
+        Enum.each(decoded_message, &process_message/1)
 
       {:error, error} ->
         Logger.error("Error decoding websocket message: #{inspect(error)}")

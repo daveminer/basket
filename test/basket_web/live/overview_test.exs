@@ -1,11 +1,12 @@
-defmodule BasketWeb.OverviewTest do
+defmodule BasketWeb.Live.OverviewTest do
   use BasketWeb.ConnCase, async: false
 
   require Phoenix.LiveViewTest
 
   import Mox
 
-  alias BasketWeb.Overview
+  alias BasketWeb.Live.Overview
+  alias BasketWeb.Live.Overview.{Search, TickerBar}
 
   @assigns_map %{__changed__: %{__context__: true}}
 
@@ -30,15 +31,15 @@ defmodule BasketWeb.OverviewTest do
        },
        basket_with_row: [
          %{
-           "S" => {"XYZ", ""},
-           "c" => {188.15, ""},
-           "h" => {188.15, ""},
-           "l" => {188.05, ""},
-           "n" => {358, ""},
-           "o" => {188.11, ""},
-           "t" => {"2023-11-15T20:59:00Z", ""},
-           "v" => {43_031, ""},
-           "vw" => {188.117416, ""}
+           "S" => %TickerBar{value: "XYZ", prev_value: "XYZ"},
+           "c" => %TickerBar{value: 188.15, prev_value: 187.15},
+           "h" => %TickerBar{value: 188.15, prev_value: 187.15},
+           "l" => %TickerBar{value: 188.05, prev_value: 187.15},
+           "n" => %TickerBar{value: 358, prev_value: 357},
+           "o" => %TickerBar{value: 188.11, prev_value: 187.11},
+           "t" => %TickerBar{value: "2023-11-15T20:59:00Z", prev_value: "2023-11-15T20:58:00Z"},
+           "v" => %TickerBar{value: 43_031, prev_value: 43_025},
+           "vw" => %TickerBar{value: 188.117416, prev_value: 187.137416}
          }
        ]
      }}
@@ -52,10 +53,9 @@ defmodule BasketWeb.OverviewTest do
 
       assert(
         socket == %{
-          __changed__: %{__context__: true, basket: true, tickers: true},
+          __changed__: %{__context__: true, basket: true},
           __context__: %{},
-          basket: [],
-          tickers: []
+          basket: []
         }
       )
     end
@@ -64,9 +64,9 @@ defmodule BasketWeb.OverviewTest do
   describe "handle_event/3 search" do
     test "ticker search does nothing without search criteria" do
       assert {:noreply, _socket} =
-               Overview.handle_event(
+               Search.handle_event(
                  "ticker-search",
-                 %{"selected-ticker" => "ABC"},
+                 %{"ticker" => "ABC"},
                  Map.merge(@assigns_map, %{assigns: %{tickers: ["ABC", "XYZ"]}})
                )
     end
@@ -77,9 +77,9 @@ defmodule BasketWeb.OverviewTest do
                 __changed__: %{__context__: true},
                 assigns: %{tickers: ["ABC", "XYZ"]}
               }} =
-               Overview.handle_event(
+               Search.handle_event(
                  "ticker-search",
-                 %{"selected-ticker" => "XYZ"},
+                 %{"ticker" => "XYZ"},
                  Map.merge(@assigns_map, %{assigns: %{tickers: ["ABC", "XYZ"]}})
                )
     end
@@ -127,9 +127,9 @@ defmodule BasketWeb.OverviewTest do
                 __changed__: %{__context__: true, tickers: true},
                 assigns: %{tickers: []}
               }} =
-               Overview.handle_event(
+               Search.handle_event(
                  "ticker-search",
-                 %{"selected-ticker" => "XYZ"},
+                 %{"ticker" => "XYZ"},
                  Map.merge(@assigns_map, %{assigns: %{tickers: []}})
                )
     end
@@ -142,39 +142,40 @@ defmodule BasketWeb.OverviewTest do
 
       assert {:reply, %{},
               %{
-                __changed__: %{__context__: true, basket: true},
-                assigns: %{tickers: [], basket: []},
-                basket: [_bars]
+                __changed__: %{__context__: true, form: true},
+                assigns: %{tickers: [], form: []},
+                form: %{"ticker" => ""}
               }} =
-               Overview.handle_event(
+               Search.handle_event(
                  "ticker-add",
-                 %{"selected-ticker" => "XYZ"},
-                 Map.merge(@assigns_map, %{assigns: %{tickers: [], basket: []}})
+                 %{"ticker" => "XYZ"},
+                 Map.merge(@assigns_map, %{assigns: %{tickers: [], form: []}})
                )
     end
 
     test "does nothing if no ticker is provided" do
-      assert {:noreply,
+      assert {:reply, %{},
               %{
-                __changed__: %{__context__: true},
-                assigns: %{tickers: [], basket: []}
+                __changed__: %{__context__: true, form: true},
+                assigns: %{basket: [], tickers: []},
+                form: %{"ticker" => ""}
               }} =
-               Overview.handle_event(
+               Search.handle_event(
                  "ticker-add",
-                 %{"selected-ticker" => ""},
+                 %{"ticker" => ""},
                  Map.merge(@assigns_map, %{assigns: %{tickers: [], basket: []}})
                )
     end
 
     test "does nothing if the ticker is already present", %{basket_with_row: basket_with_row} do
-      assert {:noreply,
+      assert {:reply, %{},
               %{
                 __changed__: %{__context__: true},
                 assigns: %{tickers: [], basket: [_bars]}
               }} =
-               Overview.handle_event(
+               Search.handle_event(
                  "ticker-add",
-                 %{"selected-ticker" => "XYZ"},
+                 %{"ticker" => "XYZ"},
                  Map.merge(@assigns_map, %{
                    assigns: %{
                      tickers: [],
@@ -245,22 +246,25 @@ defmodule BasketWeb.OverviewTest do
       assert {
                :noreply,
                %{
-                 __changed__: %{__context__: true, basket: true},
+                 __changed__: %{__context__: true},
                  assigns: %{
                    basket: ^basket_with_row,
                    tickers: []
                  },
                  basket: [
                    %{
-                     "S" => {"XYZ", ""},
-                     "c" => {189.15, "down"},
-                     "h" => {189.15, "down"},
-                     "l" => {189.05, "down"},
-                     "n" => {359, ""},
-                     "o" => {189.11, "down"},
-                     "t" => {"2023-11-15T21:59:00Z", ""},
-                     "v" => {43_032, "down"},
-                     "vw" => {189.117416, "down"}
+                     "S" => %TickerBar{value: "XYZ", prev_value: "XYZ"},
+                     "c" => %TickerBar{value: 188.15, prev_value: 187.15},
+                     "h" => %TickerBar{value: 188.15, prev_value: 187.15},
+                     "l" => %TickerBar{value: 188.05, prev_value: 187.15},
+                     "n" => %TickerBar{value: 358, prev_value: 357},
+                     "o" => %TickerBar{value: 188.11, prev_value: 187.11},
+                     "t" => %TickerBar{
+                       value: "2023-11-15T20:59:00Z",
+                       prev_value: "2023-11-15T20:58:00Z"
+                     },
+                     "v" => %TickerBar{value: 43_031, prev_value: 43_025},
+                     "vw" => %TickerBar{value: 188.117416, prev_value: 187.137416}
                    }
                  ]
                }
@@ -270,15 +274,19 @@ defmodule BasketWeb.OverviewTest do
                    topic: "bars",
                    event: "ticker-update",
                    payload: %{
-                     "S" => "XYZ",
-                     "c" => 189.15,
-                     "h" => 189.15,
-                     "l" => 189.05,
-                     "n" => 359,
-                     "o" => 189.11,
-                     "t" => "2023-11-15T21:59:00Z",
-                     "v" => 43_032,
-                     "vw" => 189.117416
+                     "S" => %TickerBar{value: "AAPL", prev_value: nil},
+                     "T" => %TickerBar{value: "b", prev_value: nil},
+                     "c" => %TickerBar{value: 191.285, prev_value: nil},
+                     "h" => %TickerBar{value: 191.37, prev_value: nil},
+                     "l" => %TickerBar{value: 191.23, prev_value: nil},
+                     "n" => %TickerBar{value: 50, prev_value: nil},
+                     "o" => %TickerBar{value: 191.23, prev_value: nil},
+                     "t" => %TickerBar{
+                       value: "2023-11-20T16:24:00Z",
+                       prev_value: nil
+                     },
+                     "v" => %TickerBar{value: 5433, prev_value: nil},
+                     "vw" => %TickerBar{value: 191.328043, prev_value: nil}
                    }
                  },
                  Map.merge(@assigns_map, %{

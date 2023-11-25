@@ -65,7 +65,7 @@ defmodule Basket.MixProject do
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.1.1"},
       {:plug_cowboy, "~> 2.5"},
-      {:surface, "~> 0.11.0"},
+      {:surface, "~> 0.11.1"},
       # for surface.init; possible to remove.
       {:sourceror, "~> 0.12.0"},
       {:surface_catalogue, "~> 0.6.1"},

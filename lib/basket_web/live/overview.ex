@@ -1,4 +1,4 @@
-defmodule BasketWeb.OverviewLive do
+defmodule BasketWeb.Live.Overview do
   @moduledoc """
   Home page shows a list of assets and updates them in realtime via websockets.
   """
@@ -8,7 +8,7 @@ defmodule BasketWeb.OverviewLive do
 
   alias Basket.Websocket
   alias BasketWeb.Components.NavRow
-  alias BasketWeb.Live.Overview.{Search, TickerAdd, TickerBar}
+  alias BasketWeb.Live.Overview.{Search, TickerAdd, TickerBar, TickerBarTable}
 
   def mount(_, _, socket) do
     BasketWeb.Endpoint.subscribe(Websocket.Alpaca.bars_topic())
@@ -90,7 +90,7 @@ defmodule BasketWeb.OverviewLive do
       <div class="w-1/4">
         <.live_component module={Search} id="stock-search-input" />
       </div>
-      <BasketWeb.Components.TickerBarTable id="ticker-bar-table" rows={@basket} />
+      <TickerBarTable id="ticker-bar-table" rows={@basket} />
     </div>
     """
   end

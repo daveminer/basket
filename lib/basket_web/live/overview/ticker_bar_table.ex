@@ -1,4 +1,4 @@
-defmodule BasketWeb.Components.TickerBarTable do
+defmodule BasketWeb.Live.Overview.TickerBarTable do
   @moduledoc """
   Allows the user to search for and add a ticker to the table. Will make an HTTP call
   if the ticker list is not populated, otherwise it will pull the list from the cache.
@@ -6,7 +6,7 @@ defmodule BasketWeb.Components.TickerBarTable do
 
   use Surface.Component
 
-  import BasketWeb.CoreComponents
+  alias BasketWeb.CoreComponents
 
   prop id, :string
   prop rows, :list, default: []
@@ -14,7 +14,7 @@ defmodule BasketWeb.Components.TickerBarTable do
   def render(assigns) do
     ~F"""
     <div>
-      <.table id="ticker-list" rows={@rows}>
+      <CoreComponents.table id={@id} rows={@rows}>
         <:col :let={ticker} key="S" label="ticker">{value_from_ticker_bar(ticker["S"])}</:col>
         <:col :let={ticker} key="o" label="open">{value_from_ticker_bar(ticker["o"])}</:col>
         <:col :let={ticker} key="h" label="high">{value_from_ticker_bar(ticker["h"])}</:col>
@@ -23,15 +23,15 @@ defmodule BasketWeb.Components.TickerBarTable do
         <:col :let={ticker} key="v" label="volume">{value_from_ticker_bar(ticker["v"])}</:col>
         <:col :let={ticker} key="t" label="timestamp">{value_from_ticker_bar(ticker["t"])}</:col>
         <:col :let={ticker} label="remove">
-          <.button
+          <CoreComponents.button
             phx-click="ticker-remove"
             phx-value-ticker={value_from_ticker_bar(ticker["S"])}
             class="bg-red-600"
           >
             X
-          </.button>
+          </CoreComponents.button>
         </:col>"
-      </.table>
+      </CoreComponents.table>
     </div>
     """
   end

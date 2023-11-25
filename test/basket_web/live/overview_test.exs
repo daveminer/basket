@@ -1,11 +1,11 @@
-defmodule BasketWeb.OverviewLiveTest do
+defmodule BasketWeb.Live.OverviewTest do
   use BasketWeb.ConnCase, async: false
 
   require Phoenix.LiveViewTest
 
   import Mox
 
-  alias BasketWeb.OverviewLive
+  alias BasketWeb.Live.Overview
   alias BasketWeb.Live.Overview.{Search, TickerBar}
 
   @assigns_map %{__changed__: %{__context__: true}}
@@ -49,7 +49,7 @@ defmodule BasketWeb.OverviewLiveTest do
     test "assigns empty lists to keys" do
       Basket.Websocket.MockAlpaca |> expect(:start_link, fn _state -> {:ok, 1} end)
 
-      assert({:ok, socket} = OverviewLive.mount([], %{}, @assigns_map))
+      assert({:ok, socket} = Overview.mount([], %{}, @assigns_map))
 
       assert(
         socket == %{
@@ -200,7 +200,7 @@ defmodule BasketWeb.OverviewLiveTest do
                 assigns: %{tickers: [], basket: ^basket_with_row},
                 basket: []
               }} =
-               OverviewLive.handle_event(
+               Overview.handle_event(
                  "ticker-remove",
                  %{"ticker" => "XYZ"},
                  Map.merge(@assigns_map, %{assigns: %{tickers: [], basket: basket_with_row}})
@@ -213,7 +213,7 @@ defmodule BasketWeb.OverviewLiveTest do
                 __changed__: %{__context__: true},
                 assigns: %{tickers: [], basket: []}
               }} =
-               OverviewLive.handle_event(
+               Overview.handle_event(
                  "ticker-remove",
                  %{"ticker" => ""},
                  Map.merge(@assigns_map, %{assigns: %{tickers: [], basket: []}})
@@ -226,7 +226,7 @@ defmodule BasketWeb.OverviewLiveTest do
                 __changed__: %{__context__: true},
                 assigns: %{tickers: [], basket: []}
               }} =
-               OverviewLive.handle_event(
+               Overview.handle_event(
                  "ticker-remove",
                  %{"ticker" => "XYZ"},
                  Map.merge(@assigns_map, %{
@@ -269,7 +269,7 @@ defmodule BasketWeb.OverviewLiveTest do
                  ]
                }
              } =
-               OverviewLive.handle_info(
+               Overview.handle_info(
                  %Phoenix.Socket.Broadcast{
                    topic: "bars",
                    event: "ticker-update",

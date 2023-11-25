@@ -34,7 +34,7 @@ defmodule BasketWeb.Router do
   scope "/", BasketWeb do
     pipe_through [:browser, :authenticated]
 
-    live "/", OverviewLive
+    live "/", Live.Overview
   end
 
   # Other scopes may use custom stacks.

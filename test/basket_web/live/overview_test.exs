@@ -3,6 +3,7 @@ defmodule BasketWeb.Live.OverviewTest do
 
   require Phoenix.LiveViewTest
 
+  import Basket.Factory
   import Mox
 
   alias BasketWeb.Live.Overview
@@ -16,19 +17,7 @@ defmodule BasketWeb.Live.OverviewTest do
 
     {:ok,
      %{
-       bars: %{
-         "XYZ" => %{
-           "S" => "XYZ",
-           "c" => 187.15,
-           "h" => 187.15,
-           "l" => 187.05,
-           "n" => 357,
-           "o" => 187.11,
-           "t" => "2023-11-15T20:59:00Z",
-           "v" => 43_025,
-           "vw" => 187.117416
-         }
-       },
+       bars: build(:new_bars),
        basket_with_row: [
          %{
            "S" => %TickerBar{value: "XYZ", prev_value: "XYZ"},
@@ -85,42 +74,9 @@ defmodule BasketWeb.Live.OverviewTest do
     end
 
     test "populates the ticker list with a web call if the cache is empty" do
-      Basket.Http.MockAlpaca
-      |> expect(:list_assets, fn ->
-        {:ok,
-         [
-           %{
-             "attributes" => [],
-             "class" => "us_equity",
-             "easy_to_borrow" => false,
-             "exchange" => "OTC",
-             "fractionable" => false,
-             "id" => "0634e31f-2a61-4990-b713-a4be6d9eee49",
-             "maintenance_margin_requirement" => 100,
-             "marginable" => false,
-             "name" => "METACRINE INC Common Stock",
-             "shortable" => false,
-             "status" => "active",
-             "symbol" => "MTCR",
-             "tradable" => false
-           },
-           %{
-             "attributes" => [],
-             "class" => "us_equity",
-             "easy_to_borrow" => false,
-             "exchange" => "OTC",
-             "fractionable" => false,
-             "id" => "ae2ab9f2-d2aa-4e7b-9ef8-2ffdf78ec0ff",
-             "maintenance_margin_requirement" => 100,
-             "marginable" => false,
-             "name" => "MTN Group, Ltd. Sponsored American Depositary Receipt",
-             "shortable" => false,
-             "status" => "active",
-             "symbol" => "MTNOY",
-             "tradable" => false
-           }
-         ]}
-      end)
+      assets = [build(:asset_mtcr), build(:asset_mtnoy)]
+
+      Basket.Http.MockAlpaca |> expect(:list_assets, fn -> {:ok, assets} end)
 
       assert {:reply, %{},
               %{

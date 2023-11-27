@@ -19,6 +19,7 @@ defmodule BasketWeb.Live.Overview do
   end
 
   def handle_info({"ticker-add", %{"ticker" => ticker}}, socket) do
+    # TODO: should not add subscription if already present
     if ticker in tickers(socket) or String.trim(ticker) == "" do
       {:noreply, socket}
     else
@@ -49,6 +50,7 @@ defmodule BasketWeb.Live.Overview do
         %Phoenix.Socket.Broadcast{topic: "bars", event: "ticker-update", payload: bars},
         socket
       ) do
+    # TODO: filter out tickers that are not in basket
     ticker = bars["S"]
 
     new_basket =

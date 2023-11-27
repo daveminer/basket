@@ -79,7 +79,7 @@ defmodule Basket.MixProject do
       {:httpoison, "~> 2.1.0"},
       {:cachex, "~> 3.6"},
       {:mox, "1.1.0", only: :test},
-      {:bypass, "~> 2.1", only: :test},
+      {:test_server, "~> 0.1", only: :test},
       {:ex_machina, "~> 2.7.0", only: :test}
     ]
   end

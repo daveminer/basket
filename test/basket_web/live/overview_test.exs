@@ -36,7 +36,7 @@ defmodule BasketWeb.Live.OverviewTest do
 
   describe "mount/3" do
     test "assigns empty lists to keys" do
-      Basket.Websocket.MockAlpaca |> expect(:start_link, fn _state -> {:ok, 1} end)
+      # Basket.Websocket.MockAlpaca |> expect(:start_link, fn _state -> {:ok, 1} end)
 
       assert({:ok, socket} = Overview.mount([], %{}, @assigns_map))
 

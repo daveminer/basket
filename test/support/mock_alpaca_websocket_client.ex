@@ -1,25 +1,13 @@
-defmodule Basket.Websocket.Alpaca.Impl do
-  @moduledoc """
-  Implementation of the Alpaca websocket client.
-  """
+defmodule Basket.Support.MockAlpacaWebsocketClient do
+  @moduledoc false
 
   require Logger
 
   @behaviour Basket.Websocket.Alpaca
 
-  @subscribe_message %{
-    action: :subscribe
-  }
-  @unsubscribe_message %{
-    action: :unsubscribe
-  }
-
   @impl true
   def start_link(state) do
-    Logger.info("Starting Alpaca websocket client.")
-    IO.inspect(iex_feed(), label: "IEX")
-
-    WebSockex.start_link(iex_feed(), Basket.Websocket.Alpaca, state, extra_headers: auth_headers())
+    {:ok, self()}
   end
 
   @impl true
@@ -52,13 +40,9 @@ defmodule Basket.Websocket.Alpaca.Impl do
     end
   end
 
-  defp auth_headers, do: [{"APCA-API-KEY-ID", api_key()}, {"APCA-API-SECRET-KEY", api_secret()}]
-
   defp api_key, do: Application.fetch_env!(:basket, :alpaca)[:api_key]
 
   defp api_secret, do: Application.fetch_env!(:basket, :alpaca)[:api_secret]
-
-  defp iex_feed, do: "#{url()}/iex"
 
   defp url, do: Application.fetch_env!(:basket, :alpaca)[:market_ws_url]
 

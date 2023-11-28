@@ -23,9 +23,6 @@ config :basket, BasketWeb.Endpoint,
 # In test we don't send emails.
 config :basket, Basket.Mailer, adapter: Swoosh.Adapters.Test
 
-# config :basket, :alpaca_http_client, Basket.Http.MockAlpaca
-# config :basket, :alpaca_websocket_client, Basket.Websocket.MockAlpaca
-
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false
 
@@ -41,3 +38,6 @@ config :basket, :alpaca,
   data_http_url: "https://test-suite-data.alpaca.markets",
   market_http_url: "https://test-suite-api.alpaca.markets",
   market_ws_url: "wss://test-suite-stream.data.alpaca.markets/v2"
+
+# This stub keeps the test app supervisor happy during startup
+config :basket, :websocket_client, Basket.Support.MockWebsocketClient

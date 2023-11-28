@@ -1,5 +1,7 @@
 # Basket
 
+![](basket_demo.gif)
+
   * Run `mix setup` to install and setup dependencies
 
 `make t` - run test suite

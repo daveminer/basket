@@ -85,23 +85,21 @@ defmodule Basket.Websocket.Alpaca do
   subscription once the authorization acknowledgement method is received.
   """
   @impl true
-  def handle_frame({_type, @connection_success}, state) do
+  def handle_frame({:text, @connection_success}, state) do
     Logger.info("Connection message received.")
 
     {:ok, state}
   end
 
   @impl true
-  def handle_frame({_type, @auth_success}, state) do
+  def handle_frame({:text, @auth_success}, state) do
     Logger.info("Alpaca websocket authenticated.")
 
     {:ok, state}
   end
 
   @impl true
-  def handle_frame({_type, msg}, state) do
-    IO.inspect(msg, label: "MSG")
-
+  def handle_frame({:text, msg}, state) do
     case Jason.decode(msg) do
       {:ok, decoded_message} ->
         Enum.each(decoded_message, &process_message/1)

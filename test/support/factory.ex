@@ -1,4 +1,6 @@
 defmodule Basket.Factory do
+  @moduledoc false
+
   use ExMachina.Ecto
 
   def asset_mtcr_factory do

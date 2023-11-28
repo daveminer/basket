@@ -1,4 +1,6 @@
 defmodule Basket.Websocket.AlpacaTest do
+  @moduledoc false
+
   use ExUnit.Case, async: false
 
   import Mox
@@ -7,7 +9,6 @@ defmodule Basket.Websocket.AlpacaTest do
 
   describe "Alpaca websocket client lifecycle" do
     test "start_link/1" do
-      # TODO: verify expects signatures
       expect(Basket.Websocket.MockClient, :start_link, fn _, _, _, _ -> {:ok, self()} end)
 
       assert {:ok, _pid} = Alpaca.start_link(%{})

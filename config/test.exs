@@ -39,5 +39,5 @@ config :basket, :alpaca,
   market_http_url: "https://test-suite-api.alpaca.markets",
   market_ws_url: "wss://test-suite-stream.data.alpaca.markets/v2"
 
-# Give the supervisor occupied for test app startup
+# This stub keeps the test app supervisor happy during startup
 config :basket, :websocket_client, Basket.Support.MockWebsocketClient

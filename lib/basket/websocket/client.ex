@@ -5,8 +5,8 @@ defmodule Basket.Websocket.Client do
 
   @callback start_link(
               url :: String.t() | WebSockex.Conn.t(),
-              module :: WebSockex.module(),
-              term :: WebSockex.term(),
+              module :: module(),
+              term :: term(),
               options :: WebSockex.options()
             ) ::
               {:ok, pid()} | {:error, term()}

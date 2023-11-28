@@ -36,7 +36,7 @@ defmodule BasketWeb.Live.OverviewTest do
 
   describe "mount/3" do
     test "assigns empty lists to keys" do
-      # Basket.Websocket.MockAlpaca |> expect(:start_link, fn _state -> {:ok, 1} end)
+      Basket.Websocket.MockClient |> expect(:start_link, fn _, _, _, _ -> {:ok, 1} end)
 
       assert({:ok, socket} = Overview.mount([], %{}, @assigns_map))
 
@@ -93,8 +93,11 @@ defmodule BasketWeb.Live.OverviewTest do
 
   describe "handle_event/3 add_ticker" do
     test "adds bars data to the liveview for the selected ticker", %{bars: bars} do
-      expect(Basket.Http.MockAlpaca, :latest_quote, fn _ -> {:ok, %{"bars" => bars}} end)
-      expect(Basket.Websocket.MockAlpaca, :subscribe, fn _ticker_subs -> :ok end)
+      Basket.Http.MockAlpaca
+      |> expect(:latest_quote, fn _ -> {:ok, %{"bars" => bars}} end)
+
+      Basket.Websocket.MockClient |> expect(:start_link, fn _, _, _, _ -> {:ok, self()} end)
+      Basket.Websocket.MockClient |> expect(:send_frame, fn _, _ -> :ok end)
 
       assert {:reply, %{},
               %{
@@ -147,8 +150,8 @@ defmodule BasketWeb.Live.OverviewTest do
       bars: bars,
       basket_with_row: basket_with_row
     } do
-      expect(Basket.Http.MockAlpaca, :latest_quote, fn _ -> {:ok, %{"bars" => bars}} end)
-      expect(Basket.Websocket.MockAlpaca, :unsubscribe, fn _ticker_subs -> :ok end)
+      Basket.Http.MockAlpaca |> expect(:latest_quote, fn _ -> {:ok, %{"bars" => bars}} end)
+      Basket.Websocket.MockClient |> expect(:send_frame, fn _, _ -> :ok end)
 
       assert {:reply, %{},
               %{

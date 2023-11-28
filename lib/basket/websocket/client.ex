@@ -28,6 +28,5 @@ defmodule Basket.Websocket.Client do
   def start_link(url, module, term, options), do: impl().start_link(url, module, term, options)
   def send_frame(client, frame), do: impl().send_frame(client, frame)
 
-  def impl,
-    do: Application.get_env(:basket, :websocket_client, WebSockex) |> IO.inspect(label: "CLIENT")
+  def impl, do: Application.get_env(:basket, :websocket_client, WebSockex)
 end

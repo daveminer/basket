@@ -3,18 +3,12 @@ defmodule Basket.Support.MockWebsocketClient do
 
   require Logger
 
-  def start_link(_state, _, _, _) do
-    # Make the supervisor happy on test server startup
-    IO.inspect("MOCKSTARTLINK")
+  @doc """
+  Satisfy the supervisor when the test application starts
+  """
+  def start_link(_state, _, _, _), do: {:ok, self()}
 
-    {:ok, self()}
-  end
+  def subscribe(_tickers), do: :not_implemented
 
-  def subscribe(_tickers) do
-    :ok
-  end
-
-  def unsubscribe(_tickers) do
-    :ok
-  end
+  def unsubscribe(_tickers), do: :not_implemented
 end

@@ -3,10 +3,5 @@ defmodule TickerAddTest do
 
   alias BasketWeb.Live.Overview.{TickerAdd, TickerBar}
 
-  setup do
-    bypass = Bypass.open()
-    {:ok, bypass: bypass}
-  end
-
   doctest TickerAdd, import: true
 end

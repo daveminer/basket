@@ -7,8 +7,6 @@ defmodule Basket.Application do
 
   @impl true
   def start(_type, _args) do
-    IO.inspect("STARTING BASKET")
-
     children = [
       BasketWeb.Telemetry,
       Basket.Repo,
@@ -23,13 +21,6 @@ defmodule Basket.Application do
       {Cachex, name: :assets},
       Basket.Websocket.Alpaca
     ]
-
-    # children =
-    #   if Mix.env() != :test do
-    #     children ++ [Basket.Websocket.Alpaca]
-    #   else
-    #     children
-    #   end
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options

@@ -3,6 +3,8 @@ defmodule Basket.Websocket.Alpaca.Impl do
   Implementation of the Alpaca websocket client.
   """
 
+  use ExUnit.Case, async: false
+
   require Logger
 
   @behaviour Basket.Websocket.Alpaca
@@ -15,27 +17,29 @@ defmodule Basket.Websocket.Alpaca.Impl do
   }
 
   @impl true
-  def start_link(state) do
+  def start_link(state, url \\ nil) do
     Logger.info("Starting Alpaca websocket client.")
-    IO.inspect(iex_feed(), label: "IEX")
 
-    WebSockex.start_link(iex_feed(), Basket.Websocket.Alpaca, state, extra_headers: auth_headers())
+    url = if url == nil, do: iex_feed(), else: url
+
+    WebSockex.start_link(url, Basket.Websocket.Alpaca, state, extra_headers: auth_headers())
   end
 
   @impl true
-  @spec subscribe(
-          %{:bars => any(), :quotes => any(), :trades => any(), optional(any()) => any()},
-          any()
-        ) :: :ok
-  def subscribe(tickers, client_pid \\ nil) do
-    # client_pid = if client_pid == nil, do: client_pid(), else: client_pid
-    IO.inspect(client_pid(), label: "CLIENTPID")
-    decoded_message = Jason.encode!(build_message(@subscribe_message, tickers))
-    IO.inspect(decoded_message, label: "DECOD")
+  @spec subscribe(%{:bars => any(), :quotes => any(), :trades => any(), optional(any()) => any()}) ::
+          :ok
+  def subscribe(tickers, client \\ nil) do
+    client = if client == nil, do: client_pid(), else: client
 
-    case WebSockex.send_frame(client_pid, {:text, decoded_message}) do
-      :ok -> Logger.debug("Subscription message sent: #{inspect(decoded_message)}")
-      {:error, error} -> Logger.error("Error sending subscription message: #{inspect(error)}")
+    decoded_message = Jason.encode!(build_message(@subscribe_message, tickers))
+
+    case WebSockex.send_frame(client, {:text, decoded_message}) do
+      :ok ->
+        Logger.debug("Subscription message sent: #{inspect(decoded_message)}")
+
+      {:error, error} ->
+        Logger.error("Error sending subscription message: #{inspect(error)}")
+        :error
     end
   end
 
@@ -52,6 +56,10 @@ defmodule Basket.Websocket.Alpaca.Impl do
     end
   end
 
+  def wait_for_message do
+    assert_receive :text, 3000
+  end
+
   defp auth_headers, do: [{"APCA-API-KEY-ID", api_key()}, {"APCA-API-SECRET-KEY", api_secret()}]
 
   defp api_key, do: Application.fetch_env!(:basket, :alpaca)[:api_key]
@@ -60,13 +68,13 @@ defmodule Basket.Websocket.Alpaca.Impl do
 
   defp iex_feed, do: "#{url()}/iex"
 
-  defp url, do: Application.fetch_env!(:basket, :alpaca)[:market_ws_url]
+  defp url,
+    do: Application.fetch_env!(:basket, :alpaca)[:market_ws_url] |> IO.inspect(label: "URL")
 
   defp client_pid do
     Supervisor.which_children(Basket.Supervisor)
+    |> IO.inspect(label: "CLIENT PID")
     |> Enum.find(fn c ->
-      IO.inspect(c, label: "C IS")
-
       case c do
         {Basket.Websocket.Alpaca, _pid, :worker, [Basket.Websocket.Alpaca]} ->
           true

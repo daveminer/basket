@@ -42,4 +42,6 @@ config :basket, :alpaca,
   market_http_url: "https://test-suite-api.alpaca.markets",
   market_ws_url: "wss://test-suite-stream.data.alpaca.markets/v2"
 
-config :basket, :alpaca_ws_client, Basket.Support.MockAlpacaWebsocketClient
+# config :basket, :alpaca_ws_client, Basket.Support.MockAlpacaWebsocketClient
+# Basket.Websocket.MockClient
+config :basket, :websocket_client, Basket.Support.MockWebsocketClient

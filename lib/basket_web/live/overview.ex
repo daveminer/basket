@@ -6,12 +6,13 @@ defmodule BasketWeb.Live.Overview do
 
   require Logger
 
-  alias Basket.Websocket
   alias BasketWeb.Components.NavRow
   alias BasketWeb.Live.Overview.{Search, TickerAdd, TickerBar, TickerBarTable}
+  alias Basket.TickerAgent
 
   def mount(_, _, socket) do
-    BasketWeb.Endpoint.subscribe(Websocket.Alpaca.bars_topic())
+    # TODO: subscribe to user's tickers
+    # BasketWeb.Endpoint.subscribe(Websocket.Alpaca.bars_topic())
 
     socket = assign(socket, basket: [])
 
@@ -25,12 +26,11 @@ defmodule BasketWeb.Live.Overview do
       socket =
         case TickerAdd.call(ticker) do
           row when is_map(row) ->
-            :ok = Websocket.Alpaca.subscribe(%{bars: [ticker], quotes: [], trades: []})
+            :ok = TickerAgent.add(ticker)
+            :ok = BasketWeb.Endpoint.subscribe("bars-#{ticker}")
             assign(socket, :basket, (socket.assigns.basket ++ [row]) |> sort_by_ticker())
 
           :market_closed ->
-            # credo:disable-for-next-line
-            # TODO: add market closed row
             socket
 
           :no_data ->
@@ -46,9 +46,10 @@ defmodule BasketWeb.Live.Overview do
   end
 
   def handle_info(
-        %Phoenix.Socket.Broadcast{topic: "bars", event: "ticker-update", payload: bars},
+        %Phoenix.Socket.Broadcast{topic: topic, event: "ticker-update", payload: bars},
         socket
       ) do
+    IO.inspect(topic, label: "TOPIC")
     ticker = bars["S"]
 
     new_basket =
@@ -67,12 +68,9 @@ defmodule BasketWeb.Live.Overview do
   end
 
   def handle_event("ticker-remove", %{"ticker" => ticker}, socket) do
-    basket_tickers = tickers(socket)
-
-    if ticker not in basket_tickers or String.trim(ticker) == "" do
-      {:noreply, socket}
-    else
-      :ok = Websocket.Alpaca.unsubscribe(%{bars: [ticker], quotes: [], trades: []})
+    if ticker in tickers(socket) do
+      :ok = BasketWeb.Endpoint.unsubscribe("bars-#{ticker}")
+      :ok = TickerAgent.remove(ticker)
 
       {:reply, %{},
        assign(
@@ -80,6 +78,8 @@ defmodule BasketWeb.Live.Overview do
          :basket,
          Enum.filter(socket.assigns.basket, fn t -> t["S"].value != ticker end)
        )}
+    else
+      {:noreply, socket}
     end
   end
 

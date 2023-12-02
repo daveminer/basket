@@ -62,6 +62,9 @@ defmodule BasketWeb do
       use Phoenix.LiveView,
         layout: {BasketWeb.Layouts, :app}
 
+      # Add User auth (Pow user) to all liveviews
+      on_mount BasketWeb.Live.UserLiveAuth
+
       unquote(html_helpers())
     end
   end
@@ -124,6 +127,9 @@ defmodule BasketWeb do
     quote do
       use Surface.LiveView,
         layout: {BasketWeb.Layouts, :app}
+
+      # Add User auth (Pow user) to all liveviews
+      on_mount BasketWeb.Live.UserLiveAuth
 
       unquote(html_helpers())
     end

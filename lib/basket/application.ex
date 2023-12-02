@@ -16,7 +16,7 @@ defmodule Basket.Application do
       {Finch, name: Basket.Finch},
       {Cachex, name: :assets},
       Basket.Websocket.Alpaca,
-      Basket.TickerAgent,
+      Basket.Websocket.TickerAgent,
       # Start to serve requests, typically the last entry
       BasketWeb.Endpoint
     ]

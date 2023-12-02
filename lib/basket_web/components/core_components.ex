@@ -720,8 +720,9 @@ defmodule BasketWeb.CoreComponents do
 
   defp diff_cell_color(%{key: nil}, _row), do: ""
 
-  defp diff_cell_color(%{key: key} = _col, row) do
-    field = row[key]
+  defp diff_cell_color(%{key: key} = col, row) do
+    IO.inspect(row, label: "ROW")
+    field = Map.get(row, String.to_existing_atom(key))
 
     if field != nil && is_number(field.value) && is_number(field.prev_value) do
       case field.value - field.prev_value do

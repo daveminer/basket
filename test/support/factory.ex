@@ -3,6 +3,8 @@ defmodule Basket.Factory do
 
   use ExMachina.Ecto
 
+  alias Basket.Http.Alpaca.Bars
+
   def asset_mtcr_factory do
     %{
       "attributes" => [],
@@ -39,19 +41,17 @@ defmodule Basket.Factory do
     }
   end
 
+  @spec new_bars_factory() :: Basket.Http.Alpaca.Bars.t()
   def new_bars_factory do
-    %{
-      "XYZ" => %{
-        "S" => "XYZ",
-        "c" => 187.15,
-        "h" => 187.15,
-        "l" => 187.05,
-        "n" => 357,
-        "o" => 187.11,
-        "t" => "2023-11-15T20:59:00Z",
-        "v" => 43_025,
-        "vw" => 187.117416
-      }
-    }
+    Bars.new("XYZ", %{
+      "c" => 187.15,
+      "h" => 187.15,
+      "l" => 187.05,
+      "n" => 357,
+      "o" => 187.11,
+      "t" => "2023-11-15T20:59:00Z",
+      "v" => 43_025,
+      "vw" => 187.117416
+    })
   end
 end

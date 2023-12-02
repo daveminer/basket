@@ -8,40 +8,30 @@ defmodule BasketWeb.Live.Overview do
 
   alias BasketWeb.Components.NavRow
   alias BasketWeb.Live.Overview.{Search, TickerAdd, TickerBar, TickerBarTable}
-  alias Basket.TickerAgent
+  alias Basket.Websocket.TickerAgent
+  alias Basket.Tickers.Ticker
 
+  on_mount {BasketWeb.Live.UserLiveAuth, :user}
+
+  # TODO: remove subs on phx-leave
   def mount(_, _, socket) do
-    # TODO: subscribe to user's tickers
-    # BasketWeb.Endpoint.subscribe(Websocket.Alpaca.bars_topic())
+    case Ticker.for_user(socket.assigns.user) do
+      [] ->
+        {:ok, assign(socket, basket: [])}
 
-    socket = assign(socket, basket: [])
+      assets ->
+        tickers = Enum.map(assets, & &1.ticker)
 
-    {:ok, socket}
+        {:ok, track_new_assets(tickers, socket)}
+    end
   end
 
   def handle_info({"ticker-add", %{"ticker" => ticker}}, socket) do
     if ticker in tickers(socket) or String.trim(ticker) == "" do
       {:noreply, socket}
     else
-      socket =
-        case TickerAdd.call(ticker) do
-          row when is_map(row) ->
-            :ok = TickerAgent.add(ticker)
-            :ok = BasketWeb.Endpoint.subscribe("bars-#{ticker}")
-            assign(socket, :basket, (socket.assigns.basket ++ [row]) |> sort_by_ticker())
-
-          :market_closed ->
-            socket
-
-          :no_data ->
-            put_flash(socket, :info, "No data for ticker: #{ticker}")
-
-          {:error, error} ->
-            Logger.error("Could not subscribe to ticker: #{error}")
-            put_flash(socket, :error, "Something when wrong.")
-        end
-
-      {:noreply, socket}
+      Ticker.add_to_user(socket.assigns.user, ticker)
+      {:noreply, track_new_assets(ticker, socket)}
     end
   end
 
@@ -49,7 +39,6 @@ defmodule BasketWeb.Live.Overview do
         %Phoenix.Socket.Broadcast{topic: topic, event: "ticker-update", payload: bars},
         socket
       ) do
-    IO.inspect(topic, label: "TOPIC")
     ticker = bars["S"]
 
     new_basket =
@@ -72,11 +61,13 @@ defmodule BasketWeb.Live.Overview do
       :ok = BasketWeb.Endpoint.unsubscribe("bars-#{ticker}")
       :ok = TickerAgent.remove(ticker)
 
+      Ticker.remove(socket.assigns.user, ticker)
+
       {:reply, %{},
        assign(
          socket,
          :basket,
-         Enum.filter(socket.assigns.basket, fn t -> t["S"].value != ticker end)
+         Enum.filter(socket.assigns.basket, fn t -> t.ticker.value != ticker end)
        )}
     else
       {:noreply, socket}
@@ -95,18 +86,50 @@ defmodule BasketWeb.Live.Overview do
     """
   end
 
-  defp new_ticker_row(row, bars) do
-    Enum.reduce(row, %{}, fn {k, v}, acc ->
+  # defp track_new_assets(ticker, socket) when is_binary(ticker) do
+  #   track_new_assets([ticker], socket)
+  # end
+
+  defp track_new_assets(tickers, socket) do
+    case TickerAdd.call(tickers) do
+      {:ok, {bar_rows, not_found_tickers}} ->
+        socket =
+          if not_found_tickers != [] do
+            put_flash(
+              socket,
+              :info,
+              "No data for tickers: #{Enum.join(not_found_tickers, ", ")}"
+            )
+          else
+            socket
+          end
+
+        ticker_bars =
+          Enum.map(bar_rows, fn bar_row -> new_ticker_row(%{}, Map.from_struct(bar_row)) end)
+          |> Enum.sort_by(& &1.ticker.value)
+
+        basket = if is_nil(socket.assigns[:basket]), do: [], else: socket.assigns.basket
+
+        assign(socket, :basket, basket ++ ticker_bars)
+
+      {:error, error} ->
+        Logger.error("Could not subscribe to ticker: #{error}")
+        put_flash(socket, :error, "Something when wrong.")
+    end
+  end
+
+  defp new_ticker_row(old_row, new_row) when old_row == %{} do
+    Enum.reduce(new_row, %{}, fn {k, v}, acc ->
+      Map.put(acc, k, %TickerBar{value: v, prev_value: nil})
+    end)
+  end
+
+  defp new_ticker_row(old_row, bars) do
+    Enum.reduce(old_row, %{}, fn {k, v}, acc ->
       new_value = Map.get(bars, k)
       Map.put(acc, k, %TickerBar{value: new_value, prev_value: v.value})
     end)
   end
 
-  defp sort_by_ticker(bars),
-    do:
-      Enum.sort(bars, fn a, b ->
-        a["S"].value < b["S"].value
-      end)
-
-  defp tickers(socket), do: Enum.map(socket.assigns.basket, &Map.get(&1, "S").value)
+  defp tickers(socket), do: Enum.map(socket.assigns.basket, fn row -> row.ticker.value end)
 end

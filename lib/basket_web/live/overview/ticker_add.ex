@@ -4,7 +4,7 @@ defmodule BasketWeb.Live.Overview.TickerAdd do
   """
 
   alias Basket.Http
-  alias BasketWeb.Live.Overview.TickerBar
+  alias Basket.Websocket.TickerAgent
 
   require Logger
 
@@ -13,46 +13,47 @@ defmodule BasketWeb.Live.Overview.TickerAdd do
   before returning.
 
   ## Example
-    iex> Mox.expect(Basket.Http.MockAlpaca, :latest_quote, fn _ -> {:ok, %{"bars" => %{"XYZ" => %{"o" => "100.0"}}}} end)
-    iex> TickerAdd.call("XYZ")
-    %{"S" => %TickerBar{value: "XYZ", prev_value: nil}, "o" => %TickerBar{value: "100.0", prev_value: nil}}
+    bars = build(:new_bars)
+    iex> Mox.expect(Basket.Http.MockAlpaca, :latest_quote, fn _ -> {:ok, %{"bars" => {}}} end)
+    iex> TickerAdd.call("ABC")
+    []
 
-    iex> Mox.expect(Basket.Http.MockAlpaca, :latest_quote, fn _ -> {:ok, %{"bars" => nil}} end)
-    iex> TickerAdd.call("XYZ")
-    :no_data
+    iex> Mox.expect(Basket.Http.MockAlpaca, :latest_quote, fn _ -> {:ok, %{"bars" => %{"ABC" => ^bars}}} end)
+    iex> TickerAdd.call("ABC")
+    [%Bars{value: "ABC", prev_value: nil}, "o" => %TickerBar{value: "100.0", prev_value: nil}}]
 
-    iex> Mox.expect(Basket.Http.MockAlpaca, :latest_quote, fn _ -> {:ok, %{"bars" => %{}}} end)
-    iex> TickerAdd.call("XYZ")
-    :market_closed
-
+    iex> Mox.expect(Basket.Http.MockAlpaca, :latest_quote, fn _ -> {:ok, %{"bars" => %{"ABC" => ^bars, "XYZ" => ^bars}}} end)
+    iex> TickerAdd.call(["ABC", "XYZ"])
+    %{"S" => %BarS{value: "ABC", prev_value: nil}, "o" => %TickerBar{value: "100.0", prev_value: nil}}
   """
-  @spec call(ticker :: String.t()) :: :no_data | :market_closed | map() | {:error, String.t()}
-  def call(ticker) do
-    case Http.Alpaca.latest_quote(ticker) do
-      {:ok, response} ->
-        build_ticker_bars(response)
+  @spec call(list(String.t()) | String.t()) ::
+          {:ok, {list(Http.Alpaca.Bars.t()), list(String.t())}} | {:error, String.t()}
+  def call(tickers) when is_list(tickers) do
+    ticker_list = Enum.join(tickers, ",")
 
-      {:error, error} ->
+    case Http.Alpaca.latest_quote(ticker_list) do
+      {:ok, %{"bars" => bar_list}} ->
+        bars = Enum.map(bar_list, fn {k, v} -> Http.Alpaca.Bars.new(k, v) end)
+
+        returned_tickers = Enum.map(bars, fn b -> b.ticker end)
+        :ok = TickerAgent.add(returned_tickers)
+        subscribe_to_tickers(returned_tickers)
+
+        {:ok, {bars, tickers -- returned_tickers}}
+
+      {:error, %{"message" => error}} ->
         {:error, error}
     end
   end
 
-  defp build_ticker_bars(%{"bars" => nil}), do: :no_data
+  def call(ticker), do: call([ticker])
 
-  defp build_ticker_bars(%{"bars" => ticker_bars}) do
-    new_ticker_bars = Map.to_list(ticker_bars) |> List.first()
-
-    case new_ticker_bars do
-      nil ->
-        :market_closed
-
-      {ticker, bars} ->
-        new_bars =
-          Enum.reduce(bars, %{}, fn {k, v}, acc ->
-            Map.put(acc, k, %TickerBar{value: v})
-          end)
-
-        Map.merge(new_bars, %{"S" => %TickerBar{value: ticker}})
-    end
-  end
+  defp subscribe_to_tickers(tickers),
+    do:
+      Enum.each(tickers, fn ticker ->
+        case BasketWeb.Endpoint.subscribe("bars-#{ticker}") do
+          :ok -> :ok
+          {:error, error} -> Logger.error("Could not subscribe to ticker: #{error}")
+        end
+      end)
 end

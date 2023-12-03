@@ -30,15 +30,16 @@ defmodule BasketWeb.Live.Overview do
     if ticker in tickers(socket) or String.trim(ticker) == "" do
       {:noreply, socket}
     else
-      Ticker.add_to_user(socket.assigns.user, ticker)
+      Ticker.add(socket.assigns.user, ticker)
       {:noreply, track_new_assets(ticker, socket)}
     end
   end
 
   def handle_info(
-        %Phoenix.Socket.Broadcast{topic: topic, event: "ticker-update", payload: bars},
+        %Phoenix.Socket.Broadcast{topic: _topic, event: "ticker-update", payload: bars},
         socket
       ) do
+    # TODO: these accesses need updating also
     ticker = bars["S"]
 
     new_basket =
@@ -54,6 +55,11 @@ defmodule BasketWeb.Live.Overview do
        :basket,
        new_basket
      )}
+  end
+
+  def handle_event("phx-leave", _, socket) do
+    IO.inspect("phx-leave event triggered")
+    {:noreply, socket}
   end
 
   def handle_event("ticker-remove", %{"ticker" => ticker}, socket) do
@@ -85,10 +91,6 @@ defmodule BasketWeb.Live.Overview do
     </div>
     """
   end
-
-  # defp track_new_assets(ticker, socket) when is_binary(ticker) do
-  #   track_new_assets([ticker], socket)
-  # end
 
   defp track_new_assets(tickers, socket) do
     case TickerAdd.call(tickers) do

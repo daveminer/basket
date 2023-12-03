@@ -19,11 +19,19 @@ defmodule Basket.Websocket.TickerAgent do
   @spec add(tickers :: list(String.t()) | String.t()) :: :ok
   def add(tickers) when is_list(tickers) do
     new_tickers =
-      Agent.get(__MODULE__, fn state -> MapSet.new(tickers) |> MapSet.difference(state) end)
+      Agent.get(__MODULE__, fn state ->
+        IO.inspect(state, label: "STATE")
+        MapSet.new(tickers) |> MapSet.difference(state)
+      end)
 
-    :ok = Websocket.Alpaca.subscribe(%{bars: MapSet.to_list(new_tickers), quotes: [], trades: []})
+    if Enum.empty?(new_tickers) do
+      :ok
+    else
+      :ok =
+        Websocket.Alpaca.subscribe(%{bars: MapSet.to_list(new_tickers), quotes: [], trades: []})
 
-    Agent.update(__MODULE__, fn state -> MapSet.union(new_tickers, state) end)
+      Agent.update(__MODULE__, fn state -> MapSet.union(new_tickers, state) end)
+    end
   end
 
   def add(tickers), do: add([tickers])
@@ -38,14 +46,18 @@ defmodule Basket.Websocket.TickerAgent do
         MapSet.intersection(MapSet.new(state), MapSet.new(tickers))
       end)
 
-    :ok =
-      Websocket.Alpaca.unsubscribe(%{
-        bars: MapSet.to_list(tickers_to_remove),
-        quotes: [],
-        trades: []
-      })
+    if Enum.empty?(tickers_to_remove) do
+      :ok
+    else
+      :ok =
+        Websocket.Alpaca.unsubscribe(%{
+          bars: MapSet.to_list(tickers_to_remove),
+          quotes: [],
+          trades: []
+        })
 
-    Agent.update(__MODULE__, fn state -> MapSet.difference(state, tickers_to_remove) end)
+      Agent.update(__MODULE__, fn state -> MapSet.difference(state, tickers_to_remove) end)
+    end
   end
 
   def remove(tickers) do

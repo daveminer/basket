@@ -39,9 +39,13 @@ defmodule Basket.Websocket.Alpaca do
   end
 
   def subscribe(tickers) do
+    IO.inspect(tickers, label: "TICKERS")
+
     decoded_message =
       build_message(@subscribe_message, tickers)
       |> Jason.encode!()
+
+    IO.inspect(decoded_message, label: "SUBBBB")
 
     case Client.send_frame(client_pid(), {:text, decoded_message}) do
       :ok ->
@@ -102,6 +106,7 @@ defmodule Basket.Websocket.Alpaca do
   def handle_frame({:text, msg}, state) do
     case Jason.decode(msg) do
       {:ok, decoded_message} ->
+        IO.inspect(decoded_message, label: "Decoded message")
         Enum.each(decoded_message, &process_message/1)
 
       {:error, error} ->

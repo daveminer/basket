@@ -1,4 +1,6 @@
 defmodule BasketWeb.Live.Overview.TickerBar do
+  alias BasketWeb.Live.Overview.TickerRow
+
   @moduledoc """
   Cell on the TickerBarTable.
   """
@@ -7,23 +9,42 @@ defmodule BasketWeb.Live.Overview.TickerBar do
   defstruct value: nil, prev_value: nil
 
   @typedoc """
-  This module takes the data from an external call and updates the state of the cell.
+  The possible types of a cell in the TickerBar table.
   """
-  @type t(value, prev_value) :: %TickerBar{
-          value: value,
-          prev_value: prev_value
+  @type ticker_bar_value() :: integer() | float() | String.t() | nil
+
+  @typedoc """
+  Handles the state for ticker bar cells.
+  """
+  @type t :: %__MODULE__{
+          value: ticker_bar_value(),
+          prev_value: ticker_bar_value()
         }
+
+  @doc ~S"""
+  Create a new TickerBar from a value and a optional previous value.
+
+  ## Example
+    iex> new(1)
+    %TickerBar{value: 1, prev_value: nil}
+
+    iex> new(1, 2)
+    %TickerBar{value: 1, prev_value: 2}
+  """
+  def new(value, prev_value \\ nil) do
+    %TickerBar{value: value, prev_value: prev_value}
+  end
 
   @doc ~S"""
   Sets a new value on a TickerBar. The prev_value is set to the current value for
   computing change direction.
 
   ## Example
-      iex> set_value(%TickerBar{value: 1, prev_value: 0}, 2)
+      iex> set(%TickerBar{value: 1, prev_value: 0}, 2)
       %TickerBar{value: 2, prev_value: 1}
   """
-  @spec set_value(TickerBar.t(any(), any()), any()) :: TickerBar.t(any(), any())
-  def set_value(ticker_bar, value) do
+  @spec set(TickerBar.t(), ticker_bar_value()) :: t()
+  def set(ticker_bar, value) do
     %TickerBar{ticker_bar | value: value, prev_value: ticker_bar.value}
   end
 
@@ -62,7 +83,7 @@ defmodule BasketWeb.Live.Overview.TickerBar do
       iex> change_value(%TickerBar{value: "123", prev_value: 100})
       0
   """
-  @spec change_value(%{:prev_value => any() | nil, :value => any()}) :: integer()
+  @spec change_value(t()) :: integer()
   def change_value(%{value: value, prev_value: prev_value}) do
     if prev_value == nil or not (is_number(value) and is_number(prev_value)) do
       0

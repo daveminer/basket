@@ -6,14 +6,14 @@ defmodule BasketWeb.Live.Overview do
 
   require Logger
 
-  alias BasketWeb.Components.NavRow
-  alias BasketWeb.Live.Overview.{Search, TickerAdd, TickerBar, TickerBarTable}
-  alias Basket.Websocket.TickerAgent
   alias Basket.Tickers.Ticker
+  alias Basket.Websocket.TickerAgent
+  alias BasketWeb.Live.Overview.{Search, TickerAdd, TickerBar, TickerBarTable, TickerRow}
+  alias BasketWeb.Components.NavRow
+  alias BasketWeb.Presence
 
   on_mount {BasketWeb.Live.UserLiveAuth, :user}
 
-  # TODO: remove subs on phx-leave
   def mount(_, _, socket) do
     case Ticker.for_user(socket.assigns.user) do
       [] ->
@@ -22,7 +22,10 @@ defmodule BasketWeb.Live.Overview do
       assets ->
         tickers = Enum.map(assets, & &1.ticker)
 
-        {:ok, track_new_assets(tickers, socket)}
+        socket = track_new_assets(tickers, socket)
+        Presence.track(self(), "connections", socket.assigns.user.id, %{tickers: tickers})
+
+        {:ok, socket}
     end
   end
 
@@ -36,18 +39,20 @@ defmodule BasketWeb.Live.Overview do
   end
 
   def handle_info(
-        %Phoenix.Socket.Broadcast{topic: _topic, event: "ticker-update", payload: bars},
+        %Phoenix.Socket.Broadcast{topic: _topic, event: "ticker-update", payload: payload},
         socket
       ) do
-    # TODO: these accesses need updating also
-    ticker = bars["S"]
+    new_values = TickerRow.new(payload)
+    IO.inspect(new_values, label: "BARS")
 
     new_basket =
-      Enum.map(socket.assigns.basket, fn row ->
-        if row["S"].value == ticker,
-          do: new_ticker_row(row, bars),
-          else: row
-      end)
+      socket.assigns.basket
+      |> Enum.find(&(&1.ticker.value == new_values.ticker.value))
+      |> TickerRow.update(new_values)
+      |> Map.from_struct()
+      |> Enum.into([])
+
+    # |> Map.to_list()
 
     {:noreply,
      assign(
@@ -57,14 +62,14 @@ defmodule BasketWeb.Live.Overview do
      )}
   end
 
-  def handle_event("phx-leave", _, socket) do
-    IO.inspect("phx-leave event triggered")
-    {:noreply, socket}
-  end
-
   def handle_event("ticker-remove", %{"ticker" => ticker}, socket) do
     if ticker in tickers(socket) do
       :ok = BasketWeb.Endpoint.unsubscribe("bars-#{ticker}")
+
+      # Presence.update(socket, "connections", socket.assigns.user.id, fn tickers ->
+      #  Enum.filter(tickers, &(&1 != ticker))
+      # end)
+
       :ok = TickerAgent.remove(ticker)
 
       Ticker.remove(socket.assigns.user, ticker)
@@ -126,10 +131,9 @@ defmodule BasketWeb.Live.Overview do
     end)
   end
 
-  defp new_ticker_row(old_row, bars) do
-    Enum.reduce(old_row, %{}, fn {k, v}, acc ->
-      new_value = Map.get(bars, k)
-      Map.put(acc, k, %TickerBar{value: new_value, prev_value: v.value})
+  defp new_ticker_row(old_row, new_row) do
+    Enum.reduce(new_row, %{}, fn {k, v}, acc ->
+      Map.put(acc, k, %TickerBar{value: v, prev_value: nil})
     end)
   end
 

@@ -718,14 +718,13 @@ defmodule BasketWeb.CoreComponents do
     for {^field, {msg, opts}} <- errors, do: translate_error({msg, opts})
   end
 
-  defp diff_cell_color(%{key: nil}, _row), do: ""
+  defp diff_cell_color({_key, %{value: _, prev_value: nil}}, _row), do: ""
 
-  defp diff_cell_color(%{key: key} = col, row) do
-    IO.inspect(row, label: "ROW")
+  defp diff_cell_color({key, %{value: value, prev_value: prev}} = _col, row) do
     field = Map.get(row, String.to_existing_atom(key))
 
-    if field != nil && is_number(field.value) && is_number(field.prev_value) do
-      case field.value - field.prev_value do
+    if field != nil && is_number(value) && is_number(prev) do
+      case value - prev do
         x when x > 0 -> "bg-emerald-300 text-emerald-900"
         x when x < 0 -> "bg-rose-300 text-rose-900"
         _ -> ""

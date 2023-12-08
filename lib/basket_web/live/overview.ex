@@ -15,14 +15,16 @@ defmodule BasketWeb.Live.Overview do
   on_mount {BasketWeb.Live.UserLiveAuth, :user}
 
   def mount(_, _, socket) do
-    case Ticker.for_user(socket.assigns.user) do
+    case Ticker.for_user(socket.assigns[:user]) do
       [] ->
         {:ok, assign(socket, basket: [])}
 
       assets ->
+        IO.inspect(assets, label: "ASSETS")
         tickers = Enum.map(assets, & &1.ticker)
 
         socket = track_new_assets(tickers, socket)
+        IO.inspect(socket.assigns, label: "SOCKASN")
         Presence.track(self(), "connections", socket.assigns.user.id, %{tickers: tickers})
 
         {:ok, socket}
@@ -42,24 +44,25 @@ defmodule BasketWeb.Live.Overview do
         %Phoenix.Socket.Broadcast{topic: _topic, event: "ticker-update", payload: payload},
         socket
       ) do
-    new_values = TickerRow.new(payload)
-    IO.inspect(new_values, label: "BARS")
+    new_row = TickerRow.new(payload)
 
     new_basket =
-      socket.assigns.basket
-      |> Enum.find(&(&1.ticker.value == new_values.ticker.value))
-      |> TickerRow.update(new_values)
-      |> Map.from_struct()
-      |> Enum.into([])
+      Enum.map(socket.assigns.basket, fn old_row ->
+        if old_row.ticker.value == new_row.ticker.value do
+          TickerRow.update(old_row, new_row)
+        else
+          old_row
+        end
+      end)
 
-    # |> Map.to_list()
-
-    {:noreply,
-     assign(
-       socket,
-       :basket,
-       new_basket
-     )}
+    {
+      :noreply,
+      assign(
+        socket,
+        :basket,
+        new_basket
+      )
+    }
   end
 
   def handle_event("ticker-remove", %{"ticker" => ticker}, socket) do
@@ -100,6 +103,8 @@ defmodule BasketWeb.Live.Overview do
   defp track_new_assets(tickers, socket) do
     case TickerAdd.call(tickers) do
       {:ok, {bar_rows, not_found_tickers}} ->
+        IO.inspect(bar_rows, label: "BAR ROWS")
+
         socket =
           if not_found_tickers != [] do
             put_flash(
@@ -133,7 +138,7 @@ defmodule BasketWeb.Live.Overview do
 
   defp new_ticker_row(old_row, new_row) do
     Enum.reduce(new_row, %{}, fn {k, v}, acc ->
-      Map.put(acc, k, %TickerBar{value: v, prev_value: nil})
+      Map.put(acc, k, %TickerBar{value: v.value, prev_value: old_row[k].value})
     end)
   end
 

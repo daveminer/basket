@@ -1,6 +1,4 @@
 defmodule BasketWeb.Live.Overview.TickerBar do
-  alias BasketWeb.Live.Overview.TickerRow
-
   @moduledoc """
   Cell on the TickerBarTable.
   """
@@ -43,9 +41,9 @@ defmodule BasketWeb.Live.Overview.TickerBar do
       iex> set(%TickerBar{value: 1, prev_value: 0}, 2)
       %TickerBar{value: 2, prev_value: 1}
   """
-  @spec set(TickerBar.t(), ticker_bar_value()) :: t()
+  @spec set(t(), ticker_bar_value()) :: t()
   def set(ticker_bar, value) do
-    %TickerBar{ticker_bar | value: value, prev_value: ticker_bar.value}
+    %TickerBar{value: value, prev_value: ticker_bar.value}
   end
 
   @doc ~S"""
@@ -60,7 +58,7 @@ defmodule BasketWeb.Live.Overview.TickerBar do
       iex> change_direction(%TickerBar{value: 0, prev_value: 1})
       -1
   """
-  @spec change_direction(%{prev_value: any(), value: any()}) :: -1 | 0 | 1
+  @spec change_direction(t()) :: -1 | 0 | 1
   def change_direction(ticker_bar) do
     case change_value(ticker_bar) do
       x when x > 0 -> 1

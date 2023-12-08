@@ -37,7 +37,12 @@ defmodule Basket.Tickers.Ticker do
     Repo.insert!(ticker)
   end
 
+  @doc """
+  Returns a list of Tickers for a given user.
+  """
   @spec for_user(user :: User.t()) :: [Basket.Tickers.Ticker.t()]
+  def for_user(nil), do: []
+
   def for_user(user) do
     from(t in __MODULE__,
       where: t.user_id == ^user.id
@@ -45,6 +50,9 @@ defmodule Basket.Tickers.Ticker do
     |> Repo.all()
   end
 
+  @doc """
+  Removes a ticker from a User's basket of stocks.
+  """
   @spec remove(user :: User.t(), ticker: String.t()) :: :ok
   def remove(user, ticker) do
     from(t in __MODULE__,

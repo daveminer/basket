@@ -15,17 +15,17 @@ defmodule BasketWeb.Live.Overview.TickerBarTable do
     ~F"""
     <div>
       <CoreComponents.table id={@id} rows={@rows}>
-        <:col :let={row} key="ticker" label="ticker">{value_from_ticker_bar(row.ticker)}</:col>
-        <:col :let={row} key="open" label="open">{value_from_ticker_bar(row.open)}</:col>
-        <:col :let={row} key="high" label="high">{value_from_ticker_bar(row.high)}</:col>
-        <:col :let={row} key="low" label="low">{value_from_ticker_bar(row.low)}</:col>
-        <:col :let={row} key="close" label="close">{value_from_ticker_bar(row.close)}</:col>
-        <:col :let={row} key="volume" label="volume">{value_from_ticker_bar(row.volume)}</:col>
-        <:col :let={row} key="timestamp" label="timestamp">{value_from_ticker_bar(row.timestamp)}</:col>
+        <:col :let={row} key="ticker" label="ticker">{row.ticker.value}</:col>
+        <:col :let={row} key="open" label="open">{row.open.value}</:col>
+        <:col :let={row} key="high" label="high">{row.high.value}</:col>
+        <:col :let={row} key="low" label="low">{row.low.value}</:col>
+        <:col :let={row} key="close" label="close">{row.close.value}</:col>
+        <:col :let={row} key="volume" label="volume">{row.volume.value}</:col>
+        <:col :let={row} key="timestamp" label="timestamp">{row.timestamp.value}</:col>
         <:col :let={row} label="remove">
           <CoreComponents.button
             phx-click="ticker-remove"
-            phx-value-ticker={value_from_ticker_bar(row.ticker)}
+            phx-value-ticker={row.ticker.value}
             class="bg-red-600"
           >
             X
@@ -35,7 +35,4 @@ defmodule BasketWeb.Live.Overview.TickerBarTable do
     </div>
     """
   end
-
-  defp value_from_ticker_bar(nil), do: nil
-  defp value_from_ticker_bar(ticker_bar), do: ticker_bar.value
 end

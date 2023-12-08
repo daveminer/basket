@@ -20,7 +20,6 @@ defmodule Basket.Websocket.TickerAgent do
   def add(tickers) when is_list(tickers) do
     new_tickers =
       Agent.get(__MODULE__, fn state ->
-        IO.inspect(state, label: "STATE")
         MapSet.new(tickers) |> MapSet.difference(state)
       end)
 

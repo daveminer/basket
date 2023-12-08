@@ -7,12 +7,12 @@ defmodule Basket.Http.AlpacaTest do
 
   describe "latest_quote" do
     test "returns the latest quote for the ticker" do
-      new_bars = build(:new_bars)
+      bars_payload = build(:bars_payload)
 
       TestServer.add("/v2/stocks/bars/latest",
         via: :get,
         to: fn conn ->
-          Plug.Conn.resp(conn, 200, Jason.encode!(new_bars))
+          Plug.Conn.resp(conn, 200, Jason.encode!(bars_payload))
         end
       )
 
@@ -22,7 +22,7 @@ defmodule Basket.Http.AlpacaTest do
 
       assert {
                :ok,
-               ^new_bars
+               ^bars_payload
              } = Alpaca.Impl.latest_quote("XYZ")
     end
   end

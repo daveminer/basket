@@ -4,6 +4,8 @@ defmodule Basket.Factory do
   use ExMachina.Ecto
 
   alias Basket.Http.Alpaca.Bars
+  alias Basket.Users.User
+  alias BasketWeb.Live.Overview.{TickerBar, TickerRow}
 
   def asset_mtcr_factory do
     %{
@@ -41,7 +43,29 @@ defmodule Basket.Factory do
     }
   end
 
-  @spec new_bars_factory() :: Basket.Http.Alpaca.Bars.t()
+  def bars_payload_factory(attrs) do
+    ticker =
+      if attrs[:ticker] do
+        attrs.ticker
+      else
+        "XYZ"
+      end
+
+    %{
+      ticker => %{
+        "c" => 187.15,
+        "h" => 187.15,
+        "l" => 187.05,
+        "n" => 357,
+        "o" => 187.11,
+        "t" => "2023-11-15T20:59:00Z",
+        "v" => 43_025,
+        "vw" => 187.117416
+      }
+    }
+  end
+
+  @spec new_bars_factory() :: Bars.t()
   def new_bars_factory do
     Bars.new("XYZ", %{
       "c" => 187.15,
@@ -53,5 +77,40 @@ defmodule Basket.Factory do
       "v" => 43_025,
       "vw" => 187.117416
     })
+  end
+
+  def ticker_row_factory do
+    %TickerRow{
+      ticker: %TickerBar{value: "XYZ", prev_value: nil},
+      close: %TickerBar{value: 100, prev_value: nil},
+      high: %TickerBar{value: 105, prev_value: nil},
+      low: %TickerBar{value: 95, prev_value: nil},
+      count: %TickerBar{value: 1, prev_value: nil},
+      open: %TickerBar{value: 99, prev_value: nil},
+      timestamp: %TickerBar{value: "2023-11-15T20:59:00Z", prev_value: nil},
+      volume: %TickerBar{value: 50, prev_value: nil},
+      vwap: %TickerBar{value: 51.1, prev_value: nil}
+    }
+  end
+
+  def ticker_row_update_factory do
+    %TickerRow{
+      ticker: %TickerBar{value: "XYZ", prev_value: nil},
+      close: %TickerBar{value: 101, prev_value: nil},
+      high: %TickerBar{value: 113, prev_value: nil},
+      low: %TickerBar{value: 93, prev_value: nil},
+      count: %TickerBar{value: 2, prev_value: nil},
+      open: %TickerBar{value: 100, prev_value: nil},
+      timestamp: %TickerBar{value: "2023-11-15T21:00:00Z", prev_value: nil},
+      volume: %TickerBar{value: 24, prev_value: nil},
+      vwap: %TickerBar{value: 33.3, prev_value: nil}
+    }
+  end
+
+  def user_factory do
+    %User{
+      id: 1,
+      email: "<EMAIL>"
+    }
   end
 end

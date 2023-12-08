@@ -13,18 +13,20 @@ defmodule BasketWeb.Live.Overview.TickerAdd do
   before returning.
 
   ## Example
-    bars = build(:new_bars)
-    iex> Mox.expect(Basket.Http.MockAlpaca, :latest_quote, fn _ -> {:ok, %{"bars" => {}}} end)
+    iex> Mox.expect(Basket.Http.MockAlpaca, :latest_quote, fn _ -> {:ok, %{"bars" => []}} end)
+    iex> Mox.expect(Basket.Websocket.MockClient, :send_frame, fn _, _ -> :ok end)
     iex> TickerAdd.call("ABC")
-    []
+    {:ok, {[], ["ABC"]}}
 
-    iex> Mox.expect(Basket.Http.MockAlpaca, :latest_quote, fn _ -> {:ok, %{"bars" => %{"ABC" => ^bars}}} end)
+    iex> Mox.expect(Basket.Http.MockAlpaca, :latest_quote, fn _ -> {:ok, %{"bars" => build(:bars_payload, ticker: "ABC")}} end)
+    iex> Mox.expect(Basket.Websocket.MockClient, :send_frame, fn _, _ -> :ok end)
     iex> TickerAdd.call("ABC")
-    [%Bars{value: "ABC", prev_value: nil}, "o" => %TickerBar{value: "100.0", prev_value: nil}}]
+    {:ok, {[%Basket.Http.Alpaca.Bars{ticker: "ABC", close: 187.15, open: 187.11, high: 187.15, low: 187.05, volume: 43025, timestamp: "2023-11-15T20:59:00Z", count: 357, vwap: 187.117416}], []}}
 
-    iex> Mox.expect(Basket.Http.MockAlpaca, :latest_quote, fn _ -> {:ok, %{"bars" => %{"ABC" => ^bars, "XYZ" => ^bars}}} end)
+    iex> Mox.expect(Basket.Http.MockAlpaca, :latest_quote, fn _ -> {:ok, %{"bars" => Map.merge(build(:bars_payload, ticker: "ABC"), build(:bars_payload))}} end)
+    iex> Mox.expect(Basket.Websocket.MockClient, :send_frame, fn _, _ -> :ok end)
     iex> TickerAdd.call(["ABC", "XYZ"])
-    %{"S" => %BarS{value: "ABC", prev_value: nil}, "o" => %TickerBar{value: "100.0", prev_value: nil}}
+    {:ok, {[%Basket.Http.Alpaca.Bars{ticker: "ABC", close: 187.15, open: 187.11, high: 187.15, low: 187.05, volume: 43025, timestamp: "2023-11-15T20:59:00Z", count: 357, vwap: 187.117416}, %Basket.Http.Alpaca.Bars{ticker: "XYZ", close: 187.15, open: 187.11, high: 187.15, low: 187.05, volume: 43025, timestamp: "2023-11-15T20:59:00Z", count: 357, vwap: 187.117416}], []}}
   """
   @spec call(list(String.t()) | String.t()) ::
           {:ok, {list(Http.Alpaca.Bars.t()), list(String.t())}} | {:error, String.t()}

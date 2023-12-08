@@ -7,9 +7,9 @@ defmodule BasketWeb.Live.OverviewTest do
   import Mox
 
   alias BasketWeb.Live.Overview
-  alias BasketWeb.Live.Overview.{Search, TickerBar}
+  alias BasketWeb.Live.Overview.{Search, TickerBar, TickerRow}
 
-  @assigns_map %{__changed__: %{__context__: true}}
+  @assigns_map %{__changed__: %{__context__: true}, assigns: %{}}
 
   setup do
     # Shares the mock with the Cachex fallback function.
@@ -19,16 +19,19 @@ defmodule BasketWeb.Live.OverviewTest do
      %{
        bars: build(:new_bars),
        basket_with_row: [
-         %{
-           "S" => %TickerBar{value: "XYZ", prev_value: "XYZ"},
-           "c" => %TickerBar{value: 188.15, prev_value: 187.15},
-           "h" => %TickerBar{value: 188.15, prev_value: 187.15},
-           "l" => %TickerBar{value: 188.05, prev_value: 187.15},
-           "n" => %TickerBar{value: 358, prev_value: 357},
-           "o" => %TickerBar{value: 188.11, prev_value: 187.11},
-           "t" => %TickerBar{value: "2023-11-15T20:59:00Z", prev_value: "2023-11-15T20:58:00Z"},
-           "v" => %TickerBar{value: 43_031, prev_value: 43_025},
-           "vw" => %TickerBar{value: 188.117416, prev_value: 187.137416}
+         %TickerRow{
+           ticker: %TickerBar{value: "XYZ", prev_value: "XYZ"},
+           close: %TickerBar{value: 188.15, prev_value: 187.15},
+           high: %TickerBar{value: 188.15, prev_value: 187.15},
+           low: %TickerBar{value: 188.05, prev_value: 187.15},
+           count: %TickerBar{value: 358, prev_value: 357},
+           open: %TickerBar{value: 188.11, prev_value: 187.11},
+           timestamp: %TickerBar{
+             value: "2023-11-15T20:59:00Z",
+             prev_value: "2023-11-15T20:58:00Z"
+           },
+           volume: %TickerBar{value: 43_031, prev_value: 43_025},
+           vwap: %TickerBar{value: 188.117416, prev_value: 187.137416}
          }
        ]
      }}
@@ -44,7 +47,8 @@ defmodule BasketWeb.Live.OverviewTest do
         socket == %{
           __changed__: %{__context__: true, basket: true},
           __context__: %{},
-          basket: []
+          basket: [],
+          assigns: %{}
         }
       )
     end
@@ -162,7 +166,9 @@ defmodule BasketWeb.Live.OverviewTest do
                Overview.handle_event(
                  "ticker-remove",
                  %{"ticker" => "XYZ"},
-                 Map.merge(@assigns_map, %{assigns: %{tickers: [], basket: basket_with_row}})
+                 Map.merge(@assigns_map, %{
+                   assigns: %{tickers: [], basket: basket_with_row, user: %{id: 1}}
+                 })
                )
     end
 
@@ -211,19 +217,22 @@ defmodule BasketWeb.Live.OverviewTest do
                    tickers: []
                  },
                  basket: [
-                   %{
-                     "S" => %TickerBar{value: "XYZ", prev_value: "XYZ"},
-                     "c" => %TickerBar{value: 188.15, prev_value: 187.15},
-                     "h" => %TickerBar{value: 188.15, prev_value: 187.15},
-                     "l" => %TickerBar{value: 188.05, prev_value: 187.15},
-                     "n" => %TickerBar{value: 358, prev_value: 357},
-                     "o" => %TickerBar{value: 188.11, prev_value: 187.11},
-                     "t" => %TickerBar{
+                   %BasketWeb.Live.Overview.TickerRow{
+                     ticker: %BasketWeb.Live.Overview.TickerBar{value: "XYZ", prev_value: "XYZ"},
+                     close: %BasketWeb.Live.Overview.TickerBar{value: 188.15, prev_value: 187.15},
+                     high: %BasketWeb.Live.Overview.TickerBar{value: 188.15, prev_value: 187.15},
+                     low: %BasketWeb.Live.Overview.TickerBar{value: 188.05, prev_value: 187.15},
+                     count: %BasketWeb.Live.Overview.TickerBar{value: 358, prev_value: 357},
+                     open: %BasketWeb.Live.Overview.TickerBar{value: 188.11, prev_value: 187.11},
+                     timestamp: %BasketWeb.Live.Overview.TickerBar{
                        value: "2023-11-15T20:59:00Z",
                        prev_value: "2023-11-15T20:58:00Z"
                      },
-                     "v" => %TickerBar{value: 43_031, prev_value: 43_025},
-                     "vw" => %TickerBar{value: 188.117416, prev_value: 187.137416}
+                     volume: %BasketWeb.Live.Overview.TickerBar{value: 43031, prev_value: 43025},
+                     vwap: %BasketWeb.Live.Overview.TickerBar{
+                       value: 188.117416,
+                       prev_value: 187.137416
+                     }
                    }
                  ]
                }

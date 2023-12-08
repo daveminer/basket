@@ -20,11 +20,8 @@ defmodule BasketWeb.Live.Overview do
         {:ok, assign(socket, basket: [])}
 
       assets ->
-        IO.inspect(assets, label: "ASSETS")
         tickers = Enum.map(assets, & &1.ticker)
-
         socket = track_new_assets(tickers, socket)
-        IO.inspect(socket.assigns, label: "SOCKASN")
         Presence.track(self(), "connections", socket.assigns.user.id, %{tickers: tickers})
 
         {:ok, socket}
@@ -103,8 +100,6 @@ defmodule BasketWeb.Live.Overview do
   defp track_new_assets(tickers, socket) do
     case TickerAdd.call(tickers) do
       {:ok, {bar_rows, not_found_tickers}} ->
-        IO.inspect(bar_rows, label: "BAR ROWS")
-
         socket =
           if not_found_tickers != [] do
             put_flash(

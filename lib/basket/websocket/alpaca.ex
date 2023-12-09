@@ -102,7 +102,6 @@ defmodule Basket.Websocket.Alpaca do
   def handle_frame({:text, msg}, state) do
     case Jason.decode(msg) do
       {:ok, decoded_message} ->
-        IO.inspect(decoded_message, label: "Decoded message")
         Enum.each(decoded_message, &process_message/1)
 
       {:error, error} ->

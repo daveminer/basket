@@ -23,6 +23,7 @@ defmodule BasketWeb.Live.Overview do
         tickers = Enum.map(assets, & &1.ticker)
         socket = track_new_assets(tickers, socket)
         Presence.track(self(), "connections", socket.assigns.user.id, %{tickers: tickers})
+        Basket.Tickers.Reaper.monitor(socket.id)
 
         {:ok, socket}
     end

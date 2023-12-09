@@ -19,6 +19,7 @@ defmodule Basket.Application do
       Basket.Websocket.TickerAgent,
       # Basket.Tickers.Subscription,
       BasketWeb.Presence,
+      Basket.Tickers.Reaper,
       # Start to serve requests, typically the last entry
       BasketWeb.Endpoint
     ]

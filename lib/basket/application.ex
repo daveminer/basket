@@ -14,12 +14,14 @@ defmodule Basket.Application do
       {Phoenix.PubSub, name: Basket.PubSub},
       # Start the Finch HTTP client for sending emails
       {Finch, name: Basket.Finch},
-      # Start a worker by calling: Basket.Worker.start_link(arg)
-      # {Basket.Worker, arg},
-      # Start to serve requests, typically the last entry
-      BasketWeb.Endpoint,
       {Cachex, name: :assets},
-      Basket.Websocket.Alpaca
+      Basket.Websocket.Alpaca,
+      # Basket.Websocket.TickerAgent,
+      # Basket.Tickers.Subscription,
+      BasketWeb.Presence,
+      Basket.Tickers.Reaper,
+      # Start to serve requests, typically the last entry
+      BasketWeb.Endpoint
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

@@ -1,7 +1,8 @@
 defmodule TickerAddTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
 
-  alias BasketWeb.Live.Overview.{TickerAdd, TickerBar}
+  import Basket.Factory
+  alias BasketWeb.Live.Overview.TickerAdd
 
   doctest TickerAdd, import: true
 end

@@ -7,6 +7,8 @@ defmodule Basket.Users.User do
   use Pow.Extension.Ecto.Schema,
     extensions: [PowResetPassword, PowEmailConfirmation]
 
+  @type t :: %__MODULE__{}
+
   def changeset(user_or_changeset, attrs) do
     user_or_changeset
     |> pow_changeset(attrs)

@@ -13,11 +13,11 @@ defmodule Basket.Http.Alpaca.Impl do
   Returns the latest quote for a ticker from the Alpaca API
   """
   @impl Basket.Http.Alpaca
-  def latest_quote(ticker) do
+  def latest_quote(tickers) do
     case get(
            "#{data_url()}#{@latest_quotes_resource}",
            [],
-           params: %{feed: "iex", symbols: ticker}
+           params: %{feed: "iex", symbols: tickers}
          ) do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
         {:ok, body}

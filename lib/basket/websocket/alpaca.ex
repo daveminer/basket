@@ -38,6 +38,7 @@ defmodule Basket.Websocket.Alpaca do
     )
   end
 
+  @spec subscribe(subscription_fields) :: :error | :ok
   def subscribe(tickers) do
     decoded_message =
       build_message(@subscribe_message, tickers)
@@ -53,6 +54,7 @@ defmodule Basket.Websocket.Alpaca do
     end
   end
 
+  @spec unsubscribe(subscription_fields) :: :error | :ok
   def unsubscribe(tickers) do
     decoded_message = build_message(@unsubscribe_message, tickers) |> Jason.encode!()
 
@@ -155,7 +157,7 @@ defmodule Basket.Websocket.Alpaca do
 
   defp handle_bars(
          %{
-           "S" => _symbol,
+           "S" => symbol,
            "o" => _open,
            "h" => _high,
            "l" => _low,
@@ -165,7 +167,8 @@ defmodule Basket.Websocket.Alpaca do
          } = message
        ) do
     Logger.debug("Bars message received")
-    BasketWeb.Endpoint.broadcast_from(self(), @bars_topic, "ticker-update", message)
+
+    BasketWeb.Endpoint.broadcast!("bars-#{symbol}", "ticker-update", message)
   end
 
   defp handle_daily_bars(_message) do

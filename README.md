@@ -1,3 +1,5 @@
+![Tests](https://github.com/daveminer/basket/actions/workflows/ci.yml/badge.svg)
+
 # Basket
 
 Watch your "basket" of stocks in real-time with data from [Alpaca](https://alpaca.markets/).
@@ -7,14 +9,14 @@ Watch your "basket" of stocks in real-time with data from [Alpaca](https://alpac
 Basket is intended as a template; it provides a working example of a Phoenix Framework web server utilizing
 the following tools and patterns:
 
-- Continuous Integrationf
+- Continuous Integration
 - [Phoenix Channels](https://hexdocs.pm/phoenix/channels.html)
 - [Phoenix LiveView](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html)
 - [Phoenix Presence](https://hexdocs.pm/phoenix/presence.html)
 - [Pow](https://github.com/pow-auth/pow)
 - Search Autocomplete (in LiveView)
 - [Surface UI](https://surface-ui.org/)
-- [WebSockex](https://github.com/Azolo/websockex)fffff
+- [WebSockex](https://github.com/Azolo/websockex)
 
 Basket also serves as a reference for testing patterns:
 
@@ -27,7 +29,8 @@ Many thanks to the authors of these excellent libraries!
 ## Setup
 
 ### Install
-* Run `mix setup` to install and setup dependencies (ensure Postgres is running!)
+* Ensure Postgres is running. If using Docker, `docker start postgres` usually works well. 
+* Run `mix setup` to install and set up dependencies 
 * Start the development server with `make dev`
 * Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
 

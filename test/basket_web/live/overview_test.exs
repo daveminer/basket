@@ -227,7 +227,7 @@ defmodule BasketWeb.Live.OverviewTest do
                        value: "2023-11-15T20:59:00Z",
                        prev_value: "2023-11-15T20:58:00Z"
                      },
-                     volume: %BasketWeb.Live.Overview.TickerBar{value: 43031, prev_value: 43025},
+                     volume: %BasketWeb.Live.Overview.TickerBar{value: 43_031, prev_value: 43_025},
                      vwap: %BasketWeb.Live.Overview.TickerBar{
                        value: 188.117416,
                        prev_value: 187.137416

@@ -6,8 +6,8 @@ defmodule BasketWeb.Live.UserLiveAuth do
   import Phoenix.LiveView
   import Phoenix.Component
 
-  alias Pow.Store.CredentialsCache
   alias Pow.Store.Backend.EtsCache
+  alias Pow.Store.CredentialsCache
 
   def on_mount(:user, _params, session, socket) do
     socket =

@@ -16,8 +16,8 @@ defmodule Basket.Tickers.Reaper do
   @spec monitor(String.t()) :: {:reply, :ok, map()}
   def monitor(socket_id), do: GenServer.call(__MODULE__, {:monitor, socket_id})
 
-  @spec demonitor() :: {:reply, :ok, map()}
-  def demonitor(), do: GenServer.call(__MODULE__, :demonitor)
+  @spec demonitor :: {:reply, :ok, map()}
+  def demonitor, do: GenServer.call(__MODULE__, :demonitor)
 
   @spec start_link(any()) :: :ignore | {:error, any()} | {:ok, pid()}
   def start_link(init_arg), do: GenServer.start_link(__MODULE__, init_arg, name: __MODULE__)

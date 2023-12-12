@@ -5,6 +5,7 @@ defmodule BasketWeb.Live.Overview.TickerAdd do
   """
 
   alias Basket.Http
+  alias Basket.Http.Alpaca.Bars
   alias BasketWeb.Presence
 
   require Logger
@@ -29,13 +30,13 @@ defmodule BasketWeb.Live.Overview.TickerAdd do
     {:ok, {[%Basket.Http.Alpaca.Bars{ticker: "ABC", close: 187.15, open: 187.11, high: 187.15, low: 187.05, volume: 43025, timestamp: "2023-11-15T20:59:00Z", count: 357, vwap: 187.117416}, %Basket.Http.Alpaca.Bars{ticker: "XYZ", close: 187.15, open: 187.11, high: 187.15, low: 187.05, volume: 43025, timestamp: "2023-11-15T20:59:00Z", count: 357, vwap: 187.117416}], []}}
   """
   @spec call(list(String.t()) | String.t(), String.t()) ::
-          {:ok, {list(Http.Alpaca.Bars.t()), list(String.t())}} | {:error, String.t()}
+          {:ok, {list(Bars.t()), list(String.t())}} | {:error, String.t()}
   def call(tickers, user_id) when is_list(tickers) do
     ticker_list = Enum.join(tickers, ",")
 
     case Http.Alpaca.latest_quote(ticker_list) do
       {:ok, %{"bars" => bar_list}} ->
-        bars = Enum.map(bar_list, fn {k, v} -> Http.Alpaca.Bars.new(k, v) end)
+        bars = Enum.map(bar_list, fn {k, v} -> Bars.new(k, v) end)
         returned_tickers = Enum.map(bars, fn b -> b.ticker end)
 
         subscribe_to_tickers(returned_tickers, user_id)

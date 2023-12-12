@@ -7,8 +7,8 @@ defmodule BasketWeb.Live.Overview do
   require Logger
 
   alias Basket.Tickers.Ticker
-  alias BasketWeb.Live.Overview.{Search, TickerAdd, TickerBar, TickerBarTable, TickerRow}
   alias BasketWeb.Components.NavRow
+  alias BasketWeb.Live.Overview.{Search, TickerAdd, TickerBar, TickerBarTable, TickerRow}
   alias BasketWeb.Presence
 
   on_mount {BasketWeb.Live.UserLiveAuth, :user}
@@ -100,7 +100,6 @@ defmodule BasketWeb.Live.Overview do
         assign(socket, basket: [])
 
       assets ->
-        IO.inspect(assets, label: "ASSETS")
         tickers = Enum.map(assets, & &1.ticker)
         track_new_assets(tickers, socket)
     end

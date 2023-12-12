@@ -1,21 +1,50 @@
 # Basket
 
+Watch your "basket" of stocks in real-time with [Phoenix LiveView](https://github.com/phoenixframework/phoenix_live_view).
+
 ![](basket_demo.gif)
 
-  * Run `mix setup` to install and setup dependencies
+Basket is intended as a template; it provides a working example of a Phoenix Framework web server utilizing
+the following tools and patterns:
 
-`make t` - run test suite
-`make console` - local dev server with IEX terminal
-`make dev` - local dev sercer with no terminal
+- Continuous Integration
+- [Phoenix Channels](https://hexdocs.pm/phoenix/channels.html)
+- [Phoenix LiveView](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html)
+- [Phoenix Presence](https://hexdocs.pm/phoenix/presence.html)
+- [Pow](https://github.com/pow-auth/pow)
+- [Surface UI](https://surface-ui.org/)
+- [WebSockex](https://github.com/Azolo/websockex)
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+Basket also serves as a reference for testing patterns:
 
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
+- [ExMachina](https://hexdocs.pm/ex_machina/ExMachina.html)
+- [Mox](https://github.com/dashbitco/mox)
+- [Test Server](https://github.com/danschultzer/test_server)
 
-## Learn more
+Many thanks to the authors of these excellent libraries!
 
-  * Official website: https://www.phoenixframework.org/
-  * Guides: https://hexdocs.pm/phoenix/overview.html
-  * Docs: https://hexdocs.pm/phoenix
-  * Forum: https://elixirforum.com/c/phoenix-forum
-  * Source: https://github.com/phoenixframework/phoenix
+## Setup
+
+### Install
+* Run `mix setup` to install and setup dependencies (ensure Postgres is running!)
+* Start the development server with `make dev`
+* Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+
+### Create a Dev User
+* Unauthenticated users will be redirected to the registration page as per [Pow](https://github.com/pow-auth/pow) standards.
+  Sign up and verify your email (for a quick fix, populate the `email_verified_at` column in the `User` table)
+* Log in and watch your basket!  
+
+## Architecture 
+
+Basket uses HTTP and WebSocket connections to ingress stock data. The real-time updates are
+received over WebSocket and distributed through Phoenix Channels. Phoenix Presence is utilized
+to track ticker subscription lifecycles for all users in aggregate against the WebSocket client,
+sharing one client connection efficiently.
+
+## Roadmap
+
+- observability
+- notifications
+- [Absinthe](https://github.com/absinthe-graphql/absinthe)
+- news data aggregation and analysis

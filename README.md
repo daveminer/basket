@@ -1,19 +1,20 @@
 # Basket
 
-Watch your "basket" of stocks in real-time with [Phoenix LiveView](https://github.com/phoenixframework/phoenix_live_view).
+Watch your "basket" of stocks in real-time with data from [Alpaca](https://alpaca.markets/).
 
 ![](basket_demo.gif)
 
 Basket is intended as a template; it provides a working example of a Phoenix Framework web server utilizing
 the following tools and patterns:
 
-- Continuous Integration
+- Continuous Integrationf
 - [Phoenix Channels](https://hexdocs.pm/phoenix/channels.html)
 - [Phoenix LiveView](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveView.html)
 - [Phoenix Presence](https://hexdocs.pm/phoenix/presence.html)
 - [Pow](https://github.com/pow-auth/pow)
+- Search Autocomplete (in LiveView)
 - [Surface UI](https://surface-ui.org/)
-- [WebSockex](https://github.com/Azolo/websockex)
+- [WebSockex](https://github.com/Azolo/websockex)fffff
 
 Basket also serves as a reference for testing patterns:
 
@@ -38,9 +39,9 @@ Many thanks to the authors of these excellent libraries!
 ## Architecture 
 
 Basket uses HTTP and WebSocket connections to ingress stock data. The real-time updates are
-received over WebSocket and distributed through Phoenix Channels. Phoenix Presence is utilized
-to track ticker subscription lifecycles for all users in aggregate against the WebSocket client,
-sharing one client connection efficiently.
+received over WebSocket and distributed through Phoenix Channels, one per stock ticker. Phoenix
+Presence is utilized to track ticker subscription lifecycles for all users in aggregate against
+the WebSocket client, sharing one client connection efficiently.
 
 ## Roadmap
 

@@ -96,7 +96,7 @@ defmodule BasketWeb.Live.Overview.TickerRow do
     vwap: %TickerBar{value: 33.3, prev_value: 51.1}
   }
   """
-  @spec update(old_row :: TickerRow.t(), new_row :: TickerRow.t()) :: t()
+  @spec update(old_row :: t(), new_row :: t()) :: t()
   def update(old_row, new_row) do
     %__MODULE__{
       ticker: TickerBar.set(old_row.ticker, new_row.ticker.value),

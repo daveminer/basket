@@ -15,9 +15,9 @@ defmodule BasketWeb.Live.Overview do
 
   def mount(_, _, socket) do
     if connected?(socket) do
-      load_user_tickers(socket)
+      {:ok, load_user_tickers(socket)}
     else
-      assign(socket, basket: [])
+      {:ok, assign(socket, basket: [])}
     end
   end
 
@@ -26,7 +26,6 @@ defmodule BasketWeb.Live.Overview do
       {:noreply, socket}
     else
       Ticker.add(socket.assigns.user, ticker)
-      BasketWeb.Endpoint.subscribe("bars-#{ticker}")
 
       {:noreply, track_new_assets(ticker, socket)}
     end
@@ -70,9 +69,7 @@ defmodule BasketWeb.Live.Overview do
   def handle_event("ticker-remove", %{"ticker" => ticker}, socket) do
     if ticker in tickers(socket) do
       Ticker.remove(socket.assigns.user, ticker)
-      IO.inspect("UNTRACK")
       Presence.untrack(self(), "bars-#{ticker}", socket.assigns.user.id)
-      :ok = BasketWeb.Endpoint.unsubscribe("bars-#{ticker}")
 
       {:reply, %{},
        assign(
@@ -103,6 +100,7 @@ defmodule BasketWeb.Live.Overview do
         assign(socket, basket: [])
 
       assets ->
+        IO.inspect(assets, label: "ASSETS")
         tickers = Enum.map(assets, & &1.ticker)
         track_new_assets(tickers, socket)
     end

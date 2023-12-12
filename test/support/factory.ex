@@ -79,6 +79,36 @@ defmodule Basket.Factory do
     })
   end
 
+  def socket_factory do
+    # %Phoenix.Socket{
+    #   assigns: %{},
+    #   channel: BasketWeb.TickerChannel,
+    #   channel_pid: self(),
+    #   endpoint: BasketWeb.Endpoint,
+    #   handler: BasketWeb.UserSocket,
+    #   id: nil,
+    #   join_ref: "1",
+    #   joined: true,
+    #   private: %{},
+    #   pubsub_server: Basket.PubSub,
+    #   ref: nil,
+    #   serializer: Jason,
+    #   topic: "topic",
+    #   transport: :websocket,
+    #   transport_pid: self()
+    # }
+
+    %Phoenix.LiveView.Socket{
+      assigns: %{__changed__: %{}},
+      endpoint: BasketWeb.Endpoint,
+      id: "1",
+      parent_pid: nil,
+      root_pid: self(),
+      router: BasketWeb.Router,
+      view: BasketWeb.OverviewLive
+    }
+  end
+
   def ticker_row_factory do
     %TickerRow{
       ticker: %TickerBar{value: "XYZ", prev_value: nil},

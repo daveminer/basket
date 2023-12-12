@@ -9,7 +9,7 @@ defmodule BasketWeb.Live.OverviewTest do
   alias BasketWeb.Live.Overview
   alias BasketWeb.Live.Overview.{Search, TickerBar, TickerRow}
 
-  @assigns_map %{__changed__: %{__context__: true}, assigns: %{}}
+  @assigns_map %{__changed__: %{__context__: true}, assigns: %{}, transport_pid: self()}
 
   setup do
     # Shares the mock with the Cachex fallback function.
@@ -41,14 +41,13 @@ defmodule BasketWeb.Live.OverviewTest do
     test "assigns empty lists to keys" do
       Basket.Websocket.MockClient |> expect(:start_link, fn _, _, _, _ -> {:ok, 1} end)
 
-      assert({:ok, socket} = Overview.mount([], %{}, @assigns_map))
+      assert({:ok, socket} = Overview.mount([], %{}, build(:socket)))
 
       assert(
-        socket == %{
+        socket.assigns == %{
           __changed__: %{__context__: true, basket: true},
           __context__: %{},
-          basket: [],
-          assigns: %{}
+          basket: []
         }
       )
     end

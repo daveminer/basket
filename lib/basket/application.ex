@@ -16,7 +16,7 @@ defmodule Basket.Application do
       {Finch, name: Basket.Finch},
       {Cachex, name: :assets},
       Basket.Websocket.Alpaca,
-      Basket.Websocket.TickerAgent,
+      # Basket.Websocket.TickerAgent,
       # Basket.Tickers.Subscription,
       BasketWeb.Presence,
       Basket.Tickers.Reaper,

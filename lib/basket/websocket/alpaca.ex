@@ -38,6 +38,7 @@ defmodule Basket.Websocket.Alpaca do
     )
   end
 
+  @spec subscribe(subscription_fields) :: :error | :ok
   def subscribe(tickers) do
     decoded_message =
       build_message(@subscribe_message, tickers)
@@ -53,6 +54,7 @@ defmodule Basket.Websocket.Alpaca do
     end
   end
 
+  @spec unsubscribe(subscription_fields) :: :error | :ok
   def unsubscribe(tickers) do
     decoded_message = build_message(@unsubscribe_message, tickers) |> Jason.encode!()
 

@@ -7,7 +7,6 @@ defmodule BasketWeb.Live.Overview do
   require Logger
 
   alias Basket.Tickers.Ticker
-  alias Basket.Websocket.TickerAgent
   alias BasketWeb.Live.Overview.{Search, TickerAdd, TickerBar, TickerBarTable, TickerRow}
   alias BasketWeb.Components.NavRow
   alias BasketWeb.Presence
@@ -15,17 +14,10 @@ defmodule BasketWeb.Live.Overview do
   on_mount {BasketWeb.Live.UserLiveAuth, :user}
 
   def mount(_, _, socket) do
-    case Ticker.for_user(socket.assigns[:user]) do
-      [] ->
-        {:ok, assign(socket, basket: [])}
-
-      assets ->
-        tickers = Enum.map(assets, & &1.ticker)
-        socket = track_new_assets(tickers, socket)
-        Presence.track(self(), "connections", socket.assigns.user.id, %{tickers: tickers})
-        Basket.Tickers.Reaper.monitor(socket.id)
-
-        {:ok, socket}
+    if connected?(socket) do
+      load_user_tickers(socket)
+    else
+      assign(socket, basket: [])
     end
   end
 
@@ -34,6 +26,8 @@ defmodule BasketWeb.Live.Overview do
       {:noreply, socket}
     else
       Ticker.add(socket.assigns.user, ticker)
+      BasketWeb.Endpoint.subscribe("bars-#{ticker}")
+
       {:noreply, track_new_assets(ticker, socket)}
     end
   end
@@ -63,17 +57,22 @@ defmodule BasketWeb.Live.Overview do
     }
   end
 
+  @doc """
+  Prevents the presence updates from being broadcast to the client.
+  """
+  def handle_info(
+        %Phoenix.Socket.Broadcast{topic: _, event: "presence_diff", payload: _},
+        socket
+      ) do
+    {:noreply, socket}
+  end
+
   def handle_event("ticker-remove", %{"ticker" => ticker}, socket) do
     if ticker in tickers(socket) do
-      :ok = BasketWeb.Endpoint.unsubscribe("bars-#{ticker}")
-
-      # Presence.update(socket, "connections", socket.assigns.user.id, fn tickers ->
-      #  Enum.filter(tickers, &(&1 != ticker))
-      # end)
-
-      :ok = TickerAgent.remove(ticker)
-
       Ticker.remove(socket.assigns.user, ticker)
+      IO.inspect("UNTRACK")
+      Presence.untrack(self(), "bars-#{ticker}", socket.assigns.user.id)
+      :ok = BasketWeb.Endpoint.unsubscribe("bars-#{ticker}")
 
       {:reply, %{},
        assign(
@@ -98,8 +97,19 @@ defmodule BasketWeb.Live.Overview do
     """
   end
 
+  defp load_user_tickers(socket) do
+    case Ticker.for_user(socket.assigns[:user]) do
+      [] ->
+        assign(socket, basket: [])
+
+      assets ->
+        tickers = Enum.map(assets, & &1.ticker)
+        track_new_assets(tickers, socket)
+    end
+  end
+
   defp track_new_assets(tickers, socket) do
-    case TickerAdd.call(tickers) do
+    case TickerAdd.call(tickers, socket.assigns.user.id) do
       {:ok, {bar_rows, not_found_tickers}} ->
         socket =
           if not_found_tickers != [] do

@@ -53,7 +53,7 @@ defmodule Basket.Tickers.Ticker do
   @doc """
   Removes a ticker from a User's basket of stocks.
   """
-  @spec remove(user :: User.t(), ticker: String.t()) :: :ok
+  @spec remove(user :: User.t(), ticker: String.t()) :: {non_neg_integer(), nil | [term()]}
   def remove(user, ticker) do
     from(t in __MODULE__,
       where: t.user_id == ^user.id and t.ticker == ^ticker

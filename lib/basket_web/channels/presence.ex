@@ -9,46 +9,46 @@ defmodule BasketWeb.Presence do
     otp_app: :basket,
     pubsub_server: Basket.PubSub
 
+  require Logger
+
+  alias Basket.Websocket
+
   @doc """
-  Keeps track of presence state within the process.
+  Keeps track of ticker subscription state within the process.
   """
-  # def init(_opts) do
-  #   {:ok, %{}}
-  # end
+  def init(_opts) do
+    {:ok, %{}}
+  end
 
-  # @doc """
-  # Add an id and user to the presence.
-  # """
-  # def fetch(_topic, presences) do
-  #   for {key, %{metas: [meta | metas]}} <- presences, into: %{} do
-  #     # user can be populated here from the database here we populate
-  #     # the name for demonstration purposes
-  #     {key, %{metas: [meta | metas], id: meta.id, user: %{name: meta.id}}}
-  #   end
-  # end
+  @doc """
+  Tracks subscriptions to ticker channels, subscribing and unsubscribing from
+  the external ticker server as needed.
 
-  # @doc """
-  # Updates the presence state based on Ticker addition and removal.
-  # """
-  # def handle_metas(topic, %{joins: joins, leaves: leaves}, presences, state) do
-  #   for {user_id, presence} <- joins do
-  #     user_data = %{id: user_id, user: presence.user, metas: Map.fetch!(presences, user_id)}
-  #     msg = {__MODULE__, {:join, user_data}}
-  #     Phoenix.PubSub.local_broadcast(Hello.PubSub, "proxy:#{topic}", msg)
-  #   end
+  ## Example
+    iex> join = %{joins: %{"1" => %{metas: [%{phx_ref: "F5-vJ_d1tq0argHC"}]}}, leaves: %{}}
+    iex> presence = %{"1" => [%{phx_ref: "F5-vJ_d1tq0argHC"}], "2" => [%{phx_ref: "F5-vPC7mhaUargKC"}]}
+    iex> state = %{}
+    iex> Presence.handle_metas("bars-ABC", join, presence, state)
+    {:ok, %{}}
+  """
+  def handle_metas("bars-" <> ticker, %{joins: joins, leaves: leaves}, presences, state) do
+    if first_to_join(joins, presences) do
+      Websocket.Alpaca.subscribe(%{bars: [ticker], quotes: [], trades: []})
+    end
 
-  #   for {user_id, presence} <- leaves do
-  #     metas =
-  #       case Map.fetch(presences, user_id) do
-  #         {:ok, presence_metas} -> presence_metas
-  #         :error -> []
-  #       end
+    if last_to_leave(leaves, presences) do
+      Websocket.Alpaca.unsubscribe(%{bars: [ticker], quotes: [], trades: []})
+    end
 
-  #     user_data = %{id: user_id, user: presence.user, metas: metas}
-  #     msg = {__MODULE__, {:leave, user_data}}
-  #     Phoenix.PubSub.local_broadcast(Hello.PubSub, "proxy:#{topic}", msg)
-  #   end
+    {:ok, state}
+  end
 
-  #   {:ok, state}
-  # end
+  defp first_to_join(joins, presences) do
+    join_count = map_size(joins)
+    join_count > 0 && map_size(presences) == join_count
+  end
+
+  defp last_to_leave(leaves, presences) do
+    map_size(leaves) > 0 && map_size(presences) == 0
+  end
 end

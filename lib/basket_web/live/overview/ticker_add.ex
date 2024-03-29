@@ -19,18 +19,18 @@ defmodule BasketWeb.Live.Overview.TickerAdd do
     iex> Mox.expect(Basket.Http.MockAlpaca, :latest_quote, fn _ -> {:ok, %{"bars" => []}} end)
     iex> Mox.expect(Basket.Websocket.MockClient, :send_frame, fn _, _ -> :ok end)
     iex> TickerAdd.call("ABC", 1)
-    {:ok, {[], ["ABC"]}}
+    {:ok, %{bars: [], tickers_not_found: ["ABC"]}}
     iex> Mox.expect(Basket.Http.MockAlpaca, :latest_quote, fn _ -> {:ok, %{"bars" => build(:bars_payload, ticker: "ABC")}} end)
     iex> Mox.expect(Basket.Websocket.MockClient, :send_frame, fn _, _ -> :ok end)
     iex> TickerAdd.call("ABC", 1)
-    {:ok, {[%Basket.Http.Alpaca.Bars{ticker: "ABC", close: 187.15, open: 187.11, high: 187.15, low: 187.05, volume: 43025, timestamp: "2023-11-15T20:59:00Z", count: 357, vwap: 187.117416}], []}}
+    {:ok, %{bars: [%Basket.Http.Alpaca.Bars{ticker: "ABC", close: 187.15, open: 187.11, high: 187.15, low: 187.05, volume: 43025, timestamp: "2023-11-15T20:59:00Z", count: 357, vwap: 187.117416}], tickers_not_found: []}}
     iex> Mox.expect(Basket.Http.MockAlpaca, :latest_quote, fn _ -> {:ok, %{"bars" => Map.merge(build(:bars_payload, ticker: "ABC"), build(:bars_payload))}} end)
     iex> Mox.expect(Basket.Websocket.MockClient, :send_frame, 2, fn _, _ -> :ok end)
     iex> TickerAdd.call(["ABC", "XYZ"], 1)
-    {:ok, {[%Basket.Http.Alpaca.Bars{ticker: "ABC", close: 187.15, open: 187.11, high: 187.15, low: 187.05, volume: 43025, timestamp: "2023-11-15T20:59:00Z", count: 357, vwap: 187.117416}, %Basket.Http.Alpaca.Bars{ticker: "XYZ", close: 187.15, open: 187.11, high: 187.15, low: 187.05, volume: 43025, timestamp: "2023-11-15T20:59:00Z", count: 357, vwap: 187.117416}], []}}
+    {:ok, %{bars: [%Basket.Http.Alpaca.Bars{ticker: "ABC", close: 187.15, open: 187.11, high: 187.15, low: 187.05, volume: 43025, timestamp: "2023-11-15T20:59:00Z", count: 357, vwap: 187.117416}, %Basket.Http.Alpaca.Bars{ticker: "XYZ", close: 187.15, open: 187.11, high: 187.15, low: 187.05, volume: 43025, timestamp: "2023-11-15T20:59:00Z", count: 357, vwap: 187.117416}], tickers_not_found: []}}
   """
   @spec call(list(String.t()) | String.t(), String.t()) ::
-          {:ok, {list(Bars.t()), list(String.t())}} | {:error, String.t()}
+          {:ok, %{bars: list(Bars.t()), tickers_not_found: list(String.t())}} | {:error, String.t()}
   def call(tickers, user_id) when is_list(tickers) do
     ticker_list = Enum.join(tickers, ",")
 
@@ -41,7 +41,7 @@ defmodule BasketWeb.Live.Overview.TickerAdd do
 
         subscribe_to_tickers(returned_tickers, user_id)
 
-        {:ok, {bars, tickers -- returned_tickers}}
+        {:ok, %{bars: bars, tickers_not_found: tickers -- returned_tickers}}
 
       {:error, %{"message" => error}} ->
         {:error, error}

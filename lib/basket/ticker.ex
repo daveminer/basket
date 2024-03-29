@@ -1,4 +1,4 @@
-defmodule Basket.Tickers.Ticker do
+defmodule Basket.Ticker do
   @moduledoc """
   Tracks the stock tickers that are active on a user's dashboard.
   """

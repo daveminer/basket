@@ -512,7 +512,11 @@ defmodule BasketWeb.CoreComponents do
 
     ~H"""
     <div class="overflow-y-auto px-4 sm:overflow-visible sm:px-0">
-      <table class="w-[40rem] mt-11 sm:w-full">
+      <table
+        id="ticker-table"
+        phx-hook="TickerHandler"
+        class="w-[40rem] mt-11 sm:w-full"
+      >
         <thead class="text-sm text-left leading-6 text-zinc-500">
           <tr>
             <th :for={col <- @col} class="p-0 pb-4 pr-6 text-center font-normal">
@@ -527,9 +531,9 @@ defmodule BasketWeb.CoreComponents do
           id={@id}
           phx-hook="CellValueStore"
           phx-update="append"
-          class="relative divide-y divide-zinc-100 border-t border-zinc-200 text-sm leading-6 text-zinc-700"
+          class="relative divide-y divide-zinc-100 border-t border-zinc-200 leading-6"
         >
-          <tr :for={row <- @rows} id={row.id} class="group hover:bg-zinc-50">
+          <tr :for={row <- @rows} id={row.id} class="group hover:bg-zinc-50 text-sm text-zinc-700">
             <td
               :for={{col, i} <- Enum.with_index(@col)}
               phx-click={@row_click && @row_click.(row)}

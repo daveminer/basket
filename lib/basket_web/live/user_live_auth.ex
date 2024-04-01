@@ -1,6 +1,6 @@
 defmodule BasketWeb.Live.UserLiveAuth do
   @moduledoc """
-  Adds the user to the socket so it can be used in the live views. The user data is
+  Adds the user to the socket so it can be used in the liveviews. The user data is
   fetched every time to prevent stale data and expire sessions on time.
   """
   import Phoenix.LiveView

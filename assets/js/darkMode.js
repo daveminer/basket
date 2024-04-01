@@ -11,7 +11,6 @@ function setMode() {
 }
 
 export function toggleDarkMode() {
-  console.log("TOGGLEDARKMODE")
   if (darkExpected()) localStorage.theme = 'light';
   else localStorage.theme = 'dark';
   setMode();

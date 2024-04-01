@@ -5,7 +5,7 @@ defmodule Basket.Factory do
 
   alias Basket.Http.Alpaca.Bars
   alias Basket.Users.User
-  alias BasketWeb.Live.Overview.{TickerBar, TickerRow}
+  alias BasketWeb.Live.Overview.TickerRow
 
   def asset_mtcr_factory do
     %{
@@ -48,7 +48,7 @@ defmodule Basket.Factory do
       if attrs[:ticker] do
         attrs.ticker
       else
-        "XYZ"
+        "ALPHA"
       end
 
     %{
@@ -63,20 +63,6 @@ defmodule Basket.Factory do
         "vw" => 187.117416
       }
     }
-  end
-
-  @spec new_bars_factory() :: Bars.t()
-  def new_bars_factory do
-    Bars.new("XYZ", %{
-      "c" => 187.15,
-      "h" => 187.15,
-      "l" => 187.05,
-      "n" => 357,
-      "o" => 187.11,
-      "t" => "2023-11-15T20:59:00Z",
-      "v" => 43_025,
-      "vw" => 187.117416
-    })
   end
 
   def socket_factory do

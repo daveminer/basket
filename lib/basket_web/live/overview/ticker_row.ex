@@ -33,38 +33,36 @@ defmodule BasketWeb.Live.Overview.TickerRow do
   Converts a ticker-update message into a TickerRow
 
   ## Example
-    iex> new_bars = %{"S" => "AAPL", "T" => "t", "c" => 100, "h" => 105, "l" => 95, "n" => 1, "o" => 99, "t" => "2023-11-15T20:59:00Z", "v" => 50, "vw" => 51.1}
+    iex> new_bars = %{"S" => "ALPHA", "T" => "t", "c" => 100, "h" => 105, "l" => 95, "n" => 1, "o" => 99, "t" => "2023-11-15T20:59:00Z", "v" => 50, "vw" => 51.1}
     iex> new(new_bars)
     %TickerRow{
-              close: 100
-              count: 1
-              high: 105
-              low: 95
-              open: 99
-              ticker: "AAPL"
-              timestamp: "2023-11-15T20:59:00Z"
-              volume: 50
-              vwap: 51.1
-            }
+      id: "ALPHA",
+      close: 100,
+      count: 1,
+      high: 105,
+      low: 95,
+      open: 99,
+      ticker: "ALPHA",
+      timestamp: "2023-11-15T20:59:00Z",
+      volume: 50,
+      vwap: 51.1
+    }
   """
-  @spec new(id :: non_neg_integer(), payload :: map()) :: t()
-  def new(
-        id,
-        %{
-          "S" => ticker,
-          "T" => _type,
-          "c" => close,
-          "h" => high,
-          "l" => low,
-          "n" => count,
-          "o" => open,
-          "t" => timestamp,
-          "v" => volume,
-          "vw" => vwap
-        }
-      ) do
+  @spec new(payload :: map()) :: t()
+  def new(%{
+        "S" => ticker,
+        "T" => _type,
+        "c" => close,
+        "h" => high,
+        "l" => low,
+        "n" => count,
+        "o" => open,
+        "t" => timestamp,
+        "v" => volume,
+        "vw" => vwap
+      }) do
     %__MODULE__{
-      id: id,
+      id: ticker,
       ticker: ticker,
       close: close,
       high: high,

@@ -40,10 +40,6 @@ defmodule Basket.DataCase do
   def setup_sandbox(tags) do
     pid = Sandbox.start_owner!(Basket.Repo, shared: not tags[:async])
 
-    # Set up a default set of mocks for use in asynchronous tests
-    # Mox.defmock(Basket.Websocket.MockAlpaca, for: Basket.Websocket.Alpaca)
-    # Application.put_env(:basket, :alpaca_ws_client, Basket.Websocket.MockAlpaca)
-
     on_exit(fn -> Sandbox.stop_owner(pid) end)
   end
 
@@ -62,10 +58,4 @@ defmodule Basket.DataCase do
       end)
     end)
   end
-
-  # Mox.defmock(Basket.Websocket.MockAlpaca, for: Basket.Websocket.Alpaca)
-  # Application.put_env(:basket, :alpaca_ws_client, Basket.Websocket.MockAlpaca)
-
-  # Mox.defmock(Basket.Http.MockAlpaca, for: Basket.Http.Alpaca)
-  # Application.put_env(:basket, :alpaca_http_client, Basket.Http.MockAlpaca)
 end

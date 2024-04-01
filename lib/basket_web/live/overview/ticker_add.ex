@@ -19,6 +19,7 @@ defmodule BasketWeb.Live.Overview.TickerAdd do
           | {:error, String.t()}
   def call(tickers, user_id) when is_list(tickers) do
     ticker_list = Enum.join(tickers, ",")
+
     case Http.Alpaca.latest_quote(ticker_list) do
       {:ok, %{"bars" => bar_list}} ->
         bars = Enum.map(bar_list, fn {k, v} -> Bars.new(k, v) end)

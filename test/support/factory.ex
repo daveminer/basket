@@ -3,9 +3,8 @@ defmodule Basket.Factory do
 
   use ExMachina.Ecto
 
-  alias Basket.Http.Alpaca.Bars
   alias Basket.Users.User
-  alias BasketWeb.Live.Overview.{TickerBar, TickerRow}
+  alias BasketWeb.Live.Overview.TickerRow
 
   def asset_mtcr_factory do
     %{
@@ -48,7 +47,7 @@ defmodule Basket.Factory do
       if attrs[:ticker] do
         attrs.ticker
       else
-        "XYZ"
+        "ALPHA"
       end
 
     %{
@@ -63,20 +62,6 @@ defmodule Basket.Factory do
         "vw" => 187.117416
       }
     }
-  end
-
-  @spec new_bars_factory() :: Bars.t()
-  def new_bars_factory do
-    Bars.new("XYZ", %{
-      "c" => 187.15,
-      "h" => 187.15,
-      "l" => 187.05,
-      "n" => 357,
-      "o" => 187.11,
-      "t" => "2023-11-15T20:59:00Z",
-      "v" => 43_025,
-      "vw" => 187.117416
-    })
   end
 
   def socket_factory do
@@ -111,29 +96,29 @@ defmodule Basket.Factory do
 
   def ticker_row_factory do
     %TickerRow{
-      ticker: %TickerBar{value: "XYZ", prev_value: nil},
-      close: %TickerBar{value: 100, prev_value: nil},
-      high: %TickerBar{value: 105, prev_value: nil},
-      low: %TickerBar{value: 95, prev_value: nil},
-      count: %TickerBar{value: 1, prev_value: nil},
-      open: %TickerBar{value: 99, prev_value: nil},
-      timestamp: %TickerBar{value: "2023-11-15T20:59:00Z", prev_value: nil},
-      volume: %TickerBar{value: 50, prev_value: nil},
-      vwap: %TickerBar{value: 51.1, prev_value: nil}
+      ticker: "XYZ",
+      close: 100,
+      high: 105,
+      low: 95,
+      count: 1,
+      open: 99,
+      timestamp: "2023-11-15T20:59:00Z",
+      volume: 50,
+      vwap: 51.1
     }
   end
 
   def ticker_row_update_factory do
     %TickerRow{
-      ticker: %TickerBar{value: "XYZ", prev_value: nil},
-      close: %TickerBar{value: 101, prev_value: nil},
-      high: %TickerBar{value: 113, prev_value: nil},
-      low: %TickerBar{value: 93, prev_value: nil},
-      count: %TickerBar{value: 2, prev_value: nil},
-      open: %TickerBar{value: 100, prev_value: nil},
-      timestamp: %TickerBar{value: "2023-11-15T21:00:00Z", prev_value: nil},
-      volume: %TickerBar{value: 24, prev_value: nil},
-      vwap: %TickerBar{value: 33.3, prev_value: nil}
+      ticker: "XYZ",
+      close: 101,
+      high: 113,
+      low: 93,
+      count: 2,
+      open: 100,
+      timestamp: "2023-11-15T21:00:00Z",
+      volume: 24,
+      vwap: 33.3
     }
   end
 

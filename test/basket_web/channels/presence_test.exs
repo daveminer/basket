@@ -1,5 +1,7 @@
 defmodule BasketWeb.PresenceTest do
-  use ExUnit.Case, async: true
+  @moduledoc false
+
+  use ExUnit.Case, async: false
 
   import Mox
 
@@ -18,7 +20,6 @@ defmodule BasketWeb.PresenceTest do
       Basket.Websocket.MockClient
       |> expect(:send_frame, fn _, _ ->
         :ok
-        # assert bars == ["ABC"]
       end)
 
       assert {:ok, _state} =

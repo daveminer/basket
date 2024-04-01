@@ -512,7 +512,7 @@ defmodule BasketWeb.CoreComponents do
 
     ~H"""
     <div class="overflow-y-auto px-4 sm:overflow-visible sm:px-0">
-      <table class="w-[40rem] mt-11 sm:w-full">
+      <table id="ticker-table" phx-hook="TickerHandler" class="w-[40rem] mt-11 sm:w-full">
         <thead class="text-sm text-left leading-6 text-zinc-500">
           <tr>
             <th :for={col <- @col} class="p-0 pb-4 pr-6 text-center font-normal">
@@ -525,19 +525,19 @@ defmodule BasketWeb.CoreComponents do
         </thead>
         <tbody
           id={@id}
-          phx-hook="BarTableUpdated"
-          phx-update={match?(%Phoenix.LiveView.LiveStream{}, @rows) && "stream"}
-          class="relative divide-y divide-zinc-100 border-t border-zinc-200 text-sm leading-6 text-zinc-700"
+          phx-hook="CellValueStore"
+          phx-update="append"
+          class="relative divide-y divide-zinc-100 border-t border-zinc-200 leading-6"
         >
-          <tr :for={row <- @rows} id={@row_id && @row_id.(row)} class="group hover:bg-zinc-50">
+          <tr :for={row <- @rows} id={row.id} class="group hover:bg-zinc-50 text-sm text-zinc-700">
             <td
               :for={{col, i} <- Enum.with_index(@col)}
               phx-click={@row_click && @row_click.(row)}
+              data-key={"#{row.id}_#{col[:key]}"}
               class={[
                 "relative p-0",
                 "text-center",
-                @row_click && "hover:cursor-pointer",
-                diff_cell_color(col, row)
+                @row_click && "hover:cursor-pointer"
               ]}
             >
               <div class="block py-4 pr-6">
@@ -717,19 +717,4 @@ defmodule BasketWeb.CoreComponents do
   def translate_errors(errors, field) when is_list(errors) do
     for {^field, {msg, opts}} <- errors, do: translate_error({msg, opts})
   end
-
-  defp diff_cell_color(%{key: key} = _col, row) when is_binary(key) do
-    %{value: value, prev_value: prev} =
-      Map.get(row, String.to_existing_atom(key), %{value: nil, prev_value: nil})
-
-    if is_number(value) && is_number(prev) do
-      case value - prev do
-        x when x > 0 -> "bg-emerald-300 text-emerald-900"
-        x when x < 0 -> "bg-rose-300 text-rose-900"
-        _ -> ""
-      end
-    end
-  end
-
-  defp diff_cell_color(_col, _row), do: ""
 end

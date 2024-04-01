@@ -1,4 +1,5 @@
 defmodule BasketWeb.ErrorJSONTest do
+  @moduledoc false
   use BasketWeb.ConnCase, async: true
 
   test "renders 404" do

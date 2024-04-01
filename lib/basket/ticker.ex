@@ -1,4 +1,4 @@
-defmodule Basket.Tickers.Ticker do
+defmodule Basket.Ticker do
   @moduledoc """
   Tracks the stock tickers that are active on a user's dashboard.
   """
@@ -40,7 +40,7 @@ defmodule Basket.Tickers.Ticker do
   @doc """
   Returns a list of Tickers for a given user.
   """
-  @spec for_user(user :: User.t()) :: [Basket.Tickers.Ticker.t()]
+  @spec for_user(user :: User.t()) :: [Basket.Ticker.t()]
   def for_user(nil), do: []
 
   def for_user(user) do

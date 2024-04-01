@@ -3,7 +3,6 @@ defmodule Basket.Factory do
 
   use ExMachina.Ecto
 
-  alias Basket.Http.Alpaca.Bars
   alias Basket.Users.User
   alias BasketWeb.Live.Overview.TickerRow
 

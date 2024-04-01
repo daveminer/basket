@@ -100,7 +100,7 @@ defmodule BasketWeb.Live.Overview do
   defp handle_ticker_add_result(
          {:ok, %{bars: bar_rows, tickers_not_found: tickers_not_found}},
          socket,
-         opts
+         _opts
        ) do
     socket =
       if tickers_not_found != [] do

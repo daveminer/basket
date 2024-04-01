@@ -40,7 +40,7 @@ defmodule Basket.Ticker do
   @doc """
   Returns a list of Tickers for a given user.
   """
-  @spec for_user(user :: User.t()) :: [Basket.Tickers.Ticker.t()]
+  @spec for_user(user :: User.t()) :: [Basket.Ticker.t()]
   def for_user(nil), do: []
 
   def for_user(user) do

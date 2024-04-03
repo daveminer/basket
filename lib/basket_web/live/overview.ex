@@ -8,7 +8,7 @@ defmodule BasketWeb.Live.Overview do
 
   alias Basket.Ticker
   alias BasketWeb.Components.NavRow
-  alias BasketWeb.Live.Overview.{Search, TickerAdd, TickerBarTable, TickerRow}
+  alias BasketWeb.Live.Overview.{Search, TickerAdd, TickerBarTable}
   alias BasketWeb.Presence
 
   on_mount {BasketWeb.Live.UserLiveAuth, :user}
@@ -18,19 +18,21 @@ defmodule BasketWeb.Live.Overview do
   def mount(_, _, socket) do
     socket = assign(socket, :basket, [])
 
-    if connected?(socket) do
-      tickers = load_user_tickers(socket.assigns.user)
+    socket =
+      if connected?(socket) do
+        tickers = load_user_tickers(socket.assigns.user)
 
-      if tickers != [] do
-        result = TickerAdd.call(tickers, socket.assigns.user.id)
-        new_socket = handle_ticker_add_result(result, socket)
-        {:ok, new_socket, temporary_assigns: @initial_temp_assigns}
+        if tickers != [] do
+          result = TickerAdd.call(tickers, socket.assigns.user.id)
+          handle_ticker_add_result(result, socket)
+        else
+          socket
+        end
       else
-        {:ok, socket, temporary_assigns: @initial_temp_assigns}
+        socket
       end
-    else
-      {:ok, socket, temporary_assigns: @initial_temp_assigns}
-    end
+
+    {:ok, socket, temporary_assigns: @initial_temp_assigns}
   end
 
   def handle_info({"ticker-add", %{"ticker" => ticker}}, socket) do
@@ -38,9 +40,23 @@ defmodule BasketWeb.Live.Overview do
       {:noreply, socket}
     else
       Ticker.add(socket.assigns.user, ticker)
-      result = TickerAdd.call(ticker, socket.assigns.user.id)
-      new_socket = handle_ticker_add_result(result, socket, add_method: :append)
-      {:noreply, new_socket}
+
+      case TickerAdd.call(ticker, socket.assigns.user.id) do
+        {:error, error} ->
+          Logger.error("Could not add ticker: #{error}")
+          {:noreply, socket}
+
+        {:ok, %{bars: [bars]}} ->
+          {:noreply, push_event(socket, "ticker-added", %{bars: bars})}
+          # IO.inspect(result, label: "RESULT")
+          # new_socket = handle_ticker_add_result(result, socket)
+          # {:noreply, new_socket}
+      end
+
+      # IO.inspect(result, label: "RESULT")
+      # new_socket = handle_ticker_add_result(result, socket)
+      # new_socket = push_event(socket, "ticker-added", %{ticker: ticker})
+      # {:noreply, new_socket}
     end
   end
 
@@ -48,7 +64,8 @@ defmodule BasketWeb.Live.Overview do
         %Phoenix.Socket.Broadcast{topic: _topic, event: "ticker-update", payload: payload},
         socket
       ) do
-    updated_socket = update(socket, :basket, fn _basket -> [TickerRow.new(payload)] end)
+    # updated_socket = update(socket, :basket, fn _basket -> [TickerRow.new(payload)] end)
+    updated_socket = push_event(socket, "ticker-update-received", payload)
 
     {:noreply, updated_socket}
   end
@@ -94,31 +111,16 @@ defmodule BasketWeb.Live.Overview do
     end
   end
 
-  # Define the default value for opts here, in the header.
-  defp handle_ticker_add_result(result, socket, opts \\ [])
-
   defp handle_ticker_add_result(
-         {:ok, %{bars: bar_rows, tickers_not_found: tickers_not_found}},
-         socket,
-         _opts
+         {:ok, %{bars: bar_rows, tickers_not_found: _tickers_not_found}},
+         socket
        ) do
-    socket =
-      if tickers_not_found != [] do
-        put_flash(
-          socket,
-          :info,
-          "No data for tickers: #{Enum.join(tickers_not_found, ", ")}"
-        )
-      else
-        socket
-      end
+    # IO.inspect(bar_rows, label: "BAR_ROWS")
 
-    update(socket, :basket, fn _basket -> bar_rows end)
-  end
-
-  defp handle_ticker_add_result({:error, error}, socket, _opts) do
-    Logger.error("Could not subscribe to ticker: #{error}")
-    socket
+    update(socket, :basket, fn basket ->
+      # IO.inspect(basket, label: "BASKET")
+      bar_rows
+    end)
   end
 
   defp tickers(socket), do: Enum.map(socket.assigns.basket, fn row -> row.ticker end)

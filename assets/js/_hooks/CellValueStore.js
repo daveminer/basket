@@ -1,58 +1,65 @@
 export const CellValueStore = {
   mounted() {
-    this.prevValues = {}; // Initialize an empty object to store previous values
-    this.updatePrevValues(); // Set initial previous values on mount
-
-    this.handleEvent("run-updated", () => {
-      // Your updated() function code here
-      this.flashUpdatedCells(); // Flash cells with updated values
-      this.updatePrevValues(); // Update previous values after flashing
+    this.handleEvent("ticker-update-received", (values) => {
+      console.log(values, "VALUES")
+      const id = values["S"];
+      // select the table row with id equal to id
+      console.log(id, "ID")
+      const row = document.querySelector(`tr[id="${id}"]`);
+      console.log(row, "ROW")
+      this.highlightChanges(row, values);
     });
   },
-  // updated() {
-  //   this.flashUpdatedCells(); // Flash cells with updated values
-  //   this.updatePrevValues(); // Update previous values after flashing
-  // },
-  updatePrevValues() {
-    // Loop through each cell and update the store with its current value
-    this.el.querySelectorAll('td[data-key]').forEach((cell) => {
-      const key = cell.getAttribute('data-key'); // Assume each cell has a unique data-key attribute
-      this.prevValues[key] = cell.textContent || cell.innerText;
-    });
-  },
-  flashUpdatedCells() {
-    let selector = this.el.querySelectorAll('td[data-key]')
-    console.log(selector, "SELECTOR")
-    this.el.querySelectorAll('td[data-key]').forEach((cell) => {
-      const key = cell.getAttribute('data-key');
-      console.log(key, "KEY")
-      const currentValue = cell.textContent || cell.innerText;
-      const prevValue = this.prevValues[key];
 
-      if (!prevValue || !isFinite(Number(currentValue))) return; // Skip if no previous value or not a number
+  highlightChanges(row, values) {
+    const cells = row.querySelectorAll('td[data-key]')
+    // Loop through each cell in the row and update the text content
+    cells.forEach((cell) => {
+      const dataKey = cell.getAttribute('data-key');
+      const [_ticker, key] = dataKey.split('_');
 
-      const prevNum = parseFloat(prevValue);
-      const currentNum = parseFloat(currentValue);
+      let value;
+      switch (key) {
+        case 'open':
+          value = values['o'];
+          break;
+        case 'high':
+          value = values['h'];
+          break;
+        case 'low':
+          value = values['l'];
+          break;
+        case 'close':
+          value = values['c'];
+          break;
+        case 'volume':
+          value = values['v'];
+          break;
+        default:
+          break;
+      }
 
-      if (isFinite(prevNum) && isFinite(currentNum)) {
-        if (prevNum < currentNum) {
-          this.applyFlash(cell, 'increase');
-        } else if (prevNum > currentNum) {
-          this.applyFlash(cell, 'decrease');
+      if (isFinite(value)) {
+        // Multiple content slots
+        const content = cell.querySelectorAll('[id$=content-slot]')
+        const oldValue = content[0].textContent;
+        content[0].textContent = value;
+        if (oldValue && isFinite(oldValue)) {
+          const oldNum = parseFloat(oldValue);
+          const newNum = parseFloat(value);
+          if (oldNum < newNum) {
+            cell.classList.add('bg-emerald-300');
+            setTimeout(() => {
+              cell.classList.remove('bg-emerald-300');
+            }, 3000);
+          } else if (oldNum > newNum) {
+            cell.classList.add('bg-rose-300');
+            setTimeout(() => {
+              cell.classList.remove('bg-rose-300');
+            }, 3000);
+          }
         }
       }
     });
-  },
-  applyFlash(cell, changeType) {
-    console.log("APPLYING FLASH")
-    // Apply classes based on whether the value increased or decreased
-    const flashClass = changeType === 'increase' ? 'bg-emerald-300' : 'bg-rose-300';
-    cell.classList.add(flashClass);
-
-    setTimeout(() => {
-      console.log("TIMEOUT RUN")
-      cell.classList.remove(flashClass)
-    }, 3000
-    );
   }
 };

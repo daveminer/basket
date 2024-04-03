@@ -512,7 +512,7 @@ defmodule BasketWeb.CoreComponents do
 
     ~H"""
     <div class="overflow-y-auto px-4 sm:overflow-visible sm:px-0">
-      <table id="ticker-table" phx-hook="TickerHandler" class="w-[40rem] mt-11 sm:w-full">
+      <table id="ticker-table" class="w-[40rem] mt-11 sm:w-full">
         <thead class="text-sm text-left leading-6 text-zinc-500">
           <tr>
             <th :for={col <- @col} class="p-0 pb-4 pr-6 text-center font-normal">
@@ -526,7 +526,7 @@ defmodule BasketWeb.CoreComponents do
         <tbody
           id={@id}
           phx-hook="CellValueStore"
-          phx-update="append"
+          phx-update="replace"
           class="relative divide-y divide-zinc-100 border-t border-zinc-200 leading-6"
         >
           <tr :for={row <- @rows} id={row.id} class="group hover:bg-zinc-50 text-sm text-zinc-700">
@@ -542,7 +542,10 @@ defmodule BasketWeb.CoreComponents do
             >
               <div class="block py-4 pr-6">
                 <span class="absolute -inset-y-px right-0 -left-4 group-hover:bg-zinc-50 sm:rounded-l-xl" />
-                <span class={["relative", i == 0 && "font-semibold text-zinc-900"]}>
+                <span
+                  id={"#{row.id}-#{col[:key]}-content-slot"}
+                  class={["relative", i == 0 && "font-semibold text-zinc-900"]}
+                >
                   <%= render_slot(col, @row_item.(row)) %>
                 </span>
               </div>

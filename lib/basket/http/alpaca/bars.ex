@@ -3,6 +3,7 @@ defmodule Basket.Http.Alpaca.Bars do
   Typed instance of a stock chart bars.
   """
 
+  @derive Jason.Encoder
   defstruct [:id, :ticker, :close, :open, :high, :low, :volume, :timestamp, :count, :vwap]
 
   @type t :: %__MODULE__{

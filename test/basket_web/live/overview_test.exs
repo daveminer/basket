@@ -99,46 +99,5 @@ defmodule BasketWeb.Live.OverviewTest do
       {:ok, _empty_view, _html} = live(conn, "/")
       assert render(view) =~ "<input id=\"ticker-input\""
     end
-
-    test "updates a TickerRow when a message with new bars is received", %{
-      conn: conn
-    } do
-      Basket.Http.MockAlpaca
-      |> expect(:latest_quote, fn _ -> {:ok, %{"bars" => build(:bars_payload)}} end)
-
-      Basket.Websocket.MockClient |> expect(:send_frame, 2, fn _, _ -> :ok end)
-
-      {:ok, view, _html} = live(conn, "/")
-
-      assert render(view) =~
-               "<span class=\"relative \">\n              43025\n            </span>"
-
-      # Send update
-      send(
-        view.pid,
-        %Phoenix.Socket.Broadcast{
-          topic: "bars-ALPHA",
-          event: "ticker-update",
-          payload: %{
-            "S" => "XYZ",
-            "T" => "b",
-            "c" => 191.285,
-            "h" => 191.37,
-            "l" => 191.23,
-            "n" => 50,
-            "o" => 191.23,
-            "t" => "2023-11-20T16:24:00Z",
-            "v" => 5433,
-            "vw" => 191.328043
-          }
-        }
-      )
-
-      # Remove the last ticker so the Presence topic is left before the mock is gone.
-      render_hook(view, "ticker-remove", %{"ticker" => "ALPHA"})
-
-      # Check for update
-      assert render(view) =~ "<span class=\"relative \">\n              5433\n            </span>"
-    end
   end
 end

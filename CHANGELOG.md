@@ -7,9 +7,10 @@
 
 ### Added
 
-- Ticker table now uses the LiveView in streaming mode with the append option.
-
 ### Changed
+
+- Ticker table now uses a client hook to process ticker updates, rather than keeping
+  previous state on the server.
 
 ### Fixed
 

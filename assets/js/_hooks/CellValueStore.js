@@ -1,12 +1,9 @@
 export const CellValueStore = {
   mounted() {
     this.handleEvent("ticker-update-received", (values) => {
-      console.log(values, "VALUES")
       const id = values["S"];
       // select the table row with id equal to id
-      console.log(id, "ID")
       const row = document.querySelector(`tr[id="${id}"]`);
-      console.log(row, "ROW")
       this.highlightChanges(row, values);
     });
   },

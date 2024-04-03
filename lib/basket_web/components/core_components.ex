@@ -512,7 +512,7 @@ defmodule BasketWeb.CoreComponents do
 
     ~H"""
     <div class="overflow-y-auto px-4 sm:overflow-visible sm:px-0">
-      <table id="ticker-table" phx-hook="TickerHandler" class="w-[40rem] mt-11 sm:w-full">
+      <table id="ticker-table" class="w-[40rem] mt-11 sm:w-full">
         <thead class="text-sm text-left leading-6 text-zinc-500">
           <tr>
             <th :for={col <- @col} class="p-0 pb-4 pr-6 text-center font-normal">

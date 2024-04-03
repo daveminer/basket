@@ -1,8 +1,7 @@
 
 # Change Log
 
-## [0.2.1] - 2024-04-02
-
+## [0.2.1] - 2024-04-03
 - Removed .gitignore entry for client hooks directory
 
 ### Added

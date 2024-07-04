@@ -37,3 +37,6 @@ npm-debug.log
 
 # Ignore generated CSS file for components
 assets/css/_components.css
+
+# Editor config
+.vscode/

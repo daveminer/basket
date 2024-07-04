@@ -68,6 +68,7 @@ config :logger, :console,
 config :phoenix, :json_library, Jason
 
 config :basket, :pow,
+  web_module: BasketWeb,
   web_mailer_module: BasketWeb,
   user: Basket.Users.User,
   repo: Basket.Repo,

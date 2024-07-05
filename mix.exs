@@ -37,8 +37,8 @@ defmodule Basket.MixProject do
   end
 
   # Specifies which paths to compile per environment.
-  defp elixirc_paths(:test), do: ["lib", "test/support"] ++ catalogues()
-  defp elixirc_paths(:dev), do: ["lib"] ++ catalogues()
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(:dev), do: ["lib"]
   defp elixirc_paths(_), do: ["lib"]
 
   # Specifies your project dependencies.
@@ -54,7 +54,7 @@ defmodule Basket.MixProject do
       {:phoenix_live_reload, "~> 1.5", only: :dev},
       {:phoenix_live_view, "~> 0.20.17"},
       {:floki, ">= 0.36.2", only: :test},
-      {:phoenix_live_dashboard, "~> 0.8.4"},
+      {:phoenix_live_dashboard, "~> 0.7"},
       {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
       {:tailwind, "~> 0.2.3", runtime: Mix.env() == :dev},
       {:swoosh, "~> 1.16"},
@@ -68,7 +68,6 @@ defmodule Basket.MixProject do
       {:surface, "~> 0.11.0"},
       # for surface.init; possible to remove.
       {:sourceror, "~> 1.0.0"},
-      {:surface_catalogue, "~> 0.6.2"},
       {:excoveralls, "~> 0.18", only: :test},
       {:sobelow, "~> 0.13.0", only: [:dev, :test], runtime: false},
       {:credo, "~> 1.7.7", only: [:dev, :test], runtime: false},
@@ -99,13 +98,6 @@ defmodule Basket.MixProject do
       "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
       "assets.build": ["tailwind default", "esbuild default"],
       "assets.deploy": ["tailwind default --minify", "esbuild default --minify", "phx.digest"]
-    ]
-  end
-
-  def catalogues do
-    [
-      "priv/catalogue",
-      "deps/surface/priv/catalogue"
     ]
   end
 end

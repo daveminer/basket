@@ -5,8 +5,6 @@ defmodule BasketWeb.Router do
   use Pow.Extension.Phoenix.Router,
     extensions: [PowResetPassword, PowEmailConfirmation, PowInvitation, PowPersistentSession]
 
-  import Surface.Catalogue.Router
-
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -56,13 +54,6 @@ defmodule BasketWeb.Router do
 
       live_dashboard "/dashboard", metrics: BasketWeb.Telemetry
       forward "/mailbox", Plug.Swoosh.MailboxPreview
-    end
-  end
-
-  if Mix.env() == :dev do
-    scope "/" do
-      pipe_through :browser
-      surface_catalogue("/catalogue")
     end
   end
 end

@@ -26,8 +26,7 @@ config :basket, BasketWeb.Endpoint,
   secret_key_base: "gRiKl5rvtc1Mgj3hhDzBzjHgmPE+PiG47uS8Pxk8KwjZhaaR3WxJ/I6czbmXr0j9",
   watchers: [
     esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]},
-    tailwind: {Tailwind, :install_and_run, [:default, ~w(--watch)]},
-    esbuild: {Esbuild, :install_and_run, [:catalogue, ~w(--sourcemap=inline --watch)]}
+    tailwind: {Tailwind, :install_and_run, [:default, ~w(--watch)]}
   ]
 
 # ## SSL Support
@@ -61,8 +60,7 @@ config :basket, BasketWeb.Endpoint,
       ~r"priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$",
       ~r"priv/gettext/.*(po)$",
       ~r"lib/basket_web/(controllers|live|components)/.*(ex|heex|sface|js)$",
-      ~r"lib/my_app_web/live/.*(sface)$",
-      ~r"priv/catalogue/.*(ex)$"
+      ~r"lib/my_app_web/live/.*(sface)$"
     ]
   ]
 

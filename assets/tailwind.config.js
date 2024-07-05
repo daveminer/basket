@@ -10,7 +10,9 @@ module.exports = {
   content: [
     "./js/**/*.js",
     "../lib/basket_web.ex",
-    "../lib/basket_web/**/*.*ex"
+    "../lib/basket_web/**/*.*ex",
+    "../lib/basket_web/**/*.sface",
+    "../priv/catalogue/**/*.{ex,sface}"
   ],
   darkMode: "class",
   theme: {

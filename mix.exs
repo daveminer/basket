@@ -65,7 +65,7 @@ defmodule Basket.MixProject do
       {:jason, "~> 1.4.1"},
       {:dns_cluster, "~> 0.1.3"},
       {:plug_cowboy, "~> 2.7"},
-      {:surface, "~> 0.11.4"},
+      {:surface, "~> 0.11.0"},
       # for surface.init; possible to remove.
       {:sourceror, "~> 1.0.0"},
       {:surface_catalogue, "~> 0.6.2"},
@@ -104,7 +104,8 @@ defmodule Basket.MixProject do
 
   def catalogues do
     [
-      "priv/catalogue"
+      "priv/catalogue",
+      "deps/surface/priv/catalogue"
     ]
   end
 end

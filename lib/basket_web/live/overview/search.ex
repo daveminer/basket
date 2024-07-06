@@ -4,7 +4,7 @@ defmodule BasketWeb.Live.Overview.Search do
   if the ticker list is not populated, otherwise it will pull the list from the cache.
   """
 
-  use Surface.LiveComponent
+  use Phoenix.LiveComponent
 
   require Logger
 
@@ -12,9 +12,6 @@ defmodule BasketWeb.Live.Overview.Search do
 
   attr :id, :string, required: true
   attr :class, :string, default: nil
-
-  data form, :map, default: %{"ticker" => ""}
-  data tickers, :list, default: []
 
   def mount(socket) do
     socket = assign(socket, :form, %{"ticker" => ""})
@@ -46,7 +43,7 @@ defmodule BasketWeb.Live.Overview.Search do
   end
 
   def render(assigns) do
-    ~F"""
+    ~H"""
     <div class="flex">
       <.form
         :let={f}
@@ -57,7 +54,7 @@ defmodule BasketWeb.Live.Overview.Search do
         phx-target={@myself}
         autocomplete="off"
         placeholder="Search..."
-        class="flex flex-row-reverse"
+        class="flex flex-row-reverse items-center"
       >
         <input
           id="ticker-input"
@@ -65,22 +62,15 @@ defmodule BasketWeb.Live.Overview.Search do
           value={f["ticker"].value}
           list="tickers"
           type="text"
-          class="mt-2 mb-2 m-2"
+          class="input input-bordered mt-2 mb-2 m-2"
         />
         <datalist id="tickers">
-          {#for ticker <- assigns.tickers}
-            <option value={ticker}>{ticker}</option>
-          {/for}
+          <%= for ticker <- assigns.tickers do %>
+            <option value={ticker}><%= ticker %></option>
+          <% end %>
           <option value="" />
         </datalist>
-        <button
-          class={[
-            "bg-green-600 whitespace-nowrap w-12",
-            "phx-submit-loading:opacity-75 rounded-lg mt-2 mb-2 m-2",
-            "text-sm font-semibold leading-6 text-white active:text-white/80"
-          ]}
-          type="submit"
-        >
+        <button class="btn btn-primary" type="submit">
           +
         </button>
       </.form>

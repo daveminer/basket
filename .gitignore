@@ -38,11 +38,6 @@ npm-debug.log
 # Ignore generated CSS file for components
 assets/css/_components.css
 
-# JS Interop
-/assets/js/_hooks/
-
 # Editor config
 .vscode/
 
-# Ignore generated js hook files for components
-assets/js/_hooks/

@@ -268,7 +268,7 @@ defmodule BasketWeb.CoreComponents do
     <button
       type={@type}
       class={[
-        "phx-submit-loading:opacity-75 rounded-lg py-2 px-3",
+        "phx-submit-loading:opacity-75 rounded-lg py-1 px-2",
         "text-sm font-semibold leading-6 text-white active:text-white/80",
         @class
       ]}
@@ -499,6 +499,7 @@ defmodule BasketWeb.CoreComponents do
     doc: "the function for mapping each row before calling the :col and :action slots"
 
   slot :col, required: true do
+    attr :key, :string
     attr :label, :string
   end
 
@@ -515,7 +516,7 @@ defmodule BasketWeb.CoreComponents do
       <table id="ticker-table" class="w-[40rem] mt-11 sm:w-full">
         <thead class="text-sm text-left leading-6 text-zinc-500">
           <tr>
-            <th :for={col <- @col} class="p-0 pb-4 pr-6 text-center font-normal">
+            <th :for={col <- @col} class="p-0 pb-4 text-center font-normal">
               <%= col[:label] %>
             </th>
             <th :if={@action != []} class="relative p-0 pb-4">
@@ -540,7 +541,7 @@ defmodule BasketWeb.CoreComponents do
                 @row_click && "hover:cursor-pointer"
               ]}
             >
-              <div class="block py-4 pr-6">
+              <div class="block">
                 <span class="absolute -inset-y-px right-0 -left-4 group-hover:bg-zinc-50 sm:rounded-l-xl" />
                 <span
                   id={"#{row.id}-#{col[:key]}-content-slot"}
@@ -550,9 +551,8 @@ defmodule BasketWeb.CoreComponents do
                 </span>
               </div>
             </td>
-            <td :if={@action != []} class="relative w-14 p-0">
+            <td :if={@action != []} class="relative p-0">
               <div class="relative whitespace-nowrap py-4 text-right text-sm font-medium">
-                <span class="absolute -inset-y-px -right-4 left-0 group-hover:bg-zinc-50 sm:rounded-r-xl" />
                 <span
                   :for={action <- @action}
                   class="relative ml-4 font-semibold leading-6 text-zinc-900 hover:text-zinc-700"

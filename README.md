@@ -15,7 +15,6 @@ the following tools and patterns:
 - [Phoenix Presence](https://hexdocs.pm/phoenix/presence.html)
 - [Pow](https://github.com/pow-auth/pow)
 - Search Autocomplete (in LiveView)
-- [Surface UI](https://surface-ui.org/)
 - [WebSockex](https://github.com/Azolo/websockex)
 
 Basket also serves as a reference for testing patterns:

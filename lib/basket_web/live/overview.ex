@@ -2,7 +2,7 @@ defmodule BasketWeb.Live.Overview do
   @moduledoc """
   Home page shows a list of assets and updates them in realtime via websockets.
   """
-  use Surface.LiveView
+  use Phoenix.LiveView
 
   require Logger
 
@@ -76,13 +76,18 @@ defmodule BasketWeb.Live.Overview do
   end
 
   def render(assigns) do
-    ~F"""
+    ~H"""
     <div class="flex-col p-8">
-      <NavRow />
-      <div class="w-1/4">
+      <NavRow.render id="nav-row" />
+      <div class="flex justify-between items-center">
         <.live_component module={Search} id="stock-search-input" />
+        <div class="flex items-center">
+          <span class="club-toggle-label">Club</span>
+          <input type="checkbox" class="toggle mx-3" checked="checked" />
+          <span class="individual-toggle-label">Individual</span>
+        </div>
       </div>
-      <TickerBarTable id="ticker-bar-table" rows={@basket} />
+      <TickerBarTable.render id="ticker-bar-table" rows={@basket} />
     </div>
     """
   end

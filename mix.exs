@@ -10,7 +10,7 @@ defmodule Basket.MixProject do
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps(),
-      compilers: Mix.compilers() ++ [:surface],
+      compilers: Mix.compilers(),
       deps: deps(),
       test_coverage: [tool: ExCoveralls],
       preferred_cli_env: [
@@ -56,7 +56,7 @@ defmodule Basket.MixProject do
       {:floki, ">= 0.36.2", only: :test},
       {:phoenix_live_dashboard, "~> 0.7"},
       {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
-      {:tailwind, "~> 0.2.3", runtime: Mix.env() == :dev},
+      {:tailwind, "~> 0.1", runtime: Mix.env() == :dev},
       {:swoosh, "~> 1.16"},
       {:finch, "~> 0.18"},
       {:telemetry_metrics, "~> 1.0"},
@@ -65,9 +65,6 @@ defmodule Basket.MixProject do
       {:jason, "~> 1.4.1"},
       {:dns_cluster, "~> 0.1.3"},
       {:plug_cowboy, "~> 2.7"},
-      {:surface, "~> 0.11.0"},
-      # for surface.init; possible to remove.
-      {:sourceror, "~> 1.0.0"},
       {:excoveralls, "~> 0.18", only: :test},
       {:sobelow, "~> 0.13.0", only: [:dev, :test], runtime: false},
       {:credo, "~> 1.7.7", only: [:dev, :test], runtime: false},
@@ -92,10 +89,15 @@ defmodule Basket.MixProject do
   defp aliases do
     [
       setup: ["deps.get", "ecto.setup", "assets.setup", "assets.build"],
+      "npm.install": ["cmd cd assets && npm install"],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
-      "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
+      "assets.setup": [
+        "npm.install",
+        "tailwind.install --if-missing",
+        "esbuild.install --if-missing"
+      ],
       "assets.build": ["tailwind default", "esbuild default"],
       "assets.deploy": ["tailwind default --minify", "esbuild default --minify", "phx.digest"]
     ]

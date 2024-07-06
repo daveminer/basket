@@ -54,13 +54,12 @@ config :basket, BasketWeb.Endpoint,
 
 # Watch static and templates for browser reloading.
 config :basket, BasketWeb.Endpoint,
-  reloadable_compilers: [:gettext, :elixir, :app, :surface],
+  reloadable_compilers: [:gettext, :elixir, :app],
   live_reload: [
     patterns: [
       ~r"priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$",
       ~r"priv/gettext/.*(po)$",
-      ~r"lib/basket_web/(controllers|live|components)/.*(ex|heex|sface|js)$",
-      ~r"lib/my_app_web/live/.*(sface)$"
+      ~r"lib/basket_web/(controllers|live|components)/.*(ex|heex|js)$"
     ]
   ]
 

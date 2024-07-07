@@ -9,7 +9,7 @@ defmodule BasketWeb.Live.Overview.TickerBarTable do
 
   alias Basket.Http
   alias Basket.Http.Alpaca.Bars
-  alias BasketWeb.{CoreComponents, Presence}
+  alias BasketWeb.{Presence}
 
   @doc """
   Creates a row to be added to the ticker bar table. Deserializes the data into TickerBar instances
@@ -51,39 +51,36 @@ defmodule BasketWeb.Live.Overview.TickerBarTable do
   def render(assigns) do
     ~H"""
     <div>
-      <CoreComponents.table id={@id} rows={@rows} can_delete={@can_delete}>
-        <:col :let={row} key="ticker" label="ticker"><%= row.ticker %></:col>
-        <:col :let={row} key="open" label="open"><%= row.open %></:col>
-        <:col :let={row} key="high" label="high"><%= row.high %></:col>
-        <:col :let={row} key="low" label="low"><%= row.low %></:col>
-        <:col :let={row} key="close" label="close"><%= row.close %></:col>
-        <:col :let={row} key="volume" label="volume"><%= row.volume %></:col>
-        <:col :let={row} key="timestamp" label="timestamp"><%= row.timestamp %></:col>
-
-        <:col :let={row} :if={@can_delete}>
-          <button
-            class="btn btn-xs btn-circle btn-outline"
-            phx-click="ticker-remove"
-            phx-value-ticker={row.id}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-3 w-3"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+      <table id="ticker-table" class="table table-zebra">
+        <thead>
+          <tr>
+            <th :for={col <- columns()} class="p-0 pb-4 text-center">
+              <%= Atom.to_string(col) %>
+            </th>
+          </tr>
+        </thead>
+        <tbody id={@id} phx-hook="CellValueStore" phx-update="replace" class="">
+          <tr :for={row <- @rows} id={row.id} class="">
+            <td
+              :for={{col, i} <- Enum.with_index(columns())}
+              data-key={"#{row.id}_#{Atom.to_string(col)}"}
+              class={[
+                "relative p-0",
+                "text-center"
+              ]}
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-        </:col>
-      </CoreComponents.table>
+              <div class="block">
+                <span id={"#{row.id}-#{Atom.to_string(col)}-content-slot"} class={}>
+                  <%= Map.get(row, col) %>
+                </span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
     """
   end
+
+  defp columns, do: [:ticker, :open, :high, :low, :close, :volume, :timestamp]
 end

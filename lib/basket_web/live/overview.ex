@@ -102,7 +102,7 @@ defmodule BasketWeb.Live.Overview do
     ~H"""
     <div class="flex-col p-8">
       <NavRow.render id="nav-row" />
-      <div class="flex justify-between items-center">
+      <div class="flex justify-between items-center mb-5">
         <.live_component
           :if={!club_mode?(@user) || officer?(@user)}
           module={Search}

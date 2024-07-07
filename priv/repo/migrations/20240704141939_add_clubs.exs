@@ -23,5 +23,18 @@ defmodule Basket.Repo.Migrations.AddClubs do
     end
 
     create unique_index(:club_officers, [:club_id, :user_id])
+
+    create table(:club_tickers) do
+      add :ticker, :string, null: false
+      add :club_id, references(:clubs, on_delete: :delete_all)
+
+      timestamps()
+    end
+
+    create unique_index(:club_tickers, [:club_id, :ticker])
+
+    alter table(:users) do
+      add :settings, :map, default: %{}, null: false
+    end
   end
 end

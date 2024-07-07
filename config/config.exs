@@ -64,7 +64,7 @@ config :phoenix, :json_library, Jason
 config :basket, :pow,
   web_module: BasketWeb,
   web_mailer_module: BasketWeb,
-  user: Basket.Users.User,
+  user: Basket.User,
   repo: Basket.Repo,
   extensions: [PowResetPassword, PowEmailConfirmation],
   controller_callbacks: Pow.Extension.Phoenix.ControllerCallbacks,

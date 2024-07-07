@@ -8,7 +8,7 @@ defmodule Basket.Ticker do
   import Ecto.{Changeset, Query}
 
   alias Basket.Repo
-  alias Basket.Users.User
+  alias Basket.User
 
   @type t :: %__MODULE__{}
 
@@ -28,18 +28,12 @@ defmodule Basket.Ticker do
     |> unique_constraint([:ticker, :user_id])
   end
 
-  @doc """
-  Adds a ticker to a User's basket of stocks.
-  """
-  @spec add(user :: User.t(), ticker: String.t()) :: __MODULE__.t()
-  def add(user, ticker) do
+  @spec add!(user :: User.t(), ticker: String.t()) :: __MODULE__.t()
+  def add!(user, ticker) do
     ticker = %__MODULE__{ticker: ticker, user_id: user.id}
     Repo.insert!(ticker)
   end
 
-  @doc """
-  Returns a list of Tickers for a given user.
-  """
   @spec for_user(user :: User.t()) :: [Basket.Ticker.t()]
   def for_user(nil), do: []
 
@@ -50,9 +44,6 @@ defmodule Basket.Ticker do
     |> Repo.all()
   end
 
-  @doc """
-  Removes a ticker from a User's basket of stocks.
-  """
   @spec remove(user :: User.t(), ticker: String.t()) :: {non_neg_integer(), nil | [term()]}
   def remove(user, ticker) do
     from(t in __MODULE__,

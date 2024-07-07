@@ -62,7 +62,7 @@ defmodule BasketWeb.Live.Overview.TickerBarTable do
         <tbody id={@id} phx-hook="CellValueStore" phx-update="replace" class="">
           <tr :for={row <- @rows} id={row.id} class="">
             <td
-              :for={{col, i} <- Enum.with_index(columns())}
+              :for={col <- columns()}
               data-key={"#{row.id}_#{Atom.to_string(col)}"}
               class={[
                 "relative p-0",

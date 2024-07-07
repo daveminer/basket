@@ -1,6 +1,7 @@
 defmodule BasketWeb.Live.Overview.ClubToggle do
   use Phoenix.Component
 
+  @moduledoc false
   def render(assigns) do
     ~H"""
     <div class="flex items-center">

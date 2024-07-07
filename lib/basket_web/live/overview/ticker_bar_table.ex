@@ -9,7 +9,7 @@ defmodule BasketWeb.Live.Overview.TickerBarTable do
 
   alias Basket.Http
   alias Basket.Http.Alpaca.Bars
-  alias BasketWeb.{Presence}
+  alias BasketWeb.Presence
 
   @doc """
   Creates a row to be added to the ticker bar table. Deserializes the data into TickerBar instances

@@ -51,7 +51,7 @@ defmodule BasketWeb.Live.Overview.TickerBarTable do
   def render(assigns) do
     ~H"""
     <div>
-      <CoreComponents.table id={@id} rows={@rows}>
+      <CoreComponents.table id={@id} rows={@rows} can_delete={@can_delete}>
         <:col :let={row} key="ticker" label="ticker"><%= row.ticker %></:col>
         <:col :let={row} key="open" label="open"><%= row.open %></:col>
         <:col :let={row} key="high" label="high"><%= row.high %></:col>
@@ -59,7 +59,8 @@ defmodule BasketWeb.Live.Overview.TickerBarTable do
         <:col :let={row} key="close" label="close"><%= row.close %></:col>
         <:col :let={row} key="volume" label="volume"><%= row.volume %></:col>
         <:col :let={row} key="timestamp" label="timestamp"><%= row.timestamp %></:col>
-        <:col :let={row}>
+
+        <:col :let={row} :if={@can_delete}>
           <button
             class="btn btn-xs btn-circle btn-outline"
             phx-click="ticker-remove"

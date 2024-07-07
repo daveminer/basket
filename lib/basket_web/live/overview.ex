@@ -8,7 +8,7 @@ defmodule BasketWeb.Live.Overview do
 
   alias Basket.{ClubTicker, Repo, Ticker, User}
   alias BasketWeb.Components.NavRow
-  alias BasketWeb.Live.Overview.{Search, TickerBarTable}
+  alias BasketWeb.Live.Overview.{ClubToggle, Search, TickerBarTable}
   alias BasketWeb.Presence
 
   on_mount {BasketWeb.Live.UserLiveAuth, :user}
@@ -23,12 +23,11 @@ defmodule BasketWeb.Live.Overview do
     else
       user = socket.assigns.user
 
-      case user.settings["ticker_view_toggle"] do
-        "club" ->
-          user.clubs |> dbg()
+      case club_mode?(user) do
+        true ->
           ClubTicker.add!(user.clubs |> List.first(), ticker)
 
-        "individual" ->
+        false ->
           Ticker.add!(user, ticker)
       end
 
@@ -55,11 +54,11 @@ defmodule BasketWeb.Live.Overview do
   def handle_event("ticker-remove", %{"ticker" => ticker}, socket) do
     user = socket.assigns.user
 
-    case user.settings["ticker_view_toggle"] do
-      "club" ->
+    case club_mode?(user) do
+      true ->
         ClubTicker.remove(user.clubs |> List.first(), ticker)
 
-      "individual" ->
+      false ->
         Ticker.remove(user, ticker)
     end
 
@@ -104,20 +103,18 @@ defmodule BasketWeb.Live.Overview do
     <div class="flex-col p-8">
       <NavRow.render id="nav-row" />
       <div class="flex justify-between items-center">
-        <.live_component module={Search} id="stock-search-input" />
-        <div :if={length(@user.clubs) > 0} class="flex items-center">
-          <span class="club-toggle-label">Club</span>
-          <input
-            type="checkbox"
-            class="toggle mx-3"
-            checked={@user.settings["ticker_view_toggle"] != "club"}
-            phx-click="club-view-toggle"
-            phx-value-toggle={@user.settings["ticker_view_toggle"] != "club"}
-          />
-          <span class="individual-toggle-label">Individual</span>
-        </div>
+        <.live_component
+          :if={!club_mode?(@user) || officer?(@user)}
+          module={Search}
+          id="stock-search-input"
+        />
+        <ClubToggle.render :if={in_club?(@user)} id="club-toggle" user={@user} />
       </div>
-      <TickerBarTable.render id="ticker-bar-table" rows={@basket} />
+      <TickerBarTable.render
+        id="ticker-bar-table"
+        rows={@basket}
+        can_delete={!club_mode?(@user) || officer?(@user)}
+      />
     </div>
     """
   end
@@ -134,23 +131,14 @@ defmodule BasketWeb.Live.Overview do
     end
   end
 
-  defp load_tickers(user) do
-    tickers =
-      if user.settings["ticker_view_toggle"] == "club" do
-        user = Repo.preload(user, :clubs)
-        ClubTicker.for_club(user.clubs |> List.first())
-      else
-        Ticker.for_user(user)
-      end
-
-    case tickers do
-      [] -> []
-      assets -> Enum.map(assets, & &1.ticker)
-    end
+  defp club_mode?(user) do
+    user.settings["ticker_view_toggle"] == "club"
   end
 
+  defp in_club?(user), do: Enum.any?(user.clubs)
+
   defp initialize(socket) do
-    user = Repo.get(User, socket.assigns.user.id) |> Repo.preload(:clubs)
+    user = Repo.get(User, socket.assigns.user.id) |> Repo.preload([:clubs, :offices])
 
     user |> dbg()
 
@@ -165,6 +153,23 @@ defmodule BasketWeb.Live.Overview do
       tickers -> add_tickers_to_view(socket, tickers)
     end
   end
+
+  defp load_tickers(user) do
+    tickers =
+      if club_mode?(user) do
+        user = Repo.preload(user, :clubs)
+        ClubTicker.for_club(user.clubs |> List.first())
+      else
+        Ticker.for_user(user)
+      end
+
+    case tickers do
+      [] -> []
+      assets -> Enum.map(assets, & &1.ticker)
+    end
+  end
+
+  defp officer?(user), do: Enum.any?(user.offices)
 
   defp tickers(socket), do: Enum.map(socket.assigns.basket, fn row -> row.ticker end)
 end

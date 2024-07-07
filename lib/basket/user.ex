@@ -26,6 +26,8 @@ defmodule Basket.User do
   schema "users" do
     many_to_many :clubs, Basket.Club, join_through: "club_members"
 
+    many_to_many :offices, Basket.Club, join_through: "club_officers"
+
     field :settings, :map
 
     pow_user_fields()

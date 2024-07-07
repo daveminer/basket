@@ -3,31 +3,84 @@ defmodule BasketWeb.Live.Overview.TickerBarTable do
   Displays a collection of TickerRow components in a table.
   """
 
-  use Surface.Component
+  use Phoenix.Component
 
-  alias BasketWeb.CoreComponents
+  require Logger
 
-  prop id, :string
-  prop rows, :list, default: []
+  alias Basket.Http
+  alias Basket.Http.Alpaca.Bars
+  alias BasketWeb.{Presence}
+
+  @doc """
+  Creates a row to be added to the ticker bar table. Deserializes the data into TickerBar instances
+  before returning.
+  """
+  @spec add_ticker(list(String.t()) | String.t(), String.t()) ::
+          {:ok, %{bars: list(Bars.t()), tickers_not_found: list(String.t())}}
+          | {:error, String.t()}
+  def add_ticker(tickers, user_id) when is_list(tickers) do
+    ticker_list = Enum.join(tickers, ",")
+
+    case Http.Alpaca.latest_quote(ticker_list) do
+      {:ok, %{"bars" => bar_list}} ->
+        bars = Enum.map(bar_list, fn {k, v} -> Bars.new(k, v) end)
+        returned_tickers = Enum.map(bars, fn b -> b.ticker end)
+
+        subscribe_to_tickers(returned_tickers, user_id)
+
+        {:ok, %{bars: bars, tickers_not_found: tickers -- returned_tickers}}
+
+      {:error, %{"message" => error}} ->
+        {:error, error}
+    end
+  end
+
+  def call(ticker, user_id), do: call([ticker], user_id)
+
+  defp subscribe_to_tickers(tickers, user_id),
+    do:
+      Enum.each(tickers, fn ticker ->
+        Presence.track(self(), "bars-#{ticker}", user_id, %{})
+
+        case BasketWeb.Endpoint.subscribe("bars-#{ticker}") do
+          :ok -> :ok
+          {:error, error} -> Logger.error("Could not subscribe to ticker: #{error}")
+        end
+      end)
 
   def render(assigns) do
-    ~F"""
+    ~H"""
     <div>
-      <CoreComponents.table id={@id} rows={@rows}>
-        <:col :let={row} key="ticker" label="ticker">{row.ticker}</:col>
-        <:col :let={row} key="open" label="open">{row.open}</:col>
-        <:col :let={row} key="high" label="high">{row.high}</:col>
-        <:col :let={row} key="low" label="low">{row.low}</:col>
-        <:col :let={row} key="close" label="close">{row.close}</:col>
-        <:col :let={row} key="volume" label="volume">{row.volume}</:col>
-        <:col :let={row} key="timestamp" label="timestamp">{row.timestamp}</:col>
-        <:col :let={row} label="remove">
-          <CoreComponents.button phx-click="ticker-remove" phx-value-ticker={row.id} class="bg-red-600">
-            X
-          </CoreComponents.button>
-        </:col>
-      </CoreComponents.table>
+      <table id="ticker-table" class="table table-zebra">
+        <thead>
+          <tr>
+            <th :for={col <- columns()} class="p-0 pb-4 text-center">
+              <%= Atom.to_string(col) %>
+            </th>
+          </tr>
+        </thead>
+        <tbody id={@id} phx-hook="CellValueStore" phx-update="replace" class="">
+          <tr :for={row <- @rows} id={row.id} class="">
+            <td
+              :for={{col, i} <- Enum.with_index(columns())}
+              data-key={"#{row.id}_#{Atom.to_string(col)}"}
+              class={[
+                "relative p-0",
+                "text-center"
+              ]}
+            >
+              <div class="block">
+                <span id={"#{row.id}-#{Atom.to_string(col)}-content-slot"} class={}>
+                  <%= Map.get(row, col) %>
+                </span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
     """
   end
+
+  defp columns, do: [:ticker, :open, :high, :low, :close, :volume, :timestamp]
 end

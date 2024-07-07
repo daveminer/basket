@@ -2,43 +2,36 @@ defmodule BasketWeb.Live.Overview do
   @moduledoc """
   Home page shows a list of assets and updates them in realtime via websockets.
   """
-  use Surface.LiveView
+  use Phoenix.LiveView
 
   require Logger
 
-  alias Basket.Ticker
+  alias Basket.{ClubTicker, Repo, Ticker, User}
   alias BasketWeb.Components.NavRow
-  alias BasketWeb.Live.Overview.{Search, TickerAdd, TickerBarTable}
+  alias BasketWeb.Live.Overview.{ClubToggle, Search, TickerBarTable}
   alias BasketWeb.Presence
 
   on_mount {BasketWeb.Live.UserLiveAuth, :user}
 
   def mount(_, _, socket) do
-    socket = assign(socket, :basket, [])
-
-    socket =
-      if connected?(socket) do
-        tickers = load_user_tickers(socket.assigns.user)
-
-        if tickers != [] do
-          add_ticker(socket, tickers)
-        else
-          socket
-        end
-      else
-        socket
-      end
-
-    {:ok, socket}
+    {:ok, initialize(socket)}
   end
 
   def handle_info({"ticker-add", %{"ticker" => ticker}}, socket) do
     if ticker in tickers(socket) or String.trim(ticker) == "" do
       {:noreply, socket}
     else
-      Ticker.add(socket.assigns.user, ticker)
+      user = socket.assigns.user
 
-      {:noreply, add_ticker(socket, ticker)}
+      case club_mode?(user) do
+        true ->
+          ClubTicker.add!(user.clubs |> List.first(), ticker)
+
+        false ->
+          Ticker.add!(user, ticker)
+      end
+
+      {:noreply, add_tickers_to_view(socket, ["#{ticker}"])}
     end
   end
 
@@ -51,9 +44,6 @@ defmodule BasketWeb.Live.Overview do
     {:noreply, updated_socket}
   end
 
-  @doc """
-  Prevents the presence updates from being broadcast to the client.
-  """
   def handle_info(
         %Phoenix.Socket.Broadcast{topic: _, event: "presence_diff", payload: _},
         socket
@@ -62,8 +52,17 @@ defmodule BasketWeb.Live.Overview do
   end
 
   def handle_event("ticker-remove", %{"ticker" => ticker}, socket) do
-    Ticker.remove(socket.assigns.user, ticker)
-    Presence.untrack(self(), "bars-#{ticker}", socket.assigns.user.id)
+    user = socket.assigns.user
+
+    case club_mode?(user) do
+      true ->
+        ClubTicker.remove(user.clubs |> List.first(), ticker)
+
+      false ->
+        Ticker.remove(user, ticker)
+    end
+
+    Presence.untrack(self(), "bars-#{ticker}", user.id)
 
     socket =
       assign(
@@ -75,46 +74,102 @@ defmodule BasketWeb.Live.Overview do
     {:noreply, socket}
   end
 
+  def handle_event("club-view-toggle", params, socket) do
+    new_setting =
+      case params["value"] do
+        "on" -> "individual"
+        nil -> "club"
+      end
+
+    Enum.each(tickers(socket), fn ticker ->
+      Presence.untrack(self(), "bars-#{ticker}", socket.assigns.user.id)
+    end)
+
+    user = User.toggle_club_view!(socket.assigns.user, new_setting)
+
+    socket = assign(socket, basket: [], user: user)
+
+    socket =
+      case load_tickers(user) do
+        [] -> socket
+        tickers -> add_tickers_to_view(socket, tickers)
+      end
+
+    {:noreply, socket}
+  end
+
   def render(assigns) do
-    ~F"""
+    ~H"""
     <div class="flex-col p-8">
-      <NavRow />
-      <div class="w-1/4">
-        <.live_component module={Search} id="stock-search-input" />
+      <NavRow.render id="nav-row" />
+      <div class="flex justify-between items-center mb-5">
+        <.live_component
+          :if={!club_mode?(@user) || officer?(@user)}
+          module={Search}
+          id="stock-search-input"
+        />
+        <ClubToggle.render :if={in_club?(@user)} id="club-toggle" user={@user} />
       </div>
-      <TickerBarTable id="ticker-bar-table" rows={@basket} />
+      <TickerBarTable.render
+        id="ticker-bar-table"
+        rows={@basket}
+        can_delete={!club_mode?(@user) || officer?(@user)}
+      />
     </div>
     """
   end
 
-  defp add_ticker(socket, tickers) do
-    case TickerAdd.call(tickers, socket.assigns.user.id) do
+  defp add_tickers_to_view(socket, tickers) do
+    case TickerBarTable.add_ticker(tickers, socket.assigns.user.id) do
       {:error, error} ->
         Logger.error("Could not add ticker: #{error}")
         socket
 
       {:ok, %{bars: bars}} ->
-        handle_ticker_add_result(bars, socket)
+        new_rows = Enum.sort(socket.assigns.basket ++ bars, fn a, b -> a.ticker < b.ticker end)
+        assign(socket, :basket, new_rows)
     end
   end
 
-  defp load_user_tickers(user) do
-    case Ticker.for_user(user) do
-      [] ->
-        []
+  defp club_mode?(user) do
+    user.settings["ticker_view_toggle"] == "club"
+  end
 
-      assets ->
-        Enum.map(assets, & &1.ticker)
+  defp in_club?(user), do: Enum.any?(user.clubs)
+
+  defp initialize(socket) do
+    user = Repo.get(User, socket.assigns.user.id) |> Repo.preload([:clubs, :offices])
+
+    user |> dbg()
+
+    socket =
+      assign(socket,
+        basket: [],
+        user: user
+      )
+
+    case load_tickers(user) do
+      [] -> socket
+      tickers -> add_tickers_to_view(socket, tickers)
     end
   end
 
-  defp handle_ticker_add_result(
-         bar_rows,
-         socket
-       ) do
-    new_rows = Enum.sort(socket.assigns.basket ++ bar_rows, fn a, b -> a.ticker < b.ticker end)
-    assign(socket, :basket, new_rows)
+  defp load_tickers(user) do
+    tickers =
+      if club_mode?(user) do
+        user = Repo.preload(user, :clubs)
+        ClubTicker.for_club(user.clubs |> List.first())
+      else
+        Ticker.for_user(user)
+      end
+
+    case tickers do
+      [] -> []
+      assets -> Enum.map(assets, & &1.ticker)
+    end
   end
+
+  defp officer?(user), do: Enum.any?(user.offices)
 
   defp tickers(socket), do: Enum.map(socket.assigns.basket, fn row -> row.ticker end)
 end

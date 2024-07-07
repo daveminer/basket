@@ -6,34 +6,27 @@ const plugin = require("tailwindcss/plugin")
 const fs = require("fs")
 const path = require("path")
 
+/** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
     "./js/**/*.js",
+    "./node_modules/daisyui/dist/*.js",
     "../lib/basket_web.ex",
-    "../lib/basket_web/**/*.*ex"
+    "../lib/basket_web/**/*.*ex",
   ],
-  darkMode: "class",
-  theme: {
-    extend: {
-      colors: {
-        primary: {
-          light: colors.emerald-800,
-          dark: colors.emerald-800
-        },
-          secondary: '#7a869a',
-        accent: '#ff5630',
-        background: {
-          light: colors.white,
-          dark: colors.emerald-800
-        },
-        surface: '#2c313a',
-        onSurface: '#ffffff',
-        error: '#de350b',
-      },
-    },
+  daisyui: {
+      themes: false, // true: all themes | false: only light + dark | array: specific themes like this ["light", "dark", "cupcake"]
+      darkTheme: "dark", // name of one of the included themes for dark mode
+      base: true, // applies background color and foreground color for root element by default
+      styled: true, // include daisyUI colors and design decisions for all components
+      utils: true, // adds responsive and modifier utility classes
+      rtl: false, // rotate style direction from left-to-right to right-to-left. You also need to add dir="rtl" to your html tag and install `tailwindcss-flip` plugin for Tailwind CSS.
+      prefix: "", // prefix for daisyUI classnames (components, modifiers and responsive class names. Not colors)
+      logs: false, // <-- to remove logs from the console.
   },
   plugins: [
-    require("@tailwindcss/forms"),
+    require('daisyui'),
+    //require("@tailwindcss/forms"),
     // Allows prefixing tailwind classes with LiveView classes to add rules
     // only when LiveView classes are applied, for example:
     //
@@ -77,6 +70,6 @@ module.exports = {
           }
         }
       }, {values})
-    })
+    }),
   ]
 }

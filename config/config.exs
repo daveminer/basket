@@ -39,17 +39,11 @@ config :esbuild,
       ~w(js/app.js --bundle --target=es2017 --outdir=../priv/static/assets --external:/fonts/* --external:/images/*),
     cd: Path.expand("../assets", __DIR__),
     env: %{"NODE_PATH" => Path.expand("../deps", __DIR__)}
-  ],
-  catalogue: [
-    args:
-      ~w(../deps/surface_catalogue/assets/js/app.js --bundle --target=es2016 --minify --outdir=../priv/static/assets/catalogue),
-    cd: Path.expand("../assets", __DIR__),
-    env: %{"NODE_PATH" => Path.expand("../deps", __DIR__)}
   ]
 
 # Configure tailwind (the version is required)
 config :tailwind,
-  version: "3.3.5",
+  version: "3.4.4",
   default: [
     args: ~w(
       --config=tailwind.config.js
@@ -68,8 +62,9 @@ config :logger, :console,
 config :phoenix, :json_library, Jason
 
 config :basket, :pow,
+  web_module: BasketWeb,
   web_mailer_module: BasketWeb,
-  user: Basket.Users.User,
+  user: Basket.User,
   repo: Basket.Repo,
   extensions: [PowResetPassword, PowEmailConfirmation],
   controller_callbacks: Pow.Extension.Phoenix.ControllerCallbacks,

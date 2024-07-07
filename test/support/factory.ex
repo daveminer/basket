@@ -3,7 +3,7 @@ defmodule Basket.Factory do
 
   use ExMachina.Ecto
 
-  alias Basket.Users.User
+  alias Basket.User
   alias BasketWeb.Live.Overview.TickerRow
 
   def asset_mtcr_factory do

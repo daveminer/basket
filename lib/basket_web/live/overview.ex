@@ -140,8 +140,6 @@ defmodule BasketWeb.Live.Overview do
   defp initialize(socket) do
     user = Repo.get(User, socket.assigns.user.id) |> Repo.preload([:clubs, :offices])
 
-    user |> dbg()
-
     socket =
       assign(socket,
         basket: [],

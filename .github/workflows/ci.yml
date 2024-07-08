@@ -88,8 +88,8 @@ jobs:
       - name: Static Analysis for Types
         run: mix dialyzer
       - name: Run Tests and Coverage Report
-        run: mix test --cover
-      - name: Tests & Coverage
+        run: mix test --cover --export-coverage default && mix test.coverage
+      - name: Generate Coverage Feedback
         uses: josecfreittas/elixir-coverage-feedback-action@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}

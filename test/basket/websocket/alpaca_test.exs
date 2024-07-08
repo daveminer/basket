@@ -17,10 +17,15 @@ defmodule Basket.Websocket.AlpacaTest do
     test "subscribe/1" do
       expect(Basket.Websocket.MockClient, :start_link, fn _, _, _, _ -> {:ok, self()} end)
 
-      expect(Basket.Websocket.MockClient, :send_frame, fn _,
-                                                          {:text,
-                                                           "{\"action\":\"subscribe\",\"trades\":[],\"quotes\":[],\"bars\":[\"ALPHA\"]}"} ->
-        :ok
+      expect(Basket.Websocket.MockClient, :send_frame, fn _, {:text, message} ->
+        case Jason.decode!(message) do
+          %{"action" => "subscribe", "bars" => bars, "quotes" => quotes, "trades" => trades}
+          when bars == ["ALPHA"] and quotes == [] and trades == [] ->
+            :ok
+
+          _ ->
+            raise "Unexpected message format or content"
+        end
       end)
 
       {:ok, _pid} = Alpaca.start_link(%{})
@@ -31,10 +36,15 @@ defmodule Basket.Websocket.AlpacaTest do
     test "unsubscribe/1" do
       expect(Basket.Websocket.MockClient, :start_link, fn _, _, _, _ -> {:ok, self()} end)
 
-      expect(Basket.Websocket.MockClient, :send_frame, fn _,
-                                                          {:text,
-                                                           "{\"action\":\"unsubscribe\",\"trades\":[],\"quotes\":[],\"bars\":[\"ALPHA\"]}"} ->
-        :ok
+      expect(Basket.Websocket.MockClient, :send_frame, fn _, {:text, message} ->
+        case Jason.decode!(message) do
+          %{"action" => "unsubscribe", "bars" => bars, "quotes" => quotes, "trades" => trades}
+          when bars == ["ALPHA"] and quotes == [] and trades == [] ->
+            :ok
+
+          _ ->
+            raise "Unexpected message format or content"
+        end
       end)
 
       {:ok, _pid} = Alpaca.start_link(%{})

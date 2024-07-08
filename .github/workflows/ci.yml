@@ -88,7 +88,7 @@ jobs:
       - name: Static Analysis for Types
         run: mix dialyzer
       - name: Run Tests and Coverage Report
-        run: mix coveralls.lcov
+        run: mix test --cover
       - name: Tests & Coverage
         uses: josecfreittas/elixir-coverage-feedback-action@v1
         with:

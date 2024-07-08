@@ -14,7 +14,13 @@ defmodule BasketWeb.Live.Overview do
   on_mount {BasketWeb.Live.UserLiveAuth, :user}
 
   def mount(_, _, socket) do
-    {:ok, initialize(socket)}
+    socket = assign(socket, :basket, [])
+
+    if connected?(socket) do
+      {:ok, initialize(socket)}
+    else
+      {:ok, socket}
+    end
   end
 
   def handle_info({"ticker-add", %{"ticker" => ticker}}, socket) do
@@ -31,7 +37,7 @@ defmodule BasketWeb.Live.Overview do
           Ticker.add!(user, ticker)
       end
 
-      {:noreply, add_tickers_to_view(socket, ["#{ticker}"])}
+      {:noreply, add_tickers_to_view(socket, ticker)}
     end
   end
 
@@ -135,7 +141,12 @@ defmodule BasketWeb.Live.Overview do
     user.settings["ticker_view_toggle"] == "club"
   end
 
-  defp in_club?(user), do: Enum.any?(user.clubs)
+  defp in_club?(user) do
+    case user.clubs do
+      %Ecto.Association.NotLoaded{} -> false
+      clubs -> Enum.any?(clubs)
+    end
+  end
 
   defp initialize(socket) do
     user = Repo.get(User, socket.assigns.user.id) |> Repo.preload([:clubs, :offices])

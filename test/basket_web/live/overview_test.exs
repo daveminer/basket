@@ -8,7 +8,7 @@ defmodule BasketWeb.Live.OverviewTest do
   import Phoenix.LiveViewTest
 
   alias BasketWeb.Live.Overview.TickerRow
-  alias Basket.{Ticker, Users.User}
+  alias Basket.{Ticker, User}
   alias Pow.Ecto.Schema.Password
 
   setup :set_mox_global
@@ -21,7 +21,10 @@ defmodule BasketWeb.Live.OverviewTest do
 
     # create a user
     user =
-      %User{email: "test@example.com", password_hash: password_hash}
+      %User{
+        email: "test@example.com",
+        password_hash: password_hash
+      }
       |> Basket.Repo.insert!()
 
     # give the user a ticker

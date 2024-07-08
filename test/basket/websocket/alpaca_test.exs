@@ -19,13 +19,13 @@ defmodule Basket.Websocket.AlpacaTest do
 
       expect(Basket.Websocket.MockClient, :send_frame, fn _,
                                                           {:text,
-                                                           "{\"action\":\"subscribe\",\"bars\":[\"XYZ\"],\"quotes\":[],\"trades\":[]}"} ->
+                                                           "{\"action\":\"subscribe\",\"trades\":[],\"quotes\":[],\"bars\":[\"ALPHA\"]}"} ->
         :ok
       end)
 
       {:ok, _pid} = Alpaca.start_link(%{})
 
-      assert :ok == Alpaca.subscribe(%{bars: ["XYZ"], quotes: [], trades: []})
+      assert :ok == Alpaca.subscribe(%{bars: ["ALPHA"], quotes: [], trades: []})
     end
 
     test "unsubscribe/1" do
@@ -33,13 +33,13 @@ defmodule Basket.Websocket.AlpacaTest do
 
       expect(Basket.Websocket.MockClient, :send_frame, fn _,
                                                           {:text,
-                                                           "{\"action\":\"unsubscribe\",\"bars\":[\"XYZ\"],\"quotes\":[],\"trades\":[]}"} ->
+                                                           "{\"action\":\"unsubscribe\",\"trades\":[],\"quotes\":[],\"bars\":[\"ALPHA\"]}"} ->
         :ok
       end)
 
       {:ok, _pid} = Alpaca.start_link(%{})
 
-      assert :ok == Alpaca.unsubscribe(%{bars: ["XYZ"], quotes: [], trades: []})
+      assert :ok == Alpaca.unsubscribe(%{bars: ["ALPHA"], quotes: [], trades: []})
     end
   end
 

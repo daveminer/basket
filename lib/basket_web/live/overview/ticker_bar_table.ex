@@ -35,7 +35,7 @@ defmodule BasketWeb.Live.Overview.TickerBarTable do
     end
   end
 
-  def call(ticker, user_id), do: call([ticker], user_id)
+  def add_ticker(ticker, user_id), do: add_ticker([ticker], user_id)
 
   defp subscribe_to_tickers(tickers, user_id),
     do:

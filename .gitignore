@@ -41,3 +41,5 @@ assets/css/_components.css
 # Editor config
 .vscode/
 
+# Production environment
+.env.prod

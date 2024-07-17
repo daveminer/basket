@@ -74,6 +74,10 @@ if config_env() == :prod do
     ],
     secret_key_base: secret_key_base
 
+  config :basket, Basket.Mailer,
+    adapter: Swoosh.Adapters.Brevo,
+    api_key: System.get_env("BREVO_API_KEY")
+
   # ## SSL Support
   #
   # To get SSL working, you will need to add the `https` key

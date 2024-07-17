@@ -7,6 +7,10 @@ import Config
 # before starting your production server.
 config :basket, BasketWeb.Endpoint, cache_static_manifest: "priv/static/cache_manifest.json"
 
+config :basket, Basket.Mailer,
+  adapter: Swoosh.Adapters.Sendgrid,
+  api_key: "SG.x.x"
+
 # Configures Swoosh API Client
 config :swoosh, api_client: Swoosh.ApiClient.Finch, finch_name: Basket.Finch
 

@@ -29,6 +29,13 @@ config :basket, BasketWeb.Endpoint,
     tailwind: {Tailwind, :install_and_run, [:default, ~w(--watch)]}
   ]
 
+config :basket, :alpaca,
+  api_key: System.get_env("ALPACA_API_KEY"),
+  api_secret: System.get_env("ALPACA_API_SECRET"),
+  data_http_url: "https://data.alpaca.markets",
+  market_http_url: "https://api.alpaca.markets/v2",
+  market_ws_url: "wss://stream.data.alpaca.markets/v2/test"
+
 # ## SSL Support
 #
 # In order to use HTTPS in development, a self-signed

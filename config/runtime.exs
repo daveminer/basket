@@ -20,15 +20,6 @@ if System.get_env("PHX_SERVER") do
   config :basket, BasketWeb.Endpoint, server: true
 end
 
-if config_env() in [:dev, :prod] do
-  config :basket, :alpaca,
-    api_key: System.get_env("ALPACA_API_KEY"),
-    api_secret: System.get_env("ALPACA_API_SECRET"),
-    data_http_url: "https://data.alpaca.markets",
-    market_http_url: "https://api.alpaca.markets",
-    market_ws_url: "wss://stream.data.alpaca.markets/v2"
-end
-
 if config_env() == :prod do
   database_url =
     System.get_env("DATABASE_URL") ||
@@ -73,6 +64,13 @@ if config_env() == :prod do
       port: port
     ],
     secret_key_base: secret_key_base
+
+  config :basket, :alpaca,
+    api_key: System.get_env("ALPACA_API_KEY"),
+    api_secret: System.get_env("ALPACA_API_SECRET"),
+    data_http_url: "https://data.alpaca.markets",
+    market_http_url: "https://api.alpaca.markets",
+    market_ws_url: "wss://stream.data.alpaca.markets/v2/iex"
 
   # ## SSL Support
   #

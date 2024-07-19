@@ -3,6 +3,8 @@ defmodule BasketWeb.Live.Overview.TickerBarTable do
   Displays a collection of TickerRow components in a table.
   """
 
+  import BasketWeb.CoreComponents
+
   use Phoenix.Component
 
   require Logger
@@ -74,6 +76,11 @@ defmodule BasketWeb.Live.Overview.TickerBarTable do
                   <%= Map.get(row, col) %>
                 </span>
               </div>
+            </td>
+            <td data-key={"#{row.id}-delete"}>
+              <button phx-click="ticker-remove" phx-value-ticker={row.id}>
+                <.icon name="hero-x-mark-solid" class="h-5 w-5 opacity-40 hover:opacity-70" />
+              </button>
             </td>
           </tr>
         </tbody>

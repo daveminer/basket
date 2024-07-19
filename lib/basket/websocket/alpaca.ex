@@ -31,7 +31,7 @@ defmodule Basket.Websocket.Alpaca do
     Logger.info("Starting Alpaca websocket client.")
 
     Client.start_link(
-      iex_feed(),
+      url(),
       Basket.Websocket.Alpaca,
       state,
       extra_headers: auth_headers()
@@ -178,8 +178,6 @@ defmodule Basket.Websocket.Alpaca do
   defp handle_bar_updates(_message) do
     Logger.debug("Bar updates message received")
   end
-
-  defp iex_feed, do: "#{url()}/iex"
 
   defp url,
     do: Application.fetch_env!(:basket, :alpaca)[:market_ws_url]

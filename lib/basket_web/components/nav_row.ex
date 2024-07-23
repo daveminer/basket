@@ -9,7 +9,7 @@ defmodule BasketWeb.Components.NavRow do
     ~H"""
     <div class="navbar bg-base-200 rounded-xl mb-5">
       <div class="flex-1">
-        <a class="btn btn-ghost text-xl">Basket</a>
+        <a class="btn btn-ghost text-xl" href="/">Basket</a>
       </div>
       <div class="flex-none dropdown dropdown-hover">
         <div role="button" class="btn btn-square btn-ghost" tabindex="0">

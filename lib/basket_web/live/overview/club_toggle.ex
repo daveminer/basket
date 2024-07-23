@@ -7,6 +7,7 @@ defmodule BasketWeb.Live.Overview.ClubToggle do
     <div class="flex items-center">
       <span class="club-toggle-label">Club</span>
       <input
+        id="club-toggle"
         type="checkbox"
         class="toggle mx-3"
         checked={@user.settings["ticker_view_toggle"] != "club"}

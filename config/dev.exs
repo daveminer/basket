@@ -88,3 +88,7 @@ config :phoenix_live_view, :debug_heex_annotations, true
 
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false
+
+config :basket, Basket.Mailer,
+  adapter: Swoosh.Adapters.Brevo,
+  api_key: System.get_env("BREVO_API_KEY")

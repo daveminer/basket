@@ -8,12 +8,12 @@ defmodule BasketWeb.SettingsHTML do
     <div class="flex-col p-4">
       <NavRow.render id="nav-row" />
 
-      <.form for={@form} class="flex flex-col" action="/invite" method="post">
+      <.form for={@form} class="flex flex-col" action="/invitations" method="post">
         <span class="mr-2">
           Send a club invite
         </span>
         <div class="w-50">
-          <input name="email" class="input input-bordered" placeholder="someone@xyz.com" />
+          <input name="user[email]" class="input input-bordered" placeholder="someone@xyz.com" />
           <button type="submit" class="btn">
             Invite
           </button>

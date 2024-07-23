@@ -14,7 +14,6 @@ defmodule Basket.Pow.Mailer do
     |> subject(subject)
     |> html_body(html)
     |> text_body(text)
-    |> IO.inspect(label: "EMAIL")
   end
 
   @impl true

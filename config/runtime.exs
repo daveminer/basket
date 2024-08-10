@@ -70,7 +70,8 @@ if config_env() == :prod do
     api_secret: System.get_env("ALPACA_API_SECRET"),
     data_http_url: "https://data.alpaca.markets",
     market_http_url: "https://api.alpaca.markets",
-    market_ws_url: "wss://stream.data.alpaca.markets/v2/iex"
+    market_ws_url: "wss://stream.data.alpaca.markets/v2/iex",
+    news_ws_url: "wss://stream.data.alpaca.markets/v1beta1/news"
 
   # ## SSL Support
   #

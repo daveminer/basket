@@ -1,4 +1,4 @@
-defmodule Basket.Websocket.Alpaca do
+defmodule Basket.Websocket.News do
   @moduledoc """
   Websocket client adapter for Alpaca Finance.
   Currently only supports the "bars" feed on the minute.
@@ -10,29 +10,26 @@ defmodule Basket.Websocket.Alpaca do
 
   alias Basket.Websocket.Client
 
+  @behaviour Client
   @type subscription_fields :: %{
-          :bars => list(String.t()),
-          :quotes => list(String.t()),
-          :trades => list(String.t())
+          :news => list(String.t())
         }
 
-  @auth_success ~s([{\"T\":\"success\",\"msg\":\"authenticated\"}])
-  @connection_success ~s([{\"T\":\"success\",\"msg\":\"connected\"}])
-  @bars_topic "bars"
+  @auth_success_msg ~s([{\"T\":\"success\",\"msg\":\"authenticated\"}])
+  @connection_success_msg ~s([{\"T\":\"success\",\"msg\":\"connected\"}])
+  @news_topic "news"
 
-  @subscribe_message %{
-    action: :subscribe
-  }
-  @unsubscribe_message %{
-    action: :unsubscribe
-  }
+  @impl true
+  def send_frame(pid, message) do
+    WebSockex.send_frame(pid, message)
+  end
 
   def start_link(state) do
-    Logger.info("Starting Alpaca websocket client.")
+    Logger.info("Starting Alpaca news websocket client.")
 
     Client.start_link(
       url(),
-      Basket.Websocket.Alpaca,
+      Basket.Websocket.News,
       state,
       extra_headers: auth_headers()
     )
@@ -41,43 +38,43 @@ defmodule Basket.Websocket.Alpaca do
   @spec subscribe(subscription_fields) :: :error | :ok
   def subscribe(tickers) do
     decoded_message =
-      build_message(@subscribe_message, tickers)
+      build_message(Client.subscribe_msg(), tickers)
       |> Jason.encode!()
 
     case Client.send_frame(client_pid(), {:text, decoded_message}) do
       :ok ->
-        Logger.debug("Subscription message sent: #{inspect(decoded_message)}")
+        Logger.debug("News subscription message sent: #{inspect(decoded_message)}")
 
       {:error, error} ->
-        Logger.error("Error sending subscription message: #{inspect(error)}")
+        Logger.error("Error sending news subscription message: #{inspect(error)}")
         :error
     end
   end
 
   @spec unsubscribe(subscription_fields) :: :error | :ok
   def unsubscribe(tickers) do
-    decoded_message = build_message(@unsubscribe_message, tickers) |> Jason.encode!()
+    decoded_message = build_message(Client.unsubscribe_msg(), tickers) |> Jason.encode!()
 
     case Client.send_frame(client_pid(), {:text, decoded_message}) do
       :ok ->
-        Logger.debug("Subscription removal message sent: #{inspect(decoded_message)}")
+        Logger.debug("News subscription removal message sent: #{inspect(decoded_message)}")
 
       {:error, error} ->
-        Logger.error("Error sending subscription removal message: #{inspect(error)}")
+        Logger.error("Error sending news subscription removal message: #{inspect(error)}")
     end
   end
 
-  def bars_topic, do: @bars_topic
+  def news_topic, do: @news_topic
 
   @impl true
   def handle_connect(_conn, state) do
-    Logger.info("Alpaca websocket connected.")
+    Logger.info("Alpaca News websocket connected.")
     {:ok, state}
   end
 
   @impl true
   def handle_disconnect(disconnect_map, state) do
-    Logger.info("Alpaca websocket disconnected.")
+    Logger.info("Alpaca News websocket disconnected.")
     super(disconnect_map, state)
   end
 
@@ -87,14 +84,14 @@ defmodule Basket.Websocket.Alpaca do
   subscription once the authorization acknowledgement method is received.
   """
   @impl true
-  def handle_frame({:text, @connection_success}, state) do
-    Logger.info("Connection message received.")
+  def handle_frame({:text, @connection_success_msg}, state) do
+    Logger.info("News connection message received.")
 
     {:ok, state}
   end
 
   @impl true
-  def handle_frame({:text, @auth_success}, state) do
+  def handle_frame({:text, @auth_success_msg}, state) do
     Logger.info("Alpaca websocket authenticated.")
 
     {:ok, state}
@@ -113,17 +110,13 @@ defmodule Basket.Websocket.Alpaca do
     {:ok, state}
   end
 
-  defp build_message(message, %{bars: bars, quotes: quotes, trades: trades}) do
-    message = if bars, do: Map.put(message, :bars, bars), else: message
-    message = if quotes, do: Map.put(message, :quotes, quotes), else: message
-    if trades, do: Map.put(message, :trades, trades), else: message
-  end
+  defp build_message(message, %{news: news}), do: Map.put(message, :news, news)
 
   defp client_pid do
     Supervisor.which_children(Basket.Supervisor)
     |> Enum.find(fn c ->
       case c do
-        {Basket.Websocket.Alpaca, _pid, :worker, [Basket.Websocket.Alpaca]} ->
+        {Basket.Websocket.News, _pid, :worker, [Basket.Websocket.News]} ->
           true
 
         _ ->
@@ -135,14 +128,8 @@ defmodule Basket.Websocket.Alpaca do
 
   defp process_message(message) do
     case Map.get(message, "T") do
-      "b" ->
-        handle_bars(message)
-
-      "d" ->
-        handle_daily_bars(message)
-
-      "u" ->
-        handle_bar_updates(message)
+      "n" ->
+        handle_news(message)
 
       "error" ->
         Logger.error("Error message from Alpaca websocket connection: #{inspect(message)}")
@@ -155,32 +142,13 @@ defmodule Basket.Websocket.Alpaca do
     end
   end
 
-  defp handle_bars(
-         %{
-           "S" => symbol,
-           "o" => _open,
-           "h" => _high,
-           "l" => _low,
-           "c" => _close,
-           "v" => _volume,
-           "t" => _timestamp
-         } = message
-       ) do
-    Logger.debug("Bars message received")
-
-    BasketWeb.Endpoint.broadcast!("bars-#{symbol}", "ticker-update", message)
-  end
-
-  defp handle_daily_bars(_message) do
-    Logger.debug("Daily bars message received.")
-  end
-
-  defp handle_bar_updates(_message) do
-    Logger.debug("Bar updates message received")
+  defp handle_news(%{"T" => "n", "id" => _id, "headline" => headline}) do
+    Logger.debug("News message received.")
+    Logger.debug("Headline: #{headline}")
   end
 
   defp url,
-    do: Application.fetch_env!(:basket, :alpaca)[:market_ws_url]
+    do: Application.fetch_env!(:basket, :alpaca)[:news_ws_url]
 
   defp auth_headers, do: [{"APCA-API-KEY-ID", api_key()}, {"APCA-API-SECRET-KEY", api_secret()}]
 

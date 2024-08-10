@@ -12,7 +12,7 @@ defmodule Basket.Http.Alpaca.Impl do
   @doc """
   Returns the latest quote for a ticker from the Alpaca API
   """
-  @impl Basket.Http.Alpaca
+  @impl true
   def latest_quote(tickers) do
     case get(
            "#{data_url()}#{@latest_quotes_resource}",
@@ -27,7 +27,7 @@ defmodule Basket.Http.Alpaca.Impl do
     end
   end
 
-  @impl Basket.Http.Alpaca
+  @impl true
   def list_assets do
     case get(
            "#{market_url()}#{@assets_resource}",

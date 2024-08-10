@@ -3,13 +3,6 @@ defmodule Basket.Websocket.Client do
   Websocket client adapter.
   """
 
-  @callback start_link(
-              url :: String.t() | WebSockex.Conn.t(),
-              module :: module(),
-              term :: term(),
-              options :: WebSockex.options()
-            ) ::
-              {:ok, pid()} | {:error, term()}
   @callback send_frame(WebSockex.client(), WebSockex.frame()) ::
               :ok
               | {:error,
@@ -25,6 +18,22 @@ defmodule Basket.Websocket.Client do
                  | %WebSockex.InvalidFrameError{__exception__: true, frame: term()}}
               | none()
 
+  @auth_success_msg ~s([{\"T\":\"success\",\"msg\":\"authenticated\"}])
+  @connection_success_msg ~s([{\"T\":\"success\",\"msg\":\"connected\"}])
+  @subscribe_message %{action: :subscribe}
+  @unsubscribe_message %{action: :unsubscribe}
+
+  def auth_success_msg, do: @auth_success_msg
+  def connection_success_msg, do: @connection_success_msg
+
+  def subscribe_msg, do: @subscribe_message
+  def unsubscribe_msg, do: @unsubscribe_message
+
+  @doc """
+  start_link/4 is not a callback because it crosses start_link/4
+  and start_link/1 from the WebSockex and Supervisor APIs rather than
+  providing a true behaviour implementation
+  """
   def start_link(url, module, term, options), do: impl().start_link(url, module, term, options)
   def send_frame(client, frame), do: impl().send_frame(client, frame)
 

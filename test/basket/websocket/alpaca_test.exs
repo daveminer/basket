@@ -1,11 +1,11 @@
-defmodule Basket.Websocket.AlpacaTest do
+defmodule Basket.Websocket.StockTest do
   @moduledoc false
 
   use ExUnit.Case, async: false
 
   import Mox
 
-  alias Basket.Websocket.Alpaca
+  alias Basket.Websocket.Stock
 
   describe "Alpaca websocket client lifecycle" do
     test "start_link/1" do

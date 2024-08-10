@@ -15,7 +15,8 @@ defmodule Basket.Application do
       # Start the Finch HTTP client for sending emails
       {Finch, name: Basket.Finch},
       {Cachex, name: :assets},
-      Basket.Websocket.Alpaca,
+      Basket.Websocket.Stock,
+      Basket.Websocket.News,
       BasketWeb.Presence,
       # Start to serve requests, typically the last entry
       BasketWeb.Endpoint

@@ -16,5 +16,7 @@ defmodule Basket.Repo.Migrations.AddNewsArticles do
 
       timestamps()
     end
+
+    create index(:news, [:images], using: :gin)
   end
 end

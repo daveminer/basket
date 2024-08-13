@@ -70,6 +70,8 @@ config :basket, :pow,
   controller_callbacks: Pow.Extension.Phoenix.ControllerCallbacks,
   mailer_backend: Basket.Pow.Mailer
 
+config :basket, :news, ms_between_checks: 1000 * 60 * 5
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"

@@ -17,6 +17,7 @@ defmodule Basket.Application do
       {Cachex, name: :assets},
       Basket.Websocket.Stock,
       Basket.Websocket.News,
+      Basket.Workers.News,
       BasketWeb.Presence,
       # Start to serve requests, typically the last entry
       BasketWeb.Endpoint

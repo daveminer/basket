@@ -41,3 +41,5 @@ config :basket, :alpaca,
 
 # This stub keeps the test app supervisor happy during startup
 config :basket, :websocket_client, Basket.Support.MockWebsocketClient
+
+config :basket, Oban, testing: :inline

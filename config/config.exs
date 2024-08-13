@@ -70,6 +70,11 @@ config :basket, :pow,
   controller_callbacks: Pow.Extension.Phoenix.ControllerCallbacks,
   mailer_backend: Basket.Pow.Mailer
 
+config :basket, Oban,
+  engine: Oban.Engines.Basic,
+  queues: [default: 10],
+  repo: Basket.Repo
+
 config :basket, :news, ms_between_checks: 1000 * 60 * 5
 
 # Import environment specific config. This must remain at the bottom

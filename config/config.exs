@@ -72,10 +72,8 @@ config :basket, :pow,
 
 config :basket, Oban,
   engine: Oban.Engines.Basic,
-  queues: [default: 10],
+  queues: [default: 10, news: 5],
   repo: Basket.Repo
-
-config :basket, :news, ms_between_checks: 1000 * 60 * 5
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

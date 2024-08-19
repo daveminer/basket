@@ -73,6 +73,11 @@ if config_env() == :prod do
     market_ws_url: "wss://stream.data.alpaca.markets/v2/iex",
     news_ws_url: "wss://stream.data.alpaca.markets/v1beta1/news"
 
+  config :basket, :news,
+    ms_between_checks: System.get_env("TIME_BETWEEN_NEWS_CHECKS") || 1000 * 60 * 5,
+    sentiment_service_active: System.get_env("SENTIMENT_ACTIVE"),
+    sentiment_service_url: System.get_env("SENTIMENT_SERVICE_URL") || "http://localhost:8000"
+
   # ## SSL Support
   #
   # To get SSL working, you will need to add the `https` key

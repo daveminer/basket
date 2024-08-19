@@ -83,7 +83,7 @@ defmodule BasketWeb.Live.OverviewTest do
       end)
 
       Basket.Websocket.MockClient
-      |> expect(:send_frame, 4, fn _, _ -> :ok end)
+      |> expect(:send_frame, 8, fn _, _ -> :ok end)
 
       # Overview loads with a ticker
       {:ok, view, _html} = live(conn, "/")

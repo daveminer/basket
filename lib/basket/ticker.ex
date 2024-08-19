@@ -57,8 +57,10 @@ defmodule Basket.Ticker do
         [users]
       end
 
+    user_ids = Enum.map(users, & &1.id)
+
     from(t in __MODULE__,
-      where: t.user_id in ^users
+      where: t.user_id in ^user_ids
     )
     |> Repo.all()
   end

@@ -3,7 +3,7 @@ defmodule Basket.News do
 
   use Ecto.Schema
 
-  import Ecto.Query
+  import Ecto.{Changeset, Query}
 
   alias Basket.Repo
 
@@ -12,10 +12,17 @@ defmodule Basket.News do
           author: String.t(),
           content: String.t(),
           creation_date: DateTime.t(),
-          images: map,
+          headline: String.t(),
+          id: integer(),
+          images: map(),
+          inserted_at: DateTime.t(),
+          sentiment: String.t(),
+          sentiment_confidence: Decimal.t(),
+          sentiment_id: integer(),
           source: String.t(),
           summary: String.t(),
           symbols: list(String.t()),
+          updated_at: DateTime.t(),
           updated_date: DateTime.t(),
           url: String.t()
         }
@@ -27,6 +34,9 @@ defmodule Basket.News do
     field :creation_date, :utc_datetime
     field :headline, :string
     field :images, {:array, :map}, type: :jsonb
+    field :sentiment, :string
+    field :sentiment_confidence, :float
+    field :sentiment_id, :integer
     field :source, :string
     field :summary, :string
     field :symbols, {:array, :string}
@@ -50,32 +60,34 @@ defmodule Basket.News do
     |> Repo.insert!()
   end
 
-  @spec new(map()) :: __MODULE__.t()
-  def new(%{
-        "id" => article_id,
-        "author" => author,
-        "content" => content,
-        "created_at" => creation_date,
-        "images" => images,
-        "source" => source,
-        "summary" => summary,
-        # "symbols" => symbols,
-        "updated_at" => updated_date,
-        "url" => url
-      }) do
-    %__MODULE__{
-      article_id: article_id,
-      author: author,
-      content: content,
-      creation_date: creation_date,
-      images: images,
-      source: source,
-      summary: summary,
-      symbols: [],
-      # symbols: symbols,
-      updated_date: updated_date,
-      url: url
-    }
+  @spec changeset(t(), map()) :: Ecto.Changeset.t()
+  def changeset(news, params \\ %{}) do
+    news
+    |> cast(params, [
+      :article_id,
+      :author,
+      :content,
+      :creation_date,
+      :headline,
+      :images,
+      :sentiment,
+      :sentiment_confidence,
+      :sentiment_id,
+      :source,
+      :summary,
+      :symbols,
+      :updated_date,
+      :url
+    ])
+    |> validate_required([
+      :article_id,
+      :author,
+      :creation_date,
+      :source,
+      :symbols,
+      :updated_date,
+      :url
+    ])
   end
 
   @spec for_ticker(ticker :: String.t()) :: [__MODULE__.t()]

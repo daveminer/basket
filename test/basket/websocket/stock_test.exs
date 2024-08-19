@@ -1,4 +1,4 @@
-defmodule Basket.Websocket.StockTest do
+defmodule Basket.Websocket.ClientTest do
   @moduledoc false
 
   use ExUnit.Case, async: false
@@ -7,11 +7,11 @@ defmodule Basket.Websocket.StockTest do
 
   alias Basket.Websocket.Stock
 
-  describe "Alpaca websocket client lifecycle" do
+  describe "Websocket client lifecycle" do
     test "start_link/1" do
       expect(Basket.Websocket.MockClient, :start_link, fn _, _, _, _ -> {:ok, self()} end)
 
-      assert {:ok, _pid} = Alpaca.start_link(%{})
+      assert {:ok, _pid} = Stock.start_link(%{})
     end
 
     test "subscribe/1" do
@@ -28,9 +28,9 @@ defmodule Basket.Websocket.StockTest do
         end
       end)
 
-      {:ok, _pid} = Alpaca.start_link(%{})
+      {:ok, _pid} = Stock.start_link(%{})
 
-      assert :ok == Alpaca.subscribe(%{bars: ["ALPHA"], quotes: [], trades: []})
+      assert :ok == Stock.subscribe(%{bars: ["ALPHA"], quotes: [], trades: []})
     end
 
     test "unsubscribe/1" do
@@ -47,34 +47,34 @@ defmodule Basket.Websocket.StockTest do
         end
       end)
 
-      {:ok, _pid} = Alpaca.start_link(%{})
+      {:ok, _pid} = Stock.start_link(%{})
 
-      assert :ok == Alpaca.unsubscribe(%{bars: ["ALPHA"], quotes: [], trades: []})
+      assert :ok == Stock.unsubscribe(%{bars: ["ALPHA"], quotes: [], trades: []})
     end
   end
 
   describe "Alpaca websocket client events" do
     test "handle_connect/2" do
-      {:ok, %{}} = Alpaca.handle_connect(%{}, %{})
+      {:ok, %{}} = Stock.handle_connect(%{}, %{})
     end
 
     test "handle_disconnect/2" do
-      {:ok, %{}} = Alpaca.handle_disconnect(%{}, %{})
+      {:ok, %{}} = Stock.handle_disconnect(%{}, %{})
     end
 
     test "handle_frame/2 connection success" do
       {:ok, _state} =
-        Alpaca.handle_frame({:text, ~s([{\"T\":\"success\",\"msg\":\"connected\"}])}, %{})
+        Stock.handle_frame({:text, ~s([{\"T\":\"success\",\"msg\":\"connected\"}])}, %{})
     end
 
     test "handle_frame/2 authentication success" do
       {:ok, _state} =
-        Alpaca.handle_frame({:text, ~s([{\"T\":\"success\",\"msg\":\"connected\"}])}, %{})
+        Stock.handle_frame({:text, ~s([{\"T\":\"success\",\"msg\":\"connected\"}])}, %{})
     end
 
     test "handle_frame/2 message" do
       {:ok, _state} =
-        Alpaca.handle_frame({:text, ~s([{\"T\":\"success\",\"msg\":\"connected\"}])}, %{})
+        Stock.handle_frame({:text, ~s([{\"T\":\"success\",\"msg\":\"connected\"}])}, %{})
     end
   end
 end

@@ -12,7 +12,7 @@ defmodule Basket.MixProject do
       deps: deps(),
       compilers: Mix.compilers(),
       deps: deps(),
-      test_coverage: [summary: [threshold: 0]],
+      test_coverage: [summary: [threshold: 0], tool: ExCoveralls],
       preferred_cli_env: [
         coveralls: :test,
         "coveralls.detail": :test,
@@ -77,7 +77,8 @@ defmodule Basket.MixProject do
       {:mox, "1.1.0", only: :test},
       {:test_server, "~> 0.1", only: :test},
       {:ex_machina, "~> 2.8.0", only: :test},
-      {:oban, "~> 2.17"}
+      {:oban, "~> 2.17"},
+      {:html_entities, "~> 0.5.2"}
     ]
   end
 

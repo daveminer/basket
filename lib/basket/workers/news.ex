@@ -1,4 +1,4 @@
-defmodule Basket.Workers.News do
+defmodule Basket.Worker.News do
   use GenServer
 
   import Ecto.Query
@@ -95,10 +95,23 @@ defmodule Basket.Workers.News do
       Logger.error("#{rows_not_updated} rows were not inserted during the news batch insert.")
     end
 
+    if is_sentiment_service_active() do
+      Enum.map(articles, fn article ->
+        Basket.Worker.Sentiment.new(%{
+          article_id: article.article_id
+        })
+      end)
+      |> Oban.insert_all()
+    end
+
     if next_page_token do
       write_article_batch_to_db(tickers, start_time, next_page_token)
     else
       :ok
     end
+  end
+
+  defp is_sentiment_service_active() do
+    Application.get_env(:basket, :news)[:sentiment_service_active]
   end
 end

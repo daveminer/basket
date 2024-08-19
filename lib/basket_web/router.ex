@@ -35,6 +35,10 @@ defmodule BasketWeb.Router do
     live "/", Live.Overview
   end
 
+  scope "/", BasketWeb do
+    post "/sentiment/new/callback", SentimentController, :callback
+  end
+
   # Other scopes may use custom stacks.
   # scope "/api", BasketWeb do
   #   pipe_through :api

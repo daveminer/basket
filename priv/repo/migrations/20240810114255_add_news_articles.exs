@@ -1,7 +1,7 @@
 defmodule Basket.Repo.Migrations.AddNewsArticles do
   use Ecto.Migration
 
-  def change do
+  def up do
     execute "CREATE TYPE sentiment AS ENUM ('positive', 'neutral', 'negative')"
 
     create table(:news) do
@@ -25,5 +25,12 @@ defmodule Basket.Repo.Migrations.AddNewsArticles do
 
     create index(:news, [:article_id], unique: true)
     create index(:news, [:images], using: :gin)
+  end
+
+  def down do
+    drop index(:news, [:images], using: :gin)
+    drop index(:news, [:article_id], unique: true)
+    drop table(:news)
+    execute "DROP TYPE sentiment"
   end
 end

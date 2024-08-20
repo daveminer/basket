@@ -48,4 +48,19 @@ defmodule Basket.Http.AlpacaTest do
              } = Alpaca.Impl.list_assets()
     end
   end
+
+  describe "news" do
+    test "returns filtered news articles" do
+      TestServer.add("/v1beta1/news",
+        via: :get,
+        to: fn conn ->
+          Plug.Conn.resp(conn, 200, Jason.encode!(build(:news_payload)))
+        end
+      )
+
+      config = Application.get_env(:basket, :alpaca)
+      config = Keyword.put(config, :market_http_url, TestServer.url())
+      Application.put_env(:basket, :alpaca, config)
+    end
+  end
 end

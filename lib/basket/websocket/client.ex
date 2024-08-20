@@ -32,6 +32,11 @@ defmodule Basket.Websocket.Client do
   def subscribe_msg, do: @subscribe_message
   def unsubscribe_msg, do: @unsubscribe_message
 
+  @doc """
+  start_link/4 is not a callback because it crosses start_link/4
+  and start_link/1 from the WebSockex and Supervisor APIs, rather than
+  providing a true behaviour implementation.
+  """
   def start_link(url, module, term, options), do: impl().start_link(url, module, term, options)
   def send_frame(client, frame), do: impl().send_frame(client, frame)
 

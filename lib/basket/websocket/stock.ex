@@ -27,6 +27,11 @@ defmodule Basket.Websocket.Stock do
     WebSockex.send_frame(pid, message)
   end
 
+  @impl true
+  def start_link(url, _module, term, options) do
+    WebSockex.start_link(url, __MODULE__, term, options)
+  end
+
   def start_link(state) do
     Logger.info("Starting Alpaca stock websocket client.")
 

@@ -63,10 +63,11 @@ config :phoenix, :json_library, Jason
 
 config :basket, :pow,
   web_module: BasketWeb,
-  web_mailer_module: BasketWeb,
+  # Enable to customize the Pow views
+  # web_mailer_module: BasketWeb,
   user: Basket.User,
   repo: Basket.Repo,
-  extensions: [PowResetPassword, PowEmailConfirmation],
+  extensions: [PowResetPassword, PowEmailConfirmation, PowInvitation],
   controller_callbacks: Pow.Extension.Phoenix.ControllerCallbacks,
   mailer_backend: Basket.Pow.Mailer
 

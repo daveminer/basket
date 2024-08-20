@@ -92,8 +92,3 @@ config :phoenix_live_view, :debug_heex_annotations, true
 config :swoosh, :api_client, false
 
 config :basket, :host, "http://localhost:4000"
-
-# config :basket, Basket.Pow.Mailer,
-#   adapter: Swoosh.Adapters.Brevo,
-#   api_key: System.get_env("BREVO_API_KEY")
-

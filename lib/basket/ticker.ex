@@ -29,7 +29,7 @@ defmodule Basket.Ticker do
   end
 
   @spec active_ticker_list() :: list(String.t())
-  def active_ticker_list() do
+  def active_ticker_list do
     tickers_query = from(t in "tickers", select: t.ticker)
     club_tickers_query = from(ct in "club_tickers", select: ct.ticker)
 

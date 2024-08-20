@@ -1,11 +1,17 @@
 defmodule Basket.Worker.News do
+  @moduledoc """
+  Designed to run under the Supervisor, this worker will periodically
+  check the Alpaca API for new news articles and insert them into the
+  data. If the sentiment service is active, it will also queue a job
+  to classifiy the sentiment of the article.
+  """
   use GenServer
 
   import Ecto.Query
 
   require Logger
 
-  alias Basket.{News, Repo, Ticker}
+  alias Basket.{Http.Alpaca, News, Repo, Ticker, Worker.Sentiment}
 
   @interval Application.compile_env(:basket, :news)[:ms_between_checks]
 
@@ -41,7 +47,7 @@ defmodule Basket.Worker.News do
 
   defp write_article_batch_to_db(tickers, start_time, page_token \\ nil) do
     {:ok, %{"news" => news, "next_page_token" => next_page_token} = _response} =
-      Basket.Http.Alpaca.news(
+      Alpaca.news(
         start_time: start_time,
         page_token: page_token,
         tickers: tickers
@@ -95,9 +101,9 @@ defmodule Basket.Worker.News do
       Logger.error("#{rows_not_updated} rows were not inserted during the news batch insert.")
     end
 
-    if is_sentiment_service_active() do
+    if sentiment_service_active? do
       Enum.map(articles, fn article ->
-        Basket.Worker.Sentiment.new(%{
+        Sentiment.new(%{
           article_id: article.article_id
         })
       end)
@@ -111,7 +117,7 @@ defmodule Basket.Worker.News do
     end
   end
 
-  defp is_sentiment_service_active() do
+  defp sentiment_service_active? do
     Application.get_env(:basket, :news)[:sentiment_service_active]
   end
 end

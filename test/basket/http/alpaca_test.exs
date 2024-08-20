@@ -59,8 +59,13 @@ defmodule Basket.Http.AlpacaTest do
       )
 
       config = Application.get_env(:basket, :alpaca)
-      config = Keyword.put(config, :market_http_url, TestServer.url())
+      config = Keyword.put(config, :data_http_url, TestServer.url())
       Application.put_env(:basket, :alpaca, config)
+
+      assert {
+               :ok,
+               ^assets
+             } = Alpaca.Impl.list_assets()
     end
   end
 end

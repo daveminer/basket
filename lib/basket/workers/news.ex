@@ -101,7 +101,7 @@ defmodule Basket.Worker.News do
       Logger.error("#{rows_not_updated} rows were not inserted during the news batch insert.")
     end
 
-    if sentiment_service_active? do
+    if sentiment_service_active?() do
       Enum.map(articles, fn article ->
         Sentiment.new(%{
           article_id: article.article_id

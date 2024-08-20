@@ -44,8 +44,8 @@ defmodule Basket.Http.Alpaca.Impl do
   end
 
   @impl true
-  def news(opts) do
-    page_token = Keyword.get(opts, :page_token, [])
+  def news(opts \\ []) do
+    page_token = Keyword.get(opts, :page_token)
     start_time = Keyword.get(opts, :start_time)
     tickers = Keyword.get(opts, :tickers, [])
 

@@ -64,8 +64,16 @@ defmodule Basket.Http.AlpacaTest do
 
       assert {
                :ok,
-               ^assets
-             } = Alpaca.Impl.list_assets()
+               %{
+                 "next_page_token" => "MTY0MDk0ODkyMzAwMDAwMDAwMHwyNDg0MzE3MQ==",
+                 "news" => [
+                   %{
+                     "author" => "Charles Gross",
+                     "symbols" => ["AAPL"]
+                   }
+                 ]
+               }
+             } = Alpaca.Impl.news()
     end
   end
 end

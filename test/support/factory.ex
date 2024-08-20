@@ -64,6 +64,33 @@ defmodule Basket.Factory do
     }
   end
 
+  def news_payload_factory() do
+    %{
+      news: [
+        %{
+          id: 24_843_171,
+          headline:
+            "Apple Leader in Phone Sales in China for Second Straight Month in November With 23.6% Share, According to Market Research Data",
+          author: "Charles Gross",
+          created_at: "2021-12-31T11:08:42Z",
+          updated_at: "2021-12-31T11:08:43Z",
+          summary:
+            "This headline-only article is meant to show you why a stock is moving, the most difficult aspect of stock trading",
+          content:
+            "<p>This headline-only article is meant to show you why a stock is moving, the most difficult aspect of stock trading....</p>",
+          url:
+            "https://www.benzinga.com/news/21/12/24843171/apple-leader-in-phone-sales-in-china-for-second-straight-month-in-november-with-23-6-share-according",
+          images: [],
+          symbols: [
+            "AAPL"
+          ],
+          source: "benzinga"
+        }
+      ],
+      next_page_token: "MTY0MDk0ODkyMzAwMDAwMDAwMHwyNDg0MzE3MQ=="
+    }
+  end
+
   def socket_factory do
     %Phoenix.LiveView.Socket{
       assigns: %{__changed__: %{}},

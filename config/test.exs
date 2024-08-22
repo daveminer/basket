@@ -45,3 +45,5 @@ config :basket, :websocket_client, Basket.Support.MockWebsocketClient
 config :basket, Oban, testing: :inline
 
 config :basket, :host, "http://localhost:4000"
+
+config :basket, :news, ms_between_checks: 10000

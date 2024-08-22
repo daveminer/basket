@@ -1,4 +1,6 @@
 defmodule Basket.Worker.NewsTest do
+  @moduledoc false
+
   use Basket.DataCase, async: true
   import Mox
 

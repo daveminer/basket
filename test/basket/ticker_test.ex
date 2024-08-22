@@ -1,4 +1,6 @@
 defmodule Basket.TickerTest do
+  @moduledoc false
+
   use Basket.DataCase, async: false
 
   import Basket.Factory

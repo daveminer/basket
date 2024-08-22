@@ -1,4 +1,6 @@
 defmodule Basket.Worker.SentimentTest do
+  @moduledoc false
+
   use Basket.DataCase, async: false
 
   import ExUnit.CaptureLog

@@ -23,7 +23,7 @@ defmodule Basket.Http.SentimentTest do
       assert {
                :ok,
                ^sentiment_payload
-             } = Sentiment.get_sentiment(1)
+             } = Sentiment.Impl.get_sentiment(1)
     end
   end
 
@@ -40,7 +40,7 @@ defmodule Basket.Http.SentimentTest do
       config = Keyword.put(config, :sentiment_service_url, TestServer.url())
       Application.put_env(:basket, :news, config)
 
-      assert :ok = Sentiment.run_sentiment("1", ["TESTTAG"], "This is a test")
+      assert :ok = Sentiment.Impl.run_sentiment("1", ["TESTTAG"], "This is a test")
     end
   end
 end

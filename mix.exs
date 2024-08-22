@@ -12,7 +12,7 @@ defmodule Basket.MixProject do
       deps: deps(),
       compilers: Mix.compilers(),
       deps: deps(),
-      test_coverage: [summary: [threshold: 0], tool: ExCoveralls],
+      test_coverage: [summary: [threshold: 0]],
       preferred_cli_env: [
         coveralls: :test,
         "coveralls.detail": :test,

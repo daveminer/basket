@@ -52,7 +52,6 @@ defmodule Basket.Http.AlpacaTest do
   describe "news" do
     test "returns filtered news articles" do
       TestServer.add("/v1beta1/news",
-        via: :get,
         to: fn conn ->
           Plug.Conn.resp(conn, 200, Jason.encode!(build(:news_payload)))
         end
@@ -73,7 +72,12 @@ defmodule Basket.Http.AlpacaTest do
                    }
                  ]
                }
-             } = Alpaca.Impl.news()
+             } =
+               Alpaca.Impl.news(
+                 page_token: "AAA0MDk0ODkyMzAwMDAwMDAwMHwyNDg0MzE3MQ==",
+                 start_time: DateTime.from_iso8601("2021-12-31T11:08:42Z") |> elem(1),
+                 tickers: ["AAPL"]
+               )
     end
   end
 end

@@ -34,8 +34,8 @@ defmodule Basket.Http.Sentiment.Impl do
            "#{url()}/sentiment/new?callback_url=#{Application.fetch_env!(:basket, :host)}/sentiment/new/callback",
            Jason.encode!([%{article_id: article_id, tags: tags, text: encoded_text}])
          ) do
-      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
-        {:ok, body}
+      {:ok, %HTTPoison.Response{status_code: 201}} ->
+        :ok
 
       {:ok, %HTTPoison.Response{status_code: 400, body: body}} ->
         {:error, body}

@@ -23,7 +23,7 @@ defmodule Basket.Http.Sentiment do
 
   @callback get_sentiment(id :: String.t()) :: {:ok, map()} | {:error, String.t()}
   @callback run_sentiment(id :: String.t(), tags :: list(String.t()), text :: String.t()) ::
-              {:ok, String.t()} | {:error, String.t()}
+              :ok | {:error, String.t()}
 
   def get_sentiment(id), do: impl().get_sentiment(id)
 

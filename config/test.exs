@@ -43,3 +43,5 @@ config :basket, :alpaca,
 config :basket, :websocket_client, Basket.Support.MockWebsocketClient
 
 config :basket, Oban, testing: :inline
+
+config :basket, :host, "http://localhost:4000"

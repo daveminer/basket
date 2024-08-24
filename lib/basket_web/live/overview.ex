@@ -6,7 +6,7 @@ defmodule BasketWeb.Live.Overview do
 
   require Logger
 
-  alias Basket.{ClubTicker, Repo, Ticker, User}
+  alias Basket.{ClubTicker, News, Repo, Ticker, User}
   alias BasketWeb.Components.NavRow
   alias BasketWeb.Live.Overview.{ClubToggle, Search, TickerBarTable}
   alias BasketWeb.Presence
@@ -93,7 +93,7 @@ defmodule BasketWeb.Live.Overview do
 
     user = User.toggle_club_view!(socket.assigns.user, new_setting)
 
-    socket = assign(socket, basket: [], user: user)
+    socket = assign(socket, basket: [], news: [], user: user)
 
     socket =
       case load_tickers(user) do
@@ -118,6 +118,7 @@ defmodule BasketWeb.Live.Overview do
       </div>
       <TickerBarTable.render
         id="ticker-bar-table"
+        news={@news}
         rows={@basket}
         can_delete={!club_mode?(@user) || officer?(@user)}
       />
@@ -158,8 +159,11 @@ defmodule BasketWeb.Live.Overview do
       )
 
     case load_tickers(user) do
-      [] -> socket
-      tickers -> add_tickers_to_view(socket, tickers)
+      [] ->
+        socket
+
+      tickers ->
+        populate_socket(socket, tickers)
     end
   end
 
@@ -179,6 +183,17 @@ defmodule BasketWeb.Live.Overview do
   end
 
   defp officer?(user), do: Enum.any?(user.offices)
+
+  defp populate_socket(socket, tickers) do
+    socket =
+      if News.sentiment_enabled?() do
+        assign(socket, news: News.sentiment_for_tickers(tickers))
+      else
+        socket
+      end
+
+    add_tickers_to_view(socket, tickers)
+  end
 
   defp tickers(socket), do: Enum.map(socket.assigns.basket, fn row -> row.ticker end)
 end

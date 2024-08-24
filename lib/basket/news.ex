@@ -35,7 +35,7 @@ defmodule Basket.News do
     field :headline, :string
     field :images, {:array, :map}, type: :jsonb
     field :sentiment, :string
-    field :sentiment_confidence, :float
+    field :sentiment_confidence, :decimal
     field :sentiment_id, :integer
     field :source, :string
     field :summary, :string
@@ -90,14 +90,34 @@ defmodule Basket.News do
     ])
   end
 
-  @spec for_ticker(ticker :: String.t()) :: [__MODULE__.t()]
-  def for_ticker(nil), do: []
+  @spec sentiment_for_tickers(ticker :: String.t() | [String.t()]) :: [__MODULE__.t()]
+  def sentiment_for_tickers(ticker) when is_binary(ticker), do: sentiment_for_tickers([ticker])
 
-  def for_ticker(ticker) do
-    from(t in __MODULE__,
-      where: ^ticker in t.symbols,
-      order_by: [desc: t.creation_date]
-    )
-    |> Repo.all()
+  def sentiment_for_tickers(tickers) when is_list(tickers) do
+    results =
+      from(t in __MODULE__,
+        where: fragment("? && ?", t.symbols, ^tickers),
+        where: t.sentiment_confidence >= 0.65,
+        where: t.creation_date > ago(30, "day"),
+        group_by: [t.symbols, t.sentiment],
+        select: {t.symbols, t.sentiment, count(t.id)}
+      )
+      |> Repo.all()
+
+    results
+    |> Enum.flat_map(fn {symbols, sentiment, count} ->
+      Enum.filter(symbols, fn symbol -> symbol in tickers end)
+      |> Enum.map(fn symbol -> {symbol, sentiment, count} end)
+    end)
+    |> Enum.group_by(fn {symbol, sentiment, _count} -> {symbol, sentiment} end, fn {_symbol,
+                                                                                    _sentiment,
+                                                                                    count} ->
+      count
+    end)
+    |> Enum.map(fn {{symbol, sentiment}, counts} -> {symbol, sentiment, Enum.sum(counts)} end)
+  end
+
+  def sentiment_enabled? do
+    Application.get_env(:basket, :news)[:sentiment_service_enabled]
   end
 end

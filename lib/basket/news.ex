@@ -90,6 +90,10 @@ defmodule Basket.News do
     ])
   end
 
+  @doc """
+  Returns the counts of news articles per ticker and per sentiment. This creates a resulting map of maps of
+  the form `%{"AAPL" => %{"negative" => 1, "neutral" => 14, "positive" => 10}}`.
+  """
   @spec sentiment_for_tickers(ticker :: String.t() | [String.t()]) :: [__MODULE__.t()]
   def sentiment_for_tickers(ticker) when is_binary(ticker), do: sentiment_for_tickers([ticker])
 
@@ -109,12 +113,21 @@ defmodule Basket.News do
       Enum.filter(symbols, fn symbol -> symbol in tickers end)
       |> Enum.map(fn symbol -> {symbol, sentiment, count} end)
     end)
-    |> Enum.group_by(fn {symbol, sentiment, _count} -> {symbol, sentiment} end, fn {_symbol,
-                                                                                    _sentiment,
-                                                                                    count} ->
-      count
+    |> Enum.group_by(fn {symbol, _sentiment, _count} -> symbol end, fn {_symbol, sentiment, count} ->
+      {sentiment, count}
     end)
-    |> Enum.map(fn {{symbol, sentiment}, counts} -> {symbol, sentiment, Enum.sum(counts)} end)
+    |> Enum.map(fn {symbol, sentiment_counts} ->
+      sentiment_map =
+        sentiment_counts
+        |> Enum.group_by(fn {sentiment, _count} -> sentiment end, fn {_sentiment, count} ->
+          count
+        end)
+        |> Enum.map(fn {sentiment, counts} -> {sentiment, Enum.sum(counts)} end)
+        |> Enum.into(%{})
+
+      {symbol, sentiment_map}
+    end)
+    |> Enum.into(%{})
   end
 
   def sentiment_enabled? do

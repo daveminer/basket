@@ -92,21 +92,37 @@ defmodule Basket.NewsTest do
       {:ok, news1: news1, news2: news2, news3: news3}
     end
 
-    test "returns news articles for a single ticker" do
-      result = News.sentiment_for_tickers("AAA")
-      assert [{"AAA", "positive", 2}] = result
+    test "returns sentiment counts for a single ticker" do
+      result = News.sentiment_for_tickers(["AAA"])
+
+      expected_result = %{
+        "AAA" => %{
+          "positive" => 2
+        }
+      }
+
+      assert result == expected_result
     end
 
     test "returns aggregated results for a list of tickers" do
       result = News.sentiment_for_tickers(["AAA", "BBB"])
 
-      assert Enum.any?(result, fn {symbol, sentiment, count} ->
-               symbol == "AAA" and sentiment == "positive" and count == 2
-             end)
+      expected_result = %{
+        "AAA" => %{
+          "positive" => 2
+        },
+        "BBB" => %{
+          "positive" => 2
+        }
+      }
 
-      assert Enum.any?(result, fn {symbol, sentiment, count} ->
-               symbol == "BBB" and sentiment == "positive" and count == 2
-             end)
+      assert result == expected_result
+    end
+
+    test "returns an empty map when no tickers match" do
+      result = News.sentiment_for_tickers(["XYZ"])
+
+      assert result == %{}
     end
   end
 

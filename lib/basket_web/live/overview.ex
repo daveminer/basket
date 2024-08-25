@@ -15,6 +15,7 @@ defmodule BasketWeb.Live.Overview do
 
   def mount(_, _, socket) do
     socket = assign(socket, :basket, [])
+    socket = assign(socket, :news, [])
 
     if connected?(socket) do
       {:ok, initialize(socket)}

@@ -6,6 +6,7 @@ defmodule BasketWeb.Live.Overview.TickerBarTable do
   import BasketWeb.CoreComponents
 
   use Phoenix.Component
+  use Phoenix.HTML
 
   require Logger
 
@@ -98,37 +99,43 @@ defmodule BasketWeb.Live.Overview.TickerBarTable do
                 <% sentiments = Map.get(@news, row.id) %>
                 <div class="flex flex-row justify-center">
                   <span>
-                    <div>
-                      <.icon
-                        name="hero-hand-thumb-up-solid"
-                        class="h-5 w-5 opacity-40 hover:opacity-70"
-                      />
-                    </div>
-                    <div>
-                      <%= sentiments["positive"] %>
-                    </div>
+                    <%= link to: "/news/#{row.id}?sentiment=positive" do %>
+                      <div>
+                        <.icon
+                          name="hero-hand-thumb-up-solid"
+                          class="h-5 w-5 opacity-40 hover:opacity-70"
+                        />
+                      </div>
+                      <div>
+                        <%= sentiments["positive"] || 0 %>
+                      </div>
+                    <% end %>
                   </span>
                   <span class="mx-4">
-                    <div>
-                      <.icon
-                        name="hero-question-mark-circle-solid"
-                        class="h-5 w-5 opacity-40 hover:opacity-70"
-                      />
-                    </div>
-                    <div>
-                      <%= sentiments["neutral"] %>
-                    </div>
+                    <%= link to: "/news/#{row.id}?sentiment=neutral" do %>
+                      <div>
+                        <.icon
+                          name="hero-question-mark-circle-solid"
+                          class="h-5 w-5 opacity-40 hover:opacity-70"
+                        />
+                      </div>
+                      <div>
+                        <%= sentiments["neutral"] || 0 %>
+                      </div>
+                    <% end %>
                   </span>
                   <span>
-                    <div>
-                      <.icon
-                        name="hero-hand-thumb-down-solid"
-                        class="h-5 w-5 opacity-40 hover:opacity-70"
-                      />
-                    </div>
-                    <div>
-                      <%= sentiments["negative"] %>
-                    </div>
+                    <%= link to: "/news/#{row.id}?sentiment=negative" do %>
+                      <div>
+                        <.icon
+                          name="hero-hand-thumb-down-solid"
+                          class="h-5 w-5 opacity-40 hover:opacity-70"
+                        />
+                      </div>
+                      <div>
+                        <%= sentiments["negative"] || 0 %>
+                      </div>
+                    <% end %>
                   </span>
                 </div>
               </td>

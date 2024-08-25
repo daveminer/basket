@@ -1,0 +1,10 @@
+<div class="flex-col p-8">
+  <BasketWeb.Components.NavRow.render id="nav-row" />
+  <div id="news-list" class="mt-10 mx-5">
+    <%= for news <- @news do %>
+    <div class="my-3">
+      <%= news.summary %>
+    </div>
+    <% end %>
+  </div>
+</div>

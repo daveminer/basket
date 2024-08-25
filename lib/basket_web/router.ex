@@ -35,6 +35,8 @@ defmodule BasketWeb.Router do
 
     live "/", Live.Overview
 
+    get "/news/:ticker", NewsController, :index
+
     resources "/settings", SettingsController, only: [:index, :update]
   end
 

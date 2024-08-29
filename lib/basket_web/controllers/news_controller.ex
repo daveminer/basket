@@ -2,7 +2,7 @@ defmodule BasketWeb.NewsController do
   use BasketWeb, :controller
 
   require Logger
-  alias Basket.{News, Repo}
+  alias Basket.News
 
   @spec index(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def index(conn, %{"ticker" => ticker} = params) do

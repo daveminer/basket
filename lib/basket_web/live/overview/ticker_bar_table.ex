@@ -68,7 +68,14 @@ defmodule BasketWeb.Live.Overview.TickerBarTable do
         <thead>
           <tr>
             <th :for={col <- base_columns()} class="p-0 pb-4 text-center">
-              <%= Atom.to_string(col) %>
+              <%= case col do %>
+                <% :ticker -> %>
+                  <% nil %>
+                <% :timestamp -> %>
+                  Last Updated
+                <% _ -> %>
+                  <%= Atom.to_string(col) |> String.capitalize() %>
+              <% end %>
             </th>
             <%= if @news != [] do %>
               <th class="p-0 pb-4 text-center">

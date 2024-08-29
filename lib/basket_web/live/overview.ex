@@ -14,8 +14,8 @@ defmodule BasketWeb.Live.Overview do
   on_mount {BasketWeb.Live.UserLiveAuth, :user}
 
   def mount(_, _, socket) do
-    socket = assign(socket, :basket, [])
-    socket = assign(socket, :news, [])
+    socket =
+      assign(socket, basket: [], news: [])
 
     if connected?(socket) do
       {:ok, initialize(socket)}
@@ -37,6 +37,12 @@ defmodule BasketWeb.Live.Overview do
         false ->
           Ticker.add!(user, ticker)
       end
+
+      :ok =
+        Basket.Worker.News.write_article_batch_to_db(
+          [ticker],
+          NaiveDateTime.utc_now() |> NaiveDateTime.add(-30 * 24 * 60 * 60)
+        )
 
       {:noreply, add_tickers_to_view(socket, ticker)}
     end
@@ -153,11 +159,7 @@ defmodule BasketWeb.Live.Overview do
   defp initialize(socket) do
     user = Repo.get(User, socket.assigns.user.id) |> Repo.preload([:clubs, :offices])
 
-    socket =
-      assign(socket,
-        basket: [],
-        user: user
-      )
+    socket = assign(socket, user: user)
 
     case load_tickers(user) do
       [] ->

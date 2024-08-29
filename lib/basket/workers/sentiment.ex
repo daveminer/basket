@@ -22,7 +22,7 @@ defmodule Basket.Worker.Sentiment do
         Logger.warning("No text found for article #{article_id}")
 
       content ->
-        {:ok, _response} = Sentiment.run_sentiment(article_id, symbols, content)
+        :ok = Sentiment.run_sentiment(article_id, symbols, content)
 
         Logger.info("Sentiment analysis completed for article #{article_id}")
     end

@@ -76,7 +76,9 @@ defmodule Basket.MixProject do
       {:cachex, "~> 3.6"},
       {:mox, "1.1.0", only: :test},
       {:test_server, "~> 0.1", only: :test},
-      {:ex_machina, "~> 2.8.0", only: :test}
+      {:ex_machina, "~> 2.8.0", only: :test},
+      {:oban, "~> 2.17"},
+      {:html_entities, "~> 0.5.2"}
     ]
   end
 

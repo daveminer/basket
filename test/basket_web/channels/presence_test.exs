@@ -18,7 +18,7 @@ defmodule BasketWeb.PresenceTest do
       state: state
     } do
       Basket.Websocket.MockClient
-      |> expect(:send_frame, fn _, _ ->
+      |> expect(:send_frame, 2, fn _, _ ->
         :ok
       end)
 
@@ -62,7 +62,7 @@ defmodule BasketWeb.PresenceTest do
       state: state
     } do
       Basket.Websocket.MockClient
-      |> expect(:send_frame, fn _, _ -> :ok end)
+      |> expect(:send_frame, 2, fn _, _ -> :ok end)
 
       assert {:ok, _state} =
                Presence.handle_metas(

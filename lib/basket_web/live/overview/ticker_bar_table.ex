@@ -14,8 +14,18 @@ defmodule BasketWeb.Live.Overview.TickerBarTable do
   alias BasketWeb.Presence
 
   @doc """
-  Creates a row to be added to the ticker bar table. Deserializes the data into TickerBar instances
-  before returning.
+  Looks up the latest quote for the provided ticker(s) and subscribes to the
+  Presence channel
+
+  ## Parameters
+
+    - `tickers`: The ticker(s) to add.
+    - `user_id`: Get this from the socket.
+
+  ## Returns
+
+    - A map of Basket.Http.Alpaca.Bars and any tickers that were not found
+      in the Alpaca API.
   """
   @spec add_ticker(list(String.t()) | String.t(), String.t()) ::
           {:ok, %{bars: list(Bars.t()), tickers_not_found: list(String.t())}}
@@ -56,15 +66,21 @@ defmodule BasketWeb.Live.Overview.TickerBarTable do
       <table id="ticker-table" class="table table-zebra">
         <thead>
           <tr>
-            <th :for={col <- columns()} class="p-0 pb-4 text-center">
+            <th :for={col <- base_columns()} class="p-0 pb-4 text-center">
               <%= Atom.to_string(col) %>
             </th>
+            <%= if @news != [] do %>
+              <th class="p-0 pb-4 text-center">
+                Sentiment
+              </th>
+            <% end %>
+            <th></th>
           </tr>
         </thead>
         <tbody id={@id} phx-hook="CellValueStore" phx-update="replace" class="">
           <tr :for={row <- @rows} id={row.id} class="">
             <td
-              :for={col <- columns()}
+              :for={col <- base_columns()}
               data-key={"#{row.id}_#{Atom.to_string(col)}"}
               class={[
                 "relative p-0",
@@ -77,6 +93,46 @@ defmodule BasketWeb.Live.Overview.TickerBarTable do
                 </span>
               </div>
             </td>
+            <%= if @news != [] do %>
+              <td data-key={"#{row.id}-sentiment"} class="text-center">
+                <% sentiments = Map.get(@news, row.id) %>
+                <div class="flex flex-row justify-center">
+                  <span>
+                    <div>
+                      <.icon
+                        name="hero-hand-thumb-up-solid"
+                        class="h-5 w-5 opacity-40 hover:opacity-70"
+                      />
+                    </div>
+                    <div>
+                      <%= sentiments["positive"] %>
+                    </div>
+                  </span>
+                  <span class="mx-4">
+                    <div>
+                      <.icon
+                        name="hero-question-mark-circle-solid"
+                        class="h-5 w-5 opacity-40 hover:opacity-70"
+                      />
+                    </div>
+                    <div>
+                      <%= sentiments["neutral"] %>
+                    </div>
+                  </span>
+                  <span>
+                    <div>
+                      <.icon
+                        name="hero-hand-thumb-down-solid"
+                        class="h-5 w-5 opacity-40 hover:opacity-70"
+                      />
+                    </div>
+                    <div>
+                      <%= sentiments["negative"] %>
+                    </div>
+                  </span>
+                </div>
+              </td>
+            <% end %>
             <td data-key={"#{row.id}-delete"}>
               <button phx-click="ticker-remove" phx-value-ticker={row.id}>
                 <.icon name="hero-x-mark-solid" class="h-5 w-5 opacity-40 hover:opacity-70" />
@@ -89,5 +145,5 @@ defmodule BasketWeb.Live.Overview.TickerBarTable do
     """
   end
 
-  defp columns, do: [:ticker, :open, :high, :low, :close, :volume, :timestamp]
+  defp base_columns, do: [:ticker, :open, :high, :low, :close, :volume, :timestamp]
 end

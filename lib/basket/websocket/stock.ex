@@ -1,4 +1,4 @@
-defmodule Basket.Websocket.Alpaca do
+defmodule Basket.Websocket.Stock do
   @moduledoc """
   Websocket client adapter for Alpaca Finance.
   Currently only supports the "bars" feed on the minute.
@@ -10,29 +10,34 @@ defmodule Basket.Websocket.Alpaca do
 
   alias Basket.Websocket.Client
 
+  @behaviour Client
+
   @type subscription_fields :: %{
           :bars => list(String.t()),
           :quotes => list(String.t()),
           :trades => list(String.t())
         }
 
-  @auth_success ~s([{\"T\":\"success\",\"msg\":\"authenticated\"}])
-  @connection_success ~s([{\"T\":\"success\",\"msg\":\"connected\"}])
+  @auth_success_msg ~s([{\"T\":\"success\",\"msg\":\"authenticated\"}])
+  @connection_success_msg ~s([{\"T\":\"success\",\"msg\":\"connected\"}])
   @bars_topic "bars"
 
-  @subscribe_message %{
-    action: :subscribe
-  }
-  @unsubscribe_message %{
-    action: :unsubscribe
-  }
+  @impl true
+  def send_frame(pid, message) do
+    WebSockex.send_frame(pid, message)
+  end
+
+  @impl true
+  def start_link(url, _module, term, options) do
+    WebSockex.start_link(url, __MODULE__, term, options)
+  end
 
   def start_link(state) do
-    Logger.info("Starting Alpaca websocket client.")
+    Logger.info("Starting Alpaca stock websocket client.")
 
     Client.start_link(
       url(),
-      Basket.Websocket.Alpaca,
+      Basket.Websocket.Stock,
       state,
       extra_headers: auth_headers()
     )
@@ -41,29 +46,29 @@ defmodule Basket.Websocket.Alpaca do
   @spec subscribe(subscription_fields) :: :error | :ok
   def subscribe(tickers) do
     decoded_message =
-      build_message(@subscribe_message, tickers)
+      build_message(Client.subscribe_msg(), tickers)
       |> Jason.encode!()
 
     case Client.send_frame(client_pid(), {:text, decoded_message}) do
       :ok ->
-        Logger.debug("Subscription message sent: #{inspect(decoded_message)}")
+        Logger.debug("Stock subscription message sent: #{inspect(decoded_message)}")
 
       {:error, error} ->
-        Logger.error("Error sending subscription message: #{inspect(error)}")
+        Logger.error("Error sending stock subscription message: #{inspect(error)}")
         :error
     end
   end
 
   @spec unsubscribe(subscription_fields) :: :error | :ok
   def unsubscribe(tickers) do
-    decoded_message = build_message(@unsubscribe_message, tickers) |> Jason.encode!()
+    decoded_message = build_message(Client.unsubscribe_msg(), tickers) |> Jason.encode!()
 
     case Client.send_frame(client_pid(), {:text, decoded_message}) do
       :ok ->
-        Logger.debug("Subscription removal message sent: #{inspect(decoded_message)}")
+        Logger.debug("Stock subscription removal message sent: #{inspect(decoded_message)}")
 
       {:error, error} ->
-        Logger.error("Error sending subscription removal message: #{inspect(error)}")
+        Logger.error("Error sending stock subscription removal message: #{inspect(error)}")
     end
   end
 
@@ -71,13 +76,13 @@ defmodule Basket.Websocket.Alpaca do
 
   @impl true
   def handle_connect(_conn, state) do
-    Logger.info("Alpaca websocket connected.")
+    Logger.info("Alpaca stock websocket connected.")
     {:ok, state}
   end
 
   @impl true
   def handle_disconnect(disconnect_map, state) do
-    Logger.info("Alpaca websocket disconnected.")
+    Logger.info("Alpaca stock websocket disconnected.")
     super(disconnect_map, state)
   end
 
@@ -87,15 +92,15 @@ defmodule Basket.Websocket.Alpaca do
   subscription once the authorization acknowledgement method is received.
   """
   @impl true
-  def handle_frame({:text, @connection_success}, state) do
-    Logger.info("Connection message received.")
+  def handle_frame({:text, @connection_success_msg}, state) do
+    Logger.info("Connection message received on Stock endpoint.")
 
     {:ok, state}
   end
 
   @impl true
-  def handle_frame({:text, @auth_success}, state) do
-    Logger.info("Alpaca websocket authenticated.")
+  def handle_frame({:text, @auth_success_msg}, state) do
+    Logger.info("Alpaca Stock websocket authenticated.")
 
     {:ok, state}
   end
@@ -107,7 +112,7 @@ defmodule Basket.Websocket.Alpaca do
         Enum.each(decoded_message, &process_message/1)
 
       {:error, error} ->
-        Logger.error("Error decoding websocket message: #{inspect(error)}")
+        Logger.error("Error decoding Stock websocket message: #{inspect(error)}")
     end
 
     {:ok, state}
@@ -123,7 +128,7 @@ defmodule Basket.Websocket.Alpaca do
     Supervisor.which_children(Basket.Supervisor)
     |> Enum.find(fn c ->
       case c do
-        {Basket.Websocket.Alpaca, _pid, :worker, [Basket.Websocket.Alpaca]} ->
+        {Basket.Websocket.Stock, _pid, :worker, [Basket.Websocket.Stock]} ->
           true
 
         _ ->
@@ -145,13 +150,15 @@ defmodule Basket.Websocket.Alpaca do
         handle_bar_updates(message)
 
       "error" ->
-        Logger.error("Error message from Alpaca websocket connection: #{inspect(message)}")
+        Logger.error("Error message from Alpaca Stock websocket connection: #{inspect(message)}")
 
       "subscription" ->
-        Logger.info("Subscription message from Alpaca websocket connection: #{inspect(message)}")
+        Logger.info(
+          "Subscription message from Alpaca Stock websocket connection: #{inspect(message)}"
+        )
 
       _ ->
-        Logger.info("Unhandled websocket message: #{inspect(message)}")
+        Logger.info("Unhandled Stock websocket message: #{inspect(message)}")
     end
   end
 

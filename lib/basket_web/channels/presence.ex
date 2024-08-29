@@ -33,11 +33,13 @@ defmodule BasketWeb.Presence do
   """
   def handle_metas("bars-" <> ticker, %{joins: joins, leaves: leaves}, presences, state) do
     if first_to_join(joins, presences) do
-      Websocket.Alpaca.subscribe(%{bars: [ticker], quotes: [], trades: []})
+      Websocket.Stock.subscribe(%{bars: [ticker], quotes: [], trades: []})
+      Websocket.News.subscribe(%{news: [ticker]})
     end
 
     if last_to_leave(leaves, presences) do
-      Websocket.Alpaca.unsubscribe(%{bars: [ticker], quotes: [], trades: []})
+      Websocket.Stock.unsubscribe(%{bars: [ticker], quotes: [], trades: []})
+      Websocket.News.unsubscribe(%{news: [ticker]})
     end
 
     {:ok, state}

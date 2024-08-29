@@ -48,4 +48,36 @@ defmodule Basket.Http.AlpacaTest do
              } = Alpaca.Impl.list_assets()
     end
   end
+
+  describe "news" do
+    test "returns filtered news articles" do
+      TestServer.add("/v1beta1/news",
+        to: fn conn ->
+          Plug.Conn.resp(conn, 200, Jason.encode!(build(:news_payload)))
+        end
+      )
+
+      config = Application.get_env(:basket, :alpaca)
+      config = Keyword.put(config, :data_http_url, TestServer.url())
+      Application.put_env(:basket, :alpaca, config)
+
+      assert {
+               :ok,
+               %{
+                 "next_page_token" => "MTY0MDk0ODkyMzAwMDAwMDAwMHwyNDg0MzE3MQ==",
+                 "news" => [
+                   %{
+                     "author" => "Charles Gross",
+                     "symbols" => ["AAPL"]
+                   }
+                 ]
+               }
+             } =
+               Alpaca.Impl.news(
+                 page_token: "AAA0MDk0ODkyMzAwMDAwMDAwMHwyNDg0MzE3MQ==",
+                 start_time: DateTime.from_iso8601("2021-12-31T11:08:42Z") |> elem(1),
+                 tickers: ["AAPL"]
+               )
+    end
+  end
 end

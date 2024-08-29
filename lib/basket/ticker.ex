@@ -28,18 +28,39 @@ defmodule Basket.Ticker do
     |> unique_constraint([:ticker, :user_id])
   end
 
+  @spec active_ticker_list() :: list(String.t())
+  def active_ticker_list do
+    tickers_query = from(t in "tickers", select: t.ticker)
+    club_tickers_query = from(ct in "club_tickers", select: ct.ticker)
+
+    from(t in subquery(union(tickers_query, ^club_tickers_query)),
+      distinct: true,
+      select: t.ticker
+    )
+    |> Repo.all()
+  end
+
   @spec add!(user :: User.t(), ticker: String.t()) :: __MODULE__.t()
   def add!(user, ticker) do
     ticker = %__MODULE__{ticker: ticker, user_id: user.id}
     Repo.insert!(ticker)
   end
 
-  @spec for_user(user :: User.t()) :: [Basket.Ticker.t()]
+  @spec for_user(user_or_users :: User.t() | [User.t()]) :: [Basket.Ticker.t()]
   def for_user(nil), do: []
 
-  def for_user(user) do
+  def for_user(users) do
+    users =
+      if is_list(users) do
+        users
+      else
+        [users]
+      end
+
+    user_ids = Enum.map(users, & &1.id)
+
     from(t in __MODULE__,
-      where: t.user_id == ^user.id
+      where: t.user_id in ^user_ids
     )
     |> Repo.all()
   end

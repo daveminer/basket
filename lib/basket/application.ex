@@ -10,12 +10,15 @@ defmodule Basket.Application do
     children = [
       BasketWeb.Telemetry,
       Basket.Repo,
+      {Oban, Application.fetch_env!(:basket, Oban)},
       {DNSCluster, query: Application.get_env(:basket, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Basket.PubSub},
       # Start the Finch HTTP client for sending emails
       {Finch, name: Basket.Finch},
       {Cachex, name: :assets},
-      Basket.Websocket.Alpaca,
+      Basket.Websocket.Stock,
+      Basket.Websocket.News,
+      Basket.Worker.News,
       BasketWeb.Presence,
       # Start to serve requests, typically the last entry
       BasketWeb.Endpoint

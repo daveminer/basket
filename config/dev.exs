@@ -34,7 +34,8 @@ config :basket, :alpaca,
   api_secret: System.get_env("ALPACA_API_SECRET"),
   data_http_url: "https://data.alpaca.markets",
   market_http_url: "https://api.alpaca.markets",
-  market_ws_url: "wss://stream.data.alpaca.markets/v2/iex"
+  market_ws_url: "wss://stream.data.alpaca.markets/v2/iex",
+  news_ws_url: "wss://stream.data.alpaca.markets/v1beta1/news"
 
 # ## SSL Support
 #
@@ -87,8 +88,7 @@ config :phoenix, :plug_init_mode, :runtime
 config :phoenix_live_view, :debug_heex_annotations, true
 
 # Disable swoosh api client as it is only required for production adapters.
-# config :swoosh, :api_client, false
 
-config :basket, Basket.Pow.Mailer,
-  adapter: Swoosh.Adapters.Brevo,
-  api_key: System.get_env("BREVO_API_KEY")
+config :swoosh, :api_client, false
+
+config :basket, :host, "http://localhost:4000"

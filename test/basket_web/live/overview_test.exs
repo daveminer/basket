@@ -82,6 +82,9 @@ defmodule BasketWeb.Live.OverviewTest do
         {:ok, %{"bars" => build(:bars_payload, ticker: "BETA")}}
       end)
 
+      Basket.Http.MockAlpaca
+      |> expect(:news, fn _ -> {:ok, %{"news" => [], "next_page_token" => nil}} end)
+
       Basket.Websocket.MockClient
       |> expect(:send_frame, 8, fn _, _ -> :ok end)
 

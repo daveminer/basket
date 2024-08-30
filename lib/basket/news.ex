@@ -90,6 +90,25 @@ defmodule Basket.News do
     ])
   end
 
+  @spec get_news(String.t(), String.t() | nil) :: list(__MODULE__.t())
+  def get_news(ticker, sentiment_filter) do
+    query =
+      from(n in __MODULE__,
+        where: ^ticker in n.symbols,
+        where: n.creation_date > ago(30, "day")
+      )
+
+    case sentiment_filter do
+      nil ->
+        query
+
+      _ ->
+        query
+        |> where([n], n.sentiment == ^sentiment_filter)
+    end
+    |> Repo.all()
+  end
+
   @doc """
   Returns the counts of news articles per ticker and per sentiment. This creates a resulting map of maps of
   the form `%{"AAPL" => %{"negative" => 1, "neutral" => 14, "positive" => 10}}`.

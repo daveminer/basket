@@ -24,6 +24,11 @@ defmodule Basket.Application do
       BasketWeb.Endpoint
     ]
 
+    OpentelemetryPhoenix.setup()
+    OpentelemetryLiveView.setup()
+    OpentelemetryEcto.setup([:basket, :repo])
+    OpentelemetryOban.setup(trace: [:jobs])
+
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Basket.Supervisor]

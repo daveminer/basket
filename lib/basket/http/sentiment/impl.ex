@@ -51,7 +51,13 @@ defmodule Basket.Http.Sentiment.Impl do
   end
 
   @impl true
-  def process_response_body(body), do: Jason.decode!(body)
+  def process_response_body(body) do
+    if body == "" do
+      %{}
+    else
+      Jason.decode!(body)
+    end
+  end
 
   defp url, do: Application.fetch_env!(:basket, :news)[:sentiment_service_url]
 end

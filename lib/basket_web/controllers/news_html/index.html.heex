@@ -1,0 +1,10 @@
+<div class="flex-col p-8">
+  <BasketWeb.Components.NavRow.render id="nav-row" />
+  <div id="news-list" phx-hook="HideShowArticles" class="mt-10 mx-5">
+    <%= for news <- @news do %>
+      <div class="my-10">
+        <BasketWeb.Components.ArticleSummary.render id="news-#{news.id}" news={news} />
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -45,7 +45,7 @@ defmodule Basket.Worker.News do
     {:noreply, state}
   end
 
-  defp write_article_batch_to_db(tickers, start_time, page_token \\ nil) do
+  def write_article_batch_to_db(tickers, start_time, page_token \\ nil) do
     {:ok, %{"news" => news, "next_page_token" => next_page_token} = _response} =
       Alpaca.news(
         start_time: start_time,
@@ -93,12 +93,12 @@ defmodule Basket.Worker.News do
         }
       end)
 
-    {rows_updated, _term} = Repo.insert_all(News, articles)
+    {rows_updated, _term} = Repo.insert_all(News, articles, on_conflict: :nothing)
 
     rows_not_updated = length(news) - rows_updated
 
     if rows_not_updated != 0 do
-      Logger.error("#{rows_not_updated} rows were not inserted during the news batch insert.")
+      Logger.info("#{rows_not_updated} rows were not inserted during the news batch insert.")
     end
 
     if sentiment_service_active?() do
@@ -107,7 +107,7 @@ defmodule Basket.Worker.News do
           article_id: article.article_id
         })
       end)
-      |> Oban.insert_all()
+      |> Oban.insert_all(on_conflict: :nothing)
     end
 
     if next_page_token do

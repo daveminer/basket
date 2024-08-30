@@ -2,4 +2,13 @@
 set -eu
 
 cd -P -- "$(dirname -- "$0")"
+
+read -r -d '' attributes << EOM
+service.name=basket
+EOM
+
+readonly OTEL_RESOURCE_ATTRIBUTES=`echo $attributes | sed 's/[[:space:]]//g'`
+
+OTEL_RESOURCE_ATTRIBUTES=${OTEL_RESOURCE_ATTRIBUTES} \
+
 PHX_SERVER=true exec ./basket start

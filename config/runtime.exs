@@ -120,10 +120,15 @@ if config_env() == :prod do
     adapter: Swoosh.Adapters.Brevo,
     api_key: System.get_env("BREVO_API_KEY")
 
-  # For this example you need include a HTTP client required by Swoosh API client.
-  # Swoosh supports Hackney and Finch out of the box:
-  #
-  #     config :swoosh, :api_client, Swoosh.ApiClient.Hackney
-  #
-  # See https://hexdocs.pm/swoosh/Swoosh.html#module-installation for details.
+  config :opentelemetry,
+    span_processor: :batch,
+    exporter: :otlp
+
+  config :opentelemetry_exporter,
+    otlp_protocol: :http_protobuf,
+    otlp_endpoint: "https://api.honeycomb.io:443",
+    otlp_headers: [
+      {"x-honeycomb-team", System.get_env("HONEYCOMB_API_KEY")},
+      {"x-honeycomb-dataset", "Basket"}
+    ]
 end

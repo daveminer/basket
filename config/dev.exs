@@ -92,3 +92,15 @@ config :phoenix_live_view, :debug_heex_annotations, true
 config :swoosh, :api_client, false
 
 config :basket, :host, "http://localhost:4000"
+
+# Turn on logging spans to the console via
+# DEBUG_OTEL=true mix phx.server
+
+if System.get_env("DEBUG_OTEL") == "true" do
+  config :opentelemetry, :processors,
+    otel_batch_processor: %{
+      exporter: {:otel_exporter_stdout, []}
+    }
+else
+  config :opentelemetry, traces_exporter: :none
+end

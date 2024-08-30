@@ -22,6 +22,16 @@ defmodule Basket.MixProject do
       dialyzer: [
         plt_add_apps: [:mix, :ex_unit],
         check_plt: true
+      ],
+      releases: [
+        basket: [
+          applications: [
+            basket: :permanent,
+            opentelemetry_exporter: :permanent,
+            # Let OTel crash without taking the app down too.
+            opentelemetry: :temporary
+          ]
+        ]
       ]
     ]
   end
@@ -46,6 +56,13 @@ defmodule Basket.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:opentelemetry_exporter, "~> 1.7"},
+      {:opentelemetry, "~> 1.4"},
+      {:opentelemetry_api, "~> 1.3"},
+      {:opentelemetry_ecto, "~> 1.2"},
+      {:opentelemetry_liveview, "~> 1.0.0-rc.4"},
+      {:opentelemetry_oban, "~> 1.0"},
+      {:opentelemetry_phoenix, "~> 1.2"},
       {:phoenix, "~> 1.7.14"},
       {:phoenix_ecto, "~> 4.6"},
       {:ecto_sql, "~> 3.11"},

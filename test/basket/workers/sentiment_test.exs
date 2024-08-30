@@ -29,7 +29,7 @@ defmodule Basket.Worker.SentimentTest do
       insert(:news, article_id: article_id, content: content, symbols: symbols)
 
       expect(Basket.Http.MockSentiment, :run_sentiment, fn ^article_id, ^symbols, ^content ->
-        {:ok, %{}}
+        :ok
       end)
 
       assert :ok = Sentiment.perform(%Job{args: %{"article_id" => article_id}})

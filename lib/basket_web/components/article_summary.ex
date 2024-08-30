@@ -1,4 +1,8 @@
 defmodule BasketWeb.Components.ArticleSummary do
+  @moduledoc """
+  Provides a summary of a news article as an element in the news index.
+  """
+
   import BasketWeb.CoreComponents
 
   use Phoenix.Component

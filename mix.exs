@@ -26,10 +26,10 @@ defmodule Basket.MixProject do
       releases: [
         basket: [
           applications: [
-            basket: :permanent,
             opentelemetry_exporter: :permanent,
             # Let OTel crash without taking the app down too.
-            opentelemetry: :temporary
+            opentelemetry: :temporary,
+            basket: :permanent
           ]
         ]
       ]

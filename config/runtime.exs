@@ -25,7 +25,6 @@ config :basket, :news,
   sentiment_servic_enabled: System.get_env("SENTIMENT_SERVICE_ENABLED"),
   sentiment_service_url: System.get_env("SENTIMENT_SERVICE_URL") || "http://localhost:8000"
 
-
 if config_env() == :prod do
   database_url =
     System.get_env("DATABASE_URL") ||

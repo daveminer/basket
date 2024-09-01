@@ -99,7 +99,7 @@ defmodule Basket.Worker.News do
       Logger.info("#{rows_not_updated} rows were not inserted during the news batch insert.")
     end
 
-    if sentiment_service_active?() do
+    if sentiment_service_enabled?() do
       Enum.map(articles, fn article ->
         Sentiment.new(%{
           article_id: article.article_id
@@ -117,7 +117,7 @@ defmodule Basket.Worker.News do
 
   defp interval, do: Application.get_env(:basket, :news)[:ms_between_checks]
 
-  defp sentiment_service_active? do
-    Application.get_env(:basket, :news)[:sentiment_service_active]
+  defp sentiment_service_enabled? do
+    Application.get_env(:basket, :news)[:sentiment_service_enabled]
   end
 end

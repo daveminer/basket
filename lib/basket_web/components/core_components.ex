@@ -74,7 +74,7 @@ defmodule BasketWeb.CoreComponents do
                   phx-click={JS.exec("data-cancel", to: "##{@id}")}
                   type="button"
                   class="-m-3 flex-none p-3 opacity-20 hover:opacity-40"
-                  aria-label={gettext("close")}
+                  aria-label={Gettext.gettext(Basket.Gettext, "close")}
                 >
                   <.icon name="hero-x-mark-solid" class="h-5 w-5" />
                 </button>
@@ -128,7 +128,7 @@ defmodule BasketWeb.CoreComponents do
         <%= @title %>
       </p>
       <p class="mt-2 text-sm leading-5"><%= msg %></p>
-      <button type="button" class="group absolute top-1 right-1 p-2" aria-label={gettext("close")}>
+      <button type="button" class="group absolute top-1 right-1 p-2" aria-label={Gettext.gettext(Basket.Gettext, "close")}>
         <.icon name="hero-x-mark-solid" class="h-5 w-5 opacity-40 group-hover:opacity-70" />
       </button>
     </div>
@@ -519,7 +519,7 @@ defmodule BasketWeb.CoreComponents do
               <%= col[:label] %>
             </th>
             <th :if={@action != []} class="relative p-0 pb-4">
-              <span class="sr-only"><%= gettext("Actions") %></span>
+              <span class="sr-only"><%= Gettext.gettext(Basket.Gettext, "Actions") %></span>
             </th>
           </tr>
         </thead>
@@ -707,9 +707,9 @@ defmodule BasketWeb.CoreComponents do
     # with our gettext backend as first argument. Translations are
     # available in the errors.po file (as we use the "errors" domain).
     if count = opts[:count] do
-      Gettext.dngettext(BasketWeb.Gettext, "errors", msg, msg, count, opts)
+      Gettext.dngettext(Basket.Gettext, "errors", msg, msg, count, opts)
     else
-      Gettext.dgettext(BasketWeb.Gettext, "errors", msg, opts)
+      Gettext.dgettext(Basket.Gettext, "errors", msg, opts)
     end
   end
 

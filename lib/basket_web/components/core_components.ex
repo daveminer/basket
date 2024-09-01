@@ -20,7 +20,6 @@ defmodule BasketWeb.CoreComponents do
   alias Phoenix.HTML.Form
   alias Phoenix.LiveView.JS
 
-
   @doc """
   Renders a modal.
 

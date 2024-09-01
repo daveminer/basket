@@ -49,6 +49,7 @@ defmodule BasketWeb do
       use Phoenix.Controller,
         formats: [:html, :json],
         layouts: [html: BasketWeb.Layouts]
+
       use Gettext, backend: Basket.Gettext
 
       import Plug.Conn

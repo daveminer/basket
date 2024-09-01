@@ -13,15 +13,13 @@ defmodule Basket.Worker.News do
 
   alias Basket.{Http.Alpaca, News, Repo, Ticker, Worker.Sentiment}
 
-  @interval Application.compile_env(:basket, :news)[:ms_between_checks]
-
   def start_link(_) do
     GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
   end
 
   @impl true
   def init(state) do
-    :timer.send_interval(@interval, :work)
+    :timer.send_interval(interval(), :work)
 
     {:ok, state}
   end
@@ -116,6 +114,8 @@ defmodule Basket.Worker.News do
       :ok
     end
   end
+
+  defp interval, do: Application.get_env(:basket, :news)[:ms_between_checks]
 
   defp sentiment_service_active? do
     Application.get_env(:basket, :news)[:sentiment_service_active]

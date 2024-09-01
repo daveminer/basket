@@ -26,8 +26,6 @@ defmodule Basket.Application do
 
     OpentelemetryPhoenix.setup()
     OpentelemetryLiveView.setup()
-    OpentelemetryEcto.setup([:basket, :repo])
-    OpentelemetryOban.setup(trace: [:jobs])
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options

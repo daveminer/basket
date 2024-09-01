@@ -15,7 +15,7 @@ defmodule BasketWeb.CoreComponents do
   Icons are provided by [heroicons](https://heroicons.com). See `icon/1` for usage.
   """
   use Phoenix.Component
-  use Gettext, backend: Basket.Gettext
+  use Gettext, backend: BasketWeb.Gettext
 
   alias Phoenix.HTML.Form
   alias Phoenix.LiveView.JS
@@ -74,7 +74,7 @@ defmodule BasketWeb.CoreComponents do
                   phx-click={JS.exec("data-cancel", to: "##{@id}")}
                   type="button"
                   class="-m-3 flex-none p-3 opacity-20 hover:opacity-40"
-                  aria-label={Gettext.gettext(Basket.Gettext, "close")}
+                  aria-label={gettext("close")}
                 >
                   <.icon name="hero-x-mark-solid" class="h-5 w-5" />
                 </button>
@@ -131,7 +131,7 @@ defmodule BasketWeb.CoreComponents do
       <button
         type="button"
         class="group absolute top-1 right-1 p-2"
-        aria-label={Gettext.gettext(Basket.Gettext, "close")}
+        aria-label={gettext("close")}
       >
         <.icon name="hero-x-mark-solid" class="h-5 w-5 opacity-40 group-hover:opacity-70" />
       </button>
@@ -523,7 +523,7 @@ defmodule BasketWeb.CoreComponents do
               <%= col[:label] %>
             </th>
             <th :if={@action != []} class="relative p-0 pb-4">
-              <span class="sr-only"><%= Gettext.gettext(Basket.Gettext, "Actions") %></span>
+              <span class="sr-only"><%= gettext("Actions") %></span>
             </th>
           </tr>
         </thead>

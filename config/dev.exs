@@ -93,11 +93,6 @@ config :swoosh, :api_client, false
 
 config :basket, :host, "http://localhost:4000"
 
-config :basket, :news,
-  ms_between_checks: System.get_env("TIME_BETWEEN_NEWS_CHECKS") || 1000 * 60 * 5,
-  sentiment_service_enabled: System.get_env("SENTIMENT_SERVICE_ENABLED"),
-  sentiment_service_url: System.get_env("SENTIMENT_SERVICE_URL") || "http://localhost:8000"
-
 # Turn on logging spans to the console via
 # DEBUG_OTEL=true mix phx.server
 

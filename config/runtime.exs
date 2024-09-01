@@ -20,6 +20,12 @@ if System.get_env("PHX_SERVER") do
   config :basket, BasketWeb.Endpoint, server: true
 end
 
+config :basket, :news,
+  ms_between_checks: System.get_env("TIME_BETWEEN_NEWS_CHECKS") || 1000 * 60 * 5,
+  sentiment_servic_enabled: System.get_env("SENTIMENT_SERVICE_ENABLED"),
+  sentiment_service_url: System.get_env("SENTIMENT_SERVICE_URL") || "http://localhost:8000"
+
+
 if config_env() == :prod do
   database_url =
     System.get_env("DATABASE_URL") ||

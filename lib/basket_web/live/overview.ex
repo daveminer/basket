@@ -41,7 +41,8 @@ defmodule BasketWeb.Live.Overview do
       :ok =
         Basket.Worker.News.write_article_batch_to_db(
           [ticker],
-          NaiveDateTime.utc_now() |> NaiveDateTime.add(-30 * 24 * 60 * 60)
+          NaiveDateTime.utc_now() |> NaiveDateTime.add(-30 * 24 * 60 * 60),
+          nil
         )
 
       {:noreply, add_tickers_to_view(socket, ticker)}

@@ -15,6 +15,19 @@ defmodule BasketWeb.Router do
     plug :put_secure_browser_headers, %{"content-security-policy" => "default-src 'self' data:"}
   end
 
+  pipeline :news_page do
+    plug :accepts, ["html"]
+    plug :fetch_session
+    plug :fetch_live_flash
+    plug :put_root_layout, html: {BasketWeb.Layouts, :root}
+    plug :protect_from_forgery
+
+    plug :put_secure_browser_headers, %{
+      "content-security-policy" =>
+        "default-src 'self' data:; img-src data: https://editorial-assets.benzinga.com https://thearorareport.com https://www.benzinga.com; script-src 'self' https://platform.twitter.com; style-src 'self'; frame-src 'self';"
+    }
+  end
+
   pipeline :api do
     plug :accepts, ["json"]
   end
@@ -35,13 +48,15 @@ defmodule BasketWeb.Router do
 
     live "/", Live.Overview
 
-    get "/news/:ticker", NewsController, :index
-
     resources "/settings", SettingsController, only: [:index, :update]
+
+    post "/sentiment/new/callback", SentimentController, :callback
   end
 
   scope "/", BasketWeb do
-    post "/sentiment/new/callback", SentimentController, :callback
+    pipe_through [:news_page, :authenticated]
+
+    get "/news/:ticker", NewsController, :index
   end
 
   # Other scopes may use custom stacks.

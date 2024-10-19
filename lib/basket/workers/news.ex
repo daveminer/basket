@@ -36,14 +36,14 @@ defmodule Basket.Worker.News do
         _ -> NaiveDateTime.utc_now() |> NaiveDateTime.add(-30, :day)
       end
 
-    tickers = Ticker.active_ticker_list()
-
-    write_article_batch_to_db(tickers, start_time)
+    Ticker.active_ticker_list() |> write_article_batch_to_db(start_time, nil)
 
     {:noreply, state}
   end
 
-  def write_article_batch_to_db(tickers, start_time, page_token \\ nil) do
+  def write_article_batch_to_db([], _start_time, _page_token), do: :ok
+
+  def write_article_batch_to_db(tickers, start_time, page_token) do
     {:ok, %{"news" => news, "next_page_token" => next_page_token} = _response} =
       Alpaca.news(
         start_time: start_time,

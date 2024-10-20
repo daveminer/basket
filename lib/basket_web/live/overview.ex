@@ -114,7 +114,7 @@ defmodule BasketWeb.Live.Overview do
 
   def render(assigns) do
     ~H"""
-    <div class="flex-col p-8">
+    <div class="flex-col p-8 bg-base-100">
       <NavRow.render id="nav-row" />
       <div class="flex justify-between items-center mb-5">
         <.live_component

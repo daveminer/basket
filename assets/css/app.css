@@ -3,3 +3,12 @@
 @import "tailwindcss/utilities";
 
 /* This file is for your main application CSS */
+
+.article-summary a {
+    text-decoration: underline;
+}
+
+.article-summary p,
+.article-summary img {
+    margin-bottom: 1.5em;
+}

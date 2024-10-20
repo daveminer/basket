@@ -23,7 +23,7 @@ defmodule BasketWeb.Components.ArticleSummary do
         </h2>
         <p><%= @news.summary %></p>
 
-        <div id={"article-content-#{@news.id}"} class="hidden">
+        <div id={"article-content-#{@news.id}"} class="hidden article-summary">
           <%= HtmlSanitizeEx.basic_html(@news.content) |> Phoenix.HTML.raw() %>
         </div>
 

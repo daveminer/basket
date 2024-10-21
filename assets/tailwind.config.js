@@ -15,14 +15,14 @@ module.exports = {
     "../lib/basket_web/**/*.*ex",
   ],
   daisyui: {
-      themes: false, // true: all themes | false: only light + dark | array: specific themes like this ["light", "dark", "cupcake"]
-      darkTheme: "dark", // name of one of the included themes for dark mode
-      base: true, // applies background color and foreground color for root element by default
-      styled: true, // include daisyUI colors and design decisions for all components
-      utils: true, // adds responsive and modifier utility classes
-      rtl: false, // rotate style direction from left-to-right to right-to-left. You also need to add dir="rtl" to your html tag and install `tailwindcss-flip` plugin for Tailwind CSS.
-      prefix: "", // prefix for daisyUI classnames (components, modifiers and responsive class names. Not colors)
-      logs: false, // <-- to remove logs from the console.
+    themes: ['fantasy', 'night'], // true: all themes | false: only light + dark | array: specific themes like this ["light", "dark", "cupcake"]
+    darkTheme: 'night', // name of one of the included themes for dark mode
+    base: true, // applies background color and foreground color for root element by default
+    styled: true, // include daisyUI colors and design decisions for all components
+    utils: true, // adds responsive and modifier utility classes
+    rtl: false, // rotate style direction from left-to-right to right-to-left. You also need to add dir="rtl" to your html tag and install `tailwindcss-flip` plugin for Tailwind CSS.
+    prefix: "", // prefix for daisyUI classnames (components, modifiers and responsive class names. Not colors)
+    logs: false, // <-- to remove logs from the console.
   },
   plugins: [
     require('daisyui'),
@@ -32,15 +32,15 @@ module.exports = {
     //
     //     <div class="phx-click-loading:animate-ping">
     //
-    plugin(({addVariant}) => addVariant("phx-no-feedback", [".phx-no-feedback&", ".phx-no-feedback &"])),
-    plugin(({addVariant}) => addVariant("phx-click-loading", [".phx-click-loading&", ".phx-click-loading &"])),
-    plugin(({addVariant}) => addVariant("phx-submit-loading", [".phx-submit-loading&", ".phx-submit-loading &"])),
-    plugin(({addVariant}) => addVariant("phx-change-loading", [".phx-change-loading&", ".phx-change-loading &"])),
+    plugin(({ addVariant }) => addVariant("phx-no-feedback", [".phx-no-feedback&", ".phx-no-feedback &"])),
+    plugin(({ addVariant }) => addVariant("phx-click-loading", [".phx-click-loading&", ".phx-click-loading &"])),
+    plugin(({ addVariant }) => addVariant("phx-submit-loading", [".phx-submit-loading&", ".phx-submit-loading &"])),
+    plugin(({ addVariant }) => addVariant("phx-change-loading", [".phx-change-loading&", ".phx-change-loading &"])),
 
     // Embeds Heroicons (https://heroicons.com) into your app.css bundle
     // See your `CoreComponents.icon/1` for more information.
     //
-    plugin(function({matchComponents, theme}) {
+    plugin(function ({ matchComponents, theme }) {
       let iconsDir = path.join(__dirname, "./vendor/heroicons/optimized")
       let values = {}
       let icons = [
@@ -51,11 +51,11 @@ module.exports = {
       icons.forEach(([suffix, dir]) => {
         fs.readdirSync(path.join(iconsDir, dir)).forEach(file => {
           let name = path.basename(file, ".svg") + suffix
-          values[name] = {name, fullPath: path.join(iconsDir, dir, file)}
+          values[name] = { name, fullPath: path.join(iconsDir, dir, file) }
         })
       })
       matchComponents({
-        "hero": ({name, fullPath}) => {
+        "hero": ({ name, fullPath }) => {
           let content = fs.readFileSync(fullPath).toString().replace(/\r?\n|\r/g, "")
           return {
             [`--hero-${name}`]: `url('data:image/svg+xml;utf8,${content}')`,
@@ -69,7 +69,7 @@ module.exports = {
             "height": theme("spacing.5")
           }
         }
-      }, {values})
+      }, { values })
     }),
   ]
 }

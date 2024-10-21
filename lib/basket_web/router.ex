@@ -24,7 +24,7 @@ defmodule BasketWeb.Router do
 
     plug :put_secure_browser_headers, %{
       "content-security-policy" =>
-        "default-src 'self' data:; img-src data: https://editorial-assets.benzinga.com https://thearorareport.com https://www.benzinga.com; script-src 'self' https://platform.twitter.com; style-src 'self'; frame-src 'self';"
+        "default-src 'self' data:; img-src data: https://editorial-assets.benzinga.com https://thearorareport.com https://www.benzinga.com; script-src 'self' https://platform.twitter.com; style-src 'self'; frame-src 'self' https://platform.twitter.com;"
     }
   end
 

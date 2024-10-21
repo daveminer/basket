@@ -5,9 +5,14 @@ defmodule Basket.Worker.NewsTest do
   import Mox
 
   alias Basket.Worker.News
-  alias Basket.{News, Repo}
+  alias Basket.{News, Repo, Ticker}
 
   describe "handle_info/2" do
+    setup do
+      _ticker = Basket.Repo.insert!(%Ticker{ticker: "AAPL"})
+      :ok
+    end
+
     test "fetches and inserts articles into the database" do
       news_data = %{
         "news" => [
@@ -29,7 +34,7 @@ defmodule Basket.Worker.NewsTest do
       }
 
       Basket.Http.MockAlpaca
-      |> expect(:news, fn _params -> {:ok, news_data} end)
+      |> expect(:news, fn _ -> {:ok, news_data} end)
 
       Basket.Http.MockSentiment
       |> expect(:run_sentiment, fn _, _, _ -> :ok end)

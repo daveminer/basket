@@ -14,7 +14,13 @@ defmodule BasketWeb.Components.NavRow do
       <div>
         <label class="swap swap-rotate">
           <!-- this hidden checkbox controls the state -->
-          <input type="checkbox" class="theme-controller" value="night" />
+          <input
+            id="theme-controller"
+            type="checkbox"
+            phx-hook="ThemeSwitcher"
+            class="theme-controller"
+            value="night"
+          />
           <!-- sun icon -->
           <svg
             class="swap-off h-10 w-10 fill-current"

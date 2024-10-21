@@ -31,8 +31,6 @@ topbar.config({ barColors: { 0: "#29d" }, shadowColor: "rgba(0, 0, 0, .3)" })
 window.addEventListener("phx:page-loading-start", _info => topbar.show(300))
 window.addEventListener("phx:page-loading-stop", _info => topbar.hide())
 
-window.addEventListener("toggle-darkmode", _e => toggleDarkMode())
-
 // connect if there are any LiveViews on the page
 liveSocket.connect()
 
@@ -40,4 +38,24 @@ liveSocket.connect()
 // >> liveSocket.enableDebug()
 // >> liveSocket.enableLatencySim(1000)  // enabled for duration of browser session
 // >> liveSocket.disableLatencySim()
+
+document.addEventListener('DOMContentLoaded', function () {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    } else {
+        document.documentElement.setAttribute('data-theme', 'fantasy');
+    }
+});
+
+// On theme change
+const themeController = document.querySelector('.theme-controller');
+if (themeController) {
+    themeController.addEventListener('change', function () {
+        const newTheme = themeController.checked ? 'night' : 'fantasy';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+    });
+}
+
 window.liveSocket = liveSocket

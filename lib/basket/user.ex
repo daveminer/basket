@@ -35,5 +35,5 @@ defmodule Basket.User do
     Repo.update!(changeset)
   end
 
-  def is_officer?(user), do: Enum.any?(user.offices)
+  def officer?(user), do: Enum.any?(user.offices)
 end

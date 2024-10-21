@@ -118,7 +118,7 @@ defmodule BasketWeb.Live.Overview do
       <NavRow.render id="nav-row" />
       <div class="flex justify-between items-center mb-5">
         <.live_component
-          :if={!club_mode?(@user) || User.is_officer?(@user)}
+          :if={!club_mode?(@user) || User.officer?(@user)}
           module={Search}
           id="stock-search-input"
         />
@@ -128,7 +128,7 @@ defmodule BasketWeb.Live.Overview do
         id="ticker-bar-table"
         news={@news}
         rows={@basket}
-        can_delete={!club_mode?(@user) || User.is_officer?(@user)}
+        can_delete={!club_mode?(@user) || User.officer?(@user)}
       />
     </div>
     """

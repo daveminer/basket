@@ -115,7 +115,8 @@ defmodule Basket.Worker.News do
     end
   end
 
-  defp interval, do: Application.get_env(:basket, :news)[:ms_between_checks] |> String.to_integer()
+  defp interval,
+    do: Application.get_env(:basket, :news)[:ms_between_checks] |> String.to_integer()
 
   defp sentiment_service_enabled? do
     Application.get_env(:basket, :news)[:sentiment_service_enabled]

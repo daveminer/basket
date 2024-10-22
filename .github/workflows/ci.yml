@@ -33,27 +33,27 @@ jobs:
         with:
           otp-version: "27.0"
           elixir-version: "1.17"
-      - name: Cache deps Directory
-        id: cache-deps
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-elixir-deps
-        with:
-          path: deps
-          key: ${{ runner.os }}-mix-${{ env.cache-name }}-${{ hashFiles('**/mix.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-mix-${{ env.cache-name }}-
-      - name: Cache Compiled build Directiory
-        id: cache-build
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-compiled-build
-        with:
-          path: _build
-          key: ${{ runner.os }}-mix-${{ env.cache-name }}-${{ hashFiles('**/mix.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-mix-${{ env.cache-name }}-
-            ${{ runner.os }}-mix-
+      # - name: Cache deps Directory
+      #   id: cache-deps
+      #   uses: actions/cache@v3
+      #   env:
+      #     cache-name: cache-elixir-deps
+      #   with:
+      #     path: deps
+      #     key: ${{ runner.os }}-mix-${{ env.cache-name }}-${{ hashFiles('**/mix.lock') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-mix-${{ env.cache-name }}-
+      # - name: Cache Compiled build Directiory
+      #   id: cache-build
+      #   uses: actions/cache@v3
+      #   env:
+      #     cache-name: cache-compiled-build
+      #   with:
+      #     path: _build
+      #     key: ${{ runner.os }}-mix-${{ env.cache-name }}-${{ hashFiles('**/mix.lock') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-mix-${{ env.cache-name }}-
+      #       ${{ runner.os }}-mix-
       - name: Fetch Dependencies
         run: mix deps.get
       - name: Check Retired Dependencies
@@ -72,19 +72,19 @@ jobs:
         run: mix credo --strict
       - name: Security Analysis
         run: mix sobelow -i Config.HTTPS
-      - name: Restore PLT Cache
-        uses: actions/cache@v3
-        id: plt_cache
-        with:
-          key: |
-            ${{ runner.os }}-${{ steps.beam.outputs.elixir-version }}-${{ steps.beam.outputs.otp-version }}-plt
-          restore-keys: |
-            ${{ runner.os }}-${{ steps.beam.outputs.elixir-version }}-${{ steps.beam.outputs.otp-version }}-plt
-          path: |
-            priv/pltsas
-      - name: Create PLTs
-        if: steps.plt_cache.outputs.cache-hit != 'true'
-        run: mix dialyzer --plt
+      # - name: Restore PLT Cache
+      #   uses: actions/cache@v3
+      #   id: plt_cache
+      #   with:
+      #     key: |
+      #       ${{ runner.os }}-${{ steps.beam.outputs.elixir-version }}-${{ steps.beam.outputs.otp-version }}-plt
+      #     restore-keys: |
+      #       ${{ runner.os }}-${{ steps.beam.outputs.elixir-version }}-${{ steps.beam.outputs.otp-version }}-plt
+      #     path: |
+      #       priv/pltsas
+      # - name: Create PLTs
+      #   if: steps.plt_cache.outputs.cache-hit != 'true'
+      #   run: mix dialyzer --plt
       - name: Static Analysis for Types
         run: mix dialyzer
       - name: Run Tests and Coverage Report

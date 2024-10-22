@@ -95,7 +95,8 @@ defmodule Basket.News do
     query =
       from(n in __MODULE__,
         where: ^ticker in n.symbols,
-        where: n.creation_date > ago(30, "day")
+        where: n.creation_date > ago(30, "day"),
+        order_by: [desc: n.creation_date]
       )
 
     case sentiment_filter do

@@ -9,7 +9,7 @@ defmodule BasketWeb.Components.ArticleSummary do
 
   def render(assigns) do
     ~H"""
-    <div class="card bg-base-100 shadow-xl">
+    <div class="card shadow-xl">
       <div class="card-body">
         <div class="flex text-sm justify-end w-auto">
           <%= @news.updated_date |> Calendar.strftime("%B %d, %Y %I:%M %p") %>
@@ -24,7 +24,7 @@ defmodule BasketWeb.Components.ArticleSummary do
         <p><%= @news.summary %></p>
 
         <div id={"article-content-#{@news.id}"} class="hidden">
-          <%= Phoenix.HTML.raw(@news.content) %>
+          <%= HtmlSanitizeEx.basic_html(@news.content) |> Phoenix.HTML.raw() %>
         </div>
 
         <div id={"article-toggle-open-#{@news.id}"} class="flex card-actions justify-end">

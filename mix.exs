@@ -5,7 +5,7 @@ defmodule Basket.MixProject do
     [
       app: :basket,
       version: "0.2.1",
-      elixir: "~> 1.14",
+      elixir: "~> 1.16.0",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
@@ -56,7 +56,7 @@ defmodule Basket.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:opentelemetry_exporter, "~> 1.7"},
+      {:opentelemetry_exporter, "~> 1.8"},
       {:opentelemetry, "~> 1.4"},
       {:opentelemetry_api, "~> 1.3"},
       {:opentelemetry_liveview, "~> 1.0.0-rc.4"},
@@ -93,7 +93,8 @@ defmodule Basket.MixProject do
       {:test_server, "~> 0.1", only: :test},
       {:ex_machina, "~> 2.8.0", only: :test},
       {:oban, "~> 2.17"},
-      {:html_entities, "~> 0.5.2"}
+      {:html_entities, "~> 0.5.2"},
+      {:html_sanitize_ex, "~> 1.4"}
     ]
   end
 

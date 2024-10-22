@@ -48,7 +48,7 @@ defmodule Basket.News do
 
   @doc ~S"""
   Create a new Bars instance from a ticker update message.
-  The 'id' field is used for tracking updates in the LiveView stream.
+  The 'id' field is used to track updates in the LiveView stream.
 
   ## Example
     iex> new("AAA", %{"c" => 1.0, "h" => 1.0, "l" => 1.0, "n" => 1, "o" => 1.0, "t" => "2023-11-15T20:59:00Z", "v" => 1, "vw" => 1.0})

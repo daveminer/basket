@@ -8,7 +8,7 @@ defmodule Basket.NewsTest do
     article_id: "123",
     author: "Jane Doe",
     content: "This is a test article",
-    creation_date: ~U[2024-08-23 10:00:00Z],
+    creation_date: DateTime.utc_now() |> DateTime.add(-1, :day) |> DateTime.truncate(:second),
     headline: "Test Headline",
     images: [%{"url" => "http://example.com/image.png"}],
     sentiment: "positive",
@@ -17,7 +17,7 @@ defmodule Basket.NewsTest do
     source: "Example Source",
     summary: "Test Summary",
     symbols: ["AAA", "BBB"],
-    updated_date: ~U[2024-08-23 10:00:00Z],
+    updated_date: DateTime.utc_now() |> DateTime.add(-1, :day) |> DateTime.truncate(:second),
     url: "http://example.com/article"
   }
 

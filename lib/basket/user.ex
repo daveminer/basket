@@ -11,6 +11,18 @@ defmodule Basket.User do
 
   @type t :: %__MODULE__{}
 
+  schema "users" do
+    many_to_many :clubs, Basket.Club, join_through: "club_members"
+
+    many_to_many :offices, Basket.Club, join_through: "club_officers"
+
+    field :settings, :map
+
+    pow_user_fields()
+
+    timestamps()
+  end
+
   def changeset(user_or_changeset, attrs) do
     user_or_changeset
     |> pow_changeset(attrs)
@@ -23,15 +35,5 @@ defmodule Basket.User do
     Repo.update!(changeset)
   end
 
-  schema "users" do
-    many_to_many :clubs, Basket.Club, join_through: "club_members"
-
-    many_to_many :offices, Basket.Club, join_through: "club_officers"
-
-    field :settings, :map
-
-    pow_user_fields()
-
-    timestamps()
-  end
+  def officer?(user), do: Enum.any?(user.offices)
 end

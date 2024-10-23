@@ -11,7 +11,6 @@ defmodule Basket.MixProject do
       aliases: aliases(),
       deps: deps(),
       compilers: Mix.compilers(),
-      deps: deps(),
       test_coverage: [summary: [threshold: 0]],
       preferred_cli_env: [
         coveralls: :test,

@@ -19,7 +19,9 @@ defmodule Basket.Worker.News do
 
   @impl true
   def init(state) do
-    :timer.send_interval(interval(), :work)
+    if sentiment_service_enabled?() do
+      :timer.send_interval(interval(), :work)
+    end
 
     {:ok, state}
   end
@@ -99,14 +101,12 @@ defmodule Basket.Worker.News do
       Logger.info("#{rows_not_updated} rows were not inserted during the news batch insert.")
     end
 
-    if sentiment_service_enabled?() do
-      Enum.map(articles, fn article ->
-        Sentiment.new(%{
-          article_id: article.article_id
-        })
-      end)
-      |> Oban.insert_all(on_conflict: :nothing)
-    end
+    Enum.map(articles, fn article ->
+      Sentiment.new(%{
+        article_id: article.article_id
+      })
+    end)
+    |> Oban.insert_all(on_conflict: :nothing)
 
     if next_page_token do
       write_article_batch_to_db(tickers, start_time, next_page_token)

@@ -8,7 +8,7 @@ defmodule BasketWeb.SettingsHTML do
     <div class="flex-col p-4">
       <NavRow.render id="nav-row" />
 
-      <%= if @officer do %>
+      <%= if @current_user.offices > 0 do %>
         <.form for={@form} class="flex flex-col" action="/invitations" method="post">
           <span class="mr-2">
             Send a club invite

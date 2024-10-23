@@ -28,7 +28,7 @@ sentiment_service_enabled =
 
 config :basket, :news,
   ms_between_checks: System.get_env("TIME_BETWEEN_NEWS_CHECKS") || 1000 * 60 * 5,
-  sentiment_service_enabled: ^sentiment_service_enabled,
+  sentiment_service_enabled: sentiment_service_enabled,
   sentiment_service_url: System.get_env("SENTIMENT_SERVICE_URL") || "http://localhost:8000"
 
 if config_env() == :prod do

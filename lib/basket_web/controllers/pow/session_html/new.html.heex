@@ -1,57 +1,56 @@
-<div class="mx-auto max-w-sm">
+<div class="w-screen h-screen">
   <.header class="text-center mb-3">
     Welcome to Basket!
   </.header>
 
   <img src={~p"/images/stock_basket.webp"} width="216" class="mx-auto block" />
 
-  <.simple_form :let={f} for={@changeset} as={:user} action={@action} phx-update="ignore">
-    <.error :if={@changeset.action}>
-      Oops, something went wrong! Please check the errors below.
-    </.error>
-    <.input
-      field={f[Pow.Ecto.Schema.user_id_field(@changeset)]}
-      type={(Pow.Ecto.Schema.user_id_field(@changeset) == :email && "email") || "text"}
-      label={Phoenix.Naming.humanize(Pow.Ecto.Schema.user_id_field(@changeset))}
-      required
-    />
-    <.input field={f[:password]} type="password" label="Password" value={nil} required />
-
-    <:actions
-      :let={f}
-      :if={
-        Pow.Plug.extension_enabled?(@conn, PowPersistentSession) ||
-          Pow.Plug.extension_enabled?(@conn, PowResetPassword)
-      }
-    >
+  <div class="mx-auto w-1/2">
+    <.simple_form :let={f} for={@changeset} as={:user} action={@action} phx-update="ignore">
+      <.error :if={@changeset.action}>
+        Oops, something went wrong! Please check the errors below.
+      </.error>
       <.input
-        :if={Pow.Plug.extension_enabled?(@conn, PowPersistentSession)}
-        field={f[:persistent_session]}
-        type="checkbox"
-        label="Keep me logged in"
+        field={f[Pow.Ecto.Schema.user_id_field(@changeset)]}
+        type={(Pow.Ecto.Schema.user_id_field(@changeset) == :email && "email") || "text"}
+        label={Phoenix.Naming.humanize(Pow.Ecto.Schema.user_id_field(@changeset))}
+        required
       />
-      <.link
-        :if={Pow.Plug.extension_enabled?(@conn, PowResetPassword)}
-        href={
-          Pow.Phoenix.Routes.path_for(
-            @conn,
-            PowResetPassword.Phoenix.ResetPasswordController,
-            :new
-          )
-        }
-        class="text-sm font-semibold"
-      >
-        Forgot your password?
-      </.link>
-    </:actions>
+      <.input field={f[:password]} type="password" label="Password" value={nil} required />
 
-    <:actions>
-      <.button
-        phx-disable-with="Signing in..."
-        class="w-full text-black bg-gray-300 hover:bg-gray-400"
+      <:actions
+        :let={f}
+        :if={
+          Pow.Plug.extension_enabled?(@conn, PowPersistentSession) ||
+            Pow.Plug.extension_enabled?(@conn, PowResetPassword)
+        }
       >
-        Sign in <span aria-hidden="true">→</span>
-      </.button>
-    </:actions>
-  </.simple_form>
+        <.input
+          :if={Pow.Plug.extension_enabled?(@conn, PowPersistentSession)}
+          field={f[:persistent_session]}
+          type="checkbox"
+          label="Keep me logged in"
+        />
+        <.link
+          :if={Pow.Plug.extension_enabled?(@conn, PowResetPassword)}
+          href={
+            Pow.Phoenix.Routes.path_for(
+              @conn,
+              PowResetPassword.Phoenix.ResetPasswordController,
+              :new
+            )
+          }
+          class="text-sm font-semibold"
+        >
+          Forgot your password?
+        </.link>
+      </:actions>
+
+      <:actions>
+        <.button phx-disable-with="Signing in..." class="w-full">
+          Sign in <span aria-hidden="true">→</span>
+        </.button>
+      </:actions>
+    </.simple_form>
+  </div>
 </div>

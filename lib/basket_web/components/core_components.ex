@@ -238,7 +238,7 @@ defmodule BasketWeb.CoreComponents do
   def simple_form(assigns) do
     ~H"""
     <.form :let={f} for={@for} as={@as} {@rest}>
-      <div class="mt-10 space-y-8 bg-white">
+      <div class="mt-10 space-y-8">
         <%= render_slot(@inner_block, f) %>
         <div :for={action <- @actions} class="mt-2 flex items-center justify-between gap-6">
           <%= render_slot(action, f) %>
@@ -412,12 +412,14 @@ defmodule BasketWeb.CoreComponents do
         name={@name}
         id={@id}
         value={Phoenix.HTML.Form.normalize_value(@type, @value)}
-        class={[
-          "mt-2 block w-full rounded-lg text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6",
-          "phx-no-feedback:border-zinc-300 phx-no-feedback:focus:border-zinc-400",
-          @errors == [] && "border-zinc-300 focus:border-zinc-400",
-          @errors != [] && "border-rose-400 focus:border-rose-400"
-        ]}
+        class={
+          [
+            "mt-2 block w-full rounded-lg focus:ring-0 sm:text-sm sm:leading-6"
+            # "phx-no-feedback:border-zinc-300 phx-no-feedback:focus:border-zinc-400",
+            # @errors == [] && "border-zinc-300 focus:border-zinc-400",
+            # @errors != [] && "border-rose-400 focus:border-rose-400"
+          ]
+        }
         {@rest}
       />
       <.error :for={msg <- @errors}><%= msg %></.error>
@@ -433,7 +435,7 @@ defmodule BasketWeb.CoreComponents do
 
   def label(assigns) do
     ~H"""
-    <label for={@for} class="block text-sm font-semibold leading-6 text-zinc-800">
+    <label for={@for} class="block text-sm font-semibold leading-6 base-content">
       <%= render_slot(@inner_block) %>
     </label>
     """
@@ -466,7 +468,7 @@ defmodule BasketWeb.CoreComponents do
     ~H"""
     <header class={[@actions != [] && "flex items-center justify-between gap-6", @class]}>
       <div>
-        <h1 class="text-lg font-semibold leading-8 text-zinc-800">
+        <h1 class="text-lg font-semibold leading-8 base-content">
           <%= render_slot(@inner_block) %>
         </h1>
         <p :if={@subtitle != []} class="mt-2 text-sm leading-6 text-zinc-600">

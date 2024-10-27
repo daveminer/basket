@@ -1,6 +1,8 @@
 defmodule Basket.Club do
   @moduledoc false
 
+  import Ecto.Changeset
+
   use Ecto.Schema
 
   @type t :: %__MODULE__{}
@@ -10,5 +12,11 @@ defmodule Basket.Club do
     field :name, :string
 
     timestamps()
+  end
+
+  def changeset(club, attrs) do
+    club
+    |> cast(attrs, [:name])
+    |> validate_required([:name])
   end
 end

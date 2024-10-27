@@ -5,7 +5,7 @@ defmodule BasketWeb.SettingsHTML do
 
   def index(assigns) do
     ~H"""
-    <div class="flex-col p-4">
+    <div class="flex-col bg-base-100 p-8">
       <NavRow.render id="nav-row" />
 
       <%= if @current_user.offices > 0 do %>
@@ -15,7 +15,7 @@ defmodule BasketWeb.SettingsHTML do
           </span>
           <div class="w-50">
             <input name="user[email]" class="input input-bordered" placeholder="someone@xyz.com" />
-            <button type="submit" class="btn">
+            <button type="submit" class="btn btn-primary ms-4">
               Invite
             </button>
           </div>

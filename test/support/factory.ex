@@ -84,6 +84,7 @@ defmodule Basket.Factory do
     %News{
       headline:
         "Apple Leader in Phone Sales in China for Second Straight Month in November With 23.6% Share, According to Market Research Data",
+      article_id: "24_843_171",
       author: "Charles Gross",
       summary:
         "This headline-only article is meant to show you why a stock is moving, the most difficult aspect of stock trading",

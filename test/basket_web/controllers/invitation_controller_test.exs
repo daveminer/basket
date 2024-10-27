@@ -3,8 +3,7 @@ defmodule BasketWeb.PowInvitation.InvitationControllerTest do
 
   import Phoenix.VerifiedRoutes
 
-  alias Basket.{Repo, User}
-  alias Basket.Factory
+  alias Basket.{Factory, Repo, User}
 
   setup do
     # Create an inviting user with an office

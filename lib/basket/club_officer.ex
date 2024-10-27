@@ -1,8 +1,10 @@
 defmodule Basket.ClubOfficer do
+  @moduledoc false
+
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias Basket.{User, Club}
+  alias Basket.{Club, User}
 
   schema "club_officers" do
     belongs_to :user, User

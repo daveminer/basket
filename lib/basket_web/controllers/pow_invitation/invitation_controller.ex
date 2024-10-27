@@ -59,14 +59,13 @@ defmodule BasketWeb.PowInvitation.InvitationController do
   end
 
   defp format_changeset_errors(changeset) do
-    Enum.map(changeset.errors, fn
+    Enum.map_join(changeset.errors, ", ", fn
       {:email, {"has already been taken", _}} ->
         "That email address has already been invited."
 
       {field, {message, _}} ->
         "#{humanize(field)} #{message}"
     end)
-    |> Enum.join(", ")
   end
 
   defp humanize(field) do

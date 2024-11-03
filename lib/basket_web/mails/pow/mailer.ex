@@ -10,7 +10,7 @@ defmodule Basket.Pow.Mailer do
   def cast(%{user: user, subject: subject, text: text, html: html}) do
     %Swoosh.Email{}
     |> to({"", user.email})
-    |> from({"Basket", "no-reply@halyard.systems"})
+    |> from({"Basket", "no-reply@example.org"})
     |> subject(subject)
     |> html_body(html)
     |> text_body(text)

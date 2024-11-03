@@ -116,14 +116,18 @@ defmodule BasketWeb.Live.Overview do
     ~H"""
     <div class="flex-col p-8 bg-base-100">
       <NavRow.render id="nav-row" />
+
       <div class="flex justify-between items-center mb-5">
-        <.live_component
-          :if={!club_mode?(@user) || User.officer?(@user)}
-          module={Search}
-          id="stock-search-input"
-        />
+        <div class="min-h-16">
+          <.live_component
+            :if={!club_mode?(@user) || User.officer?(@user)}
+            module={Search}
+            id="stock-search-input"
+          />
+        </div>
         <ClubToggle.render :if={in_club?(@user)} id="club-toggle" user={@user} />
       </div>
+
       <TickerBarTable.render
         id="ticker-bar-table"
         news={@news}

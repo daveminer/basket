@@ -3,15 +3,18 @@ defmodule BasketWeb.PowInvitation.InvitationController do
 
   import Phoenix.VerifiedRoutes
 
-  alias Basket.Repo
+  alias Basket.{Repo, User}
   alias Pow.{Config, Plug}
 
   plug :load_user when action in [:create]
 
   @doc """
-  This custom PowInvitation controller allows for a custom redirect after invitation and
-  creation of a club membership for the new user, based on the inviting user's office.
-  This controller assumes the inviting user only has one office.
+  Creates a user record for the invited user with membership to the inviting user's club,
+  then sends an email invitation to the invited user.
+
+  This custom PowInvitation controller action allows for a custom redirect after
+  invitation and creation of a club membership for the new user, based on the
+  inviting user's office. This controller assumes the inviting user only has one office.
   """
   def create(%{assigns: %{current_user: invited_by}} = conn, %{"user" => user_params}) do
     case create_user(conn, user_params) do
@@ -30,6 +33,37 @@ defmodule BasketWeb.PowInvitation.InvitationController do
         conn
         |> put_flash(:error, error_message)
         |> redirect(to: path(conn, BasketWeb.Router, ~p"/settings"))
+    end
+  end
+
+  @doc """
+  Loads the view to collect the rest of the user information.
+  """
+  def edit(conn, _params) do
+    conn
+    |> assign(:changeset, User.empty_changeset())
+    |> render("edit.html")
+  end
+
+  @doc """
+  Completes the user's account and the invitation process.
+  """
+  def update(conn, %{"id" => invitation_id, "user" => user_params}) do
+    changeset =
+      User.get_by_invitation_token(invitation_id)
+      |> User.invitation_complete_changeset(user_params)
+
+    if changeset.valid? do
+      User.update!(changeset)
+
+      conn
+      |> put_flash(:info, "Welcome! You may now log in.")
+      |> redirect(to: "/session/new")
+    else
+      # Render the edit page with the changeset if there are validation errors
+      conn
+      |> put_flash(:error, "Please correct the errors below.")
+      |> render("edit.html", changeset: changeset)
     end
   end
 

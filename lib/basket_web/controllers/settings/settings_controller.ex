@@ -6,7 +6,7 @@ defmodule BasketWeb.SettingsController do
   def index(conn, _params) do
     conn =
       if user = Pow.Plug.current_user(conn) do
-        user = Repo.preload(user, :offices)
+        user = Repo.preload(user, [:clubs, :offices])
         assign(conn, :current_user, user)
       else
         conn

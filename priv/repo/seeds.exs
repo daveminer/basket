@@ -25,7 +25,11 @@ Repo.delete_all(Club)
 user1 =
   %User{
     email: "user1@example.com",
-    password_hash: Password.pbkdf2_hash("password"),
+    first_name: "Fnameuser1",
+    last_name: "Lnameuser1",
+    # password
+    password_hash:
+      "$pbkdf2-sha512$100000$51bzdu5aRG4vMSDu7+y8tA==$rzNyOf2CR4KsCkkNtmf4auFGnefJbJBeP7wNougM5oJ9ISJbhxGiZcri2VHX75Vv0NxRHBg6pEkLjphtjDV+8A==",
     settings: %{"theme" => "dark"}
   }
   |> Repo.insert!()
@@ -33,7 +37,11 @@ user1 =
 user2 =
   %User{
     email: "user2@example.com",
-    password_hash: Password.pbkdf2_hash("password"),
+    first_name: "Fnameuser2",
+    last_name: "Lnameuser2",
+    # password
+    password_hash:
+      "$pbkdf2-sha512$100000$51bzdu5aRG4vMSDu7+y8tA==$rzNyOf2CR4KsCkkNtmf4auFGnefJbJBeP7wNougM5oJ9ISJbhxGiZcri2VHX75Vv0NxRHBg6pEkLjphtjDV+8A==",
     settings: %{"theme" => "light"}
   }
   |> Repo.insert!()

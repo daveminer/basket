@@ -6,7 +6,6 @@ defmodule BasketWeb.PowInvitation.InvitationControllerTest do
   alias Basket.{Factory, Repo, User}
 
   setup do
-    # Create an inviting user with an office
     invited_by = Factory.insert(:user)
     office = Factory.insert(:club)
     Repo.insert!(%Basket.ClubOfficer{user_id: invited_by.id, club_id: office.id})

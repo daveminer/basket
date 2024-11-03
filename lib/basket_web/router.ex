@@ -46,7 +46,9 @@ defmodule BasketWeb.Router do
   scope "/", BasketWeb.PowInvitation, as: "pow_invitation" do
     pipe_through :browser
 
+    # TODO: protect this route with a plug that checks if the current user has any offices
     resources "/invitations", InvitationController, only: [:new, :create, :edit]
+    post "/invitations/:id/edit", InvitationController, :update
   end
 
   scope "/", BasketWeb do

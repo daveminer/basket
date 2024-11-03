@@ -38,10 +38,9 @@ defmodule Basket.User do
     |> validate_confirmation(:password)
   end
 
-  def empty_changeset(), do: Ecto.Changeset.change(%__MODULE__{})
+  def empty_changeset, do: Ecto.Changeset.change(%__MODULE__{})
 
   def invitation_complete_changeset(user, attrs) do
-    dbg(user)
     now = DateTime.utc_now() |> DateTime.truncate(:second)
 
     user
@@ -55,6 +54,8 @@ defmodule Basket.User do
     |> validate_length(:password, min: 12)
     |> validate_confirmation(:password)
   end
+
+  def get(id, preloads \\ []), do: Repo.get(__MODULE__, id) |> Repo.preload(preloads)
 
   def get_by_invitation_token(token), do: Repo.get_by(__MODULE__, invitation_token: token)
 

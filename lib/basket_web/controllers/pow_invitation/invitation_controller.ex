@@ -6,7 +6,7 @@ defmodule BasketWeb.PowInvitation.InvitationController do
   alias Basket.{Repo, User}
   alias Pow.{Config, Plug}
 
-  plug :load_user when action in [:create]
+  plug :require_office when action in [:create]
 
   @doc """
   Creates a user record for the invited user with membership to the inviting user's club,
@@ -109,8 +109,17 @@ defmodule BasketWeb.PowInvitation.InvitationController do
     |> String.capitalize()
   end
 
-  defp load_user(conn, _opts) do
-    user = Pow.Plug.current_user(conn)
-    assign(conn, :current_user, user)
+  defp require_office(conn, _opts) do
+    %{id: id} = Pow.Plug.current_user(conn)
+    user = User.get(id, [:offices])
+
+    if Enum.empty?(user.offices) do
+      conn
+      |> put_flash(:error, "You must be an officer to make this action.")
+      |> redirect(to: "/settings")
+      |> halt()
+    else
+      assign(conn, :current_user, user)
+    end
   end
 end

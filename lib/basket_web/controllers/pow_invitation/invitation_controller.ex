@@ -20,8 +20,8 @@ defmodule BasketWeb.PowInvitation.InvitationController do
     case create_user(conn, user_params) do
       {:ok, user, conn} ->
         url = path(conn, BasketWeb.Router, ~p"/invitations/#{user.invitation_token}/edit")
-        email = PowInvitation.Phoenix.Mailer.invitation(conn, user, invited_by, url)
-        Pow.Phoenix.Mailer.deliver(conn, email)
+        email = PowInvitation.Phoenix.Mailer.invitation(conn, user, invited_by, "#{host()}#{url}")
+        :ok = Pow.Phoenix.Mailer.deliver(conn, email)
 
         conn
         |> put_flash(:info, "Invitation sent successfully.")
@@ -122,4 +122,6 @@ defmodule BasketWeb.PowInvitation.InvitationController do
       assign(conn, :current_user, user)
     end
   end
+
+  defp host(), do: Application.get_env(:basket, :host)
 end

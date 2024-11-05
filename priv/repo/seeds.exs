@@ -30,7 +30,7 @@ user1 =
     # password
     password_hash:
       "$pbkdf2-sha512$100000$51bzdu5aRG4vMSDu7+y8tA==$rzNyOf2CR4KsCkkNtmf4auFGnefJbJBeP7wNougM5oJ9ISJbhxGiZcri2VHX75Vv0NxRHBg6pEkLjphtjDV+8A==",
-    settings: %{"theme" => "dark"}
+    settings: %{ticker_view_toggle: "individual"}
   }
   |> Repo.insert!()
 
@@ -42,7 +42,7 @@ user2 =
     # password
     password_hash:
       "$pbkdf2-sha512$100000$51bzdu5aRG4vMSDu7+y8tA==$rzNyOf2CR4KsCkkNtmf4auFGnefJbJBeP7wNougM5oJ9ISJbhxGiZcri2VHX75Vv0NxRHBg6pEkLjphtjDV+8A==",
-    settings: %{"theme" => "light"}
+    settings: %{ticker_view_toggle: "individual"}
   }
   |> Repo.insert!()
 

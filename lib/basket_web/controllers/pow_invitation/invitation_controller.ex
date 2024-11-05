@@ -123,5 +123,5 @@ defmodule BasketWeb.PowInvitation.InvitationController do
     end
   end
 
-  defp host(), do: Application.get_env(:basket, :host)
+  defp host, do: Application.get_env(:basket, :host)
 end

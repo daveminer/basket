@@ -56,7 +56,11 @@ defmodule BasketWeb.Router do
     live "/", Live.Overview
 
     resources "/settings", SettingsController, only: [:index, :update]
+  end
 
+  scope "/", BasketWeb do
+    # Routes in this scope have no authentication; deferring to a reverse
+    # proxy or similar to deny traffic; allowing local traffic through by default.
     post "/sentiment/new/callback", SentimentController, :callback
   end
 
@@ -65,11 +69,6 @@ defmodule BasketWeb.Router do
 
     get "/news/:ticker", NewsController, :index
   end
-
-  # Other scopes may use custom stacks.
-  # scope "/api", BasketWeb do
-  #   pipe_through :api
-  # end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:basket, :dev_routes) do

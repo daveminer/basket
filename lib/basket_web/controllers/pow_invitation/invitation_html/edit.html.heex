@@ -42,13 +42,7 @@
       </span>
     <% end %>
 
-    <.input
-      field={f[:password_confirmation]}
-      type="password"
-      label="Confirm password"
-      required
-      class="input-lg"
-    />
+    <.input field={f[:password_confirmation]} type="password" label="Confirm password" required />
     <%= if f.source.errors[:password_confirmation] do %>
       <span class="error text-error">
         <%= translate_changeset_error(f.source.errors[:password_confirmation]) %>
@@ -56,9 +50,11 @@
     <% end %>
 
     <:actions>
-      <.button phx-disable-with="Submitting..." class="w-full">
-        Submit <span aria-hidden="true">→</span>
-      </.button>
+      <div class="flex justify-center w-full">
+        <.button phx-disable-with="Submitting..." class="btn btn-primary px-4">
+          Finish signup <span aria-hidden="true">→</span>
+        </.button>
+      </div>
     </:actions>
   </.simple_form>
 </div>

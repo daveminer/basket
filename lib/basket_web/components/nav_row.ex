@@ -18,7 +18,7 @@ defmodule BasketWeb.Components.NavRow do
             id="theme-controller"
             type="checkbox"
             phx-hook="ThemeSwitcher"
-            class="theme-controller"
+            class="theme-controller hidden"
             value="night"
           />
           <!-- sun icon -->

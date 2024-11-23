@@ -240,7 +240,7 @@ defmodule BasketWeb.CoreComponents do
     <.form :let={f} for={@for} as={@as} {@rest}>
       <div class="mt-10 space-y-8">
         <%= render_slot(@inner_block, f) %>
-        <div :for={action <- @actions} class="mt-2 flex items-center justify-between gap-6">
+        <div :for={action <- @actions} class="mt-2 gap-6">
           <%= render_slot(action, f) %>
         </div>
       </div>
@@ -268,7 +268,7 @@ defmodule BasketWeb.CoreComponents do
       type={@type}
       class={[
         "phx-submit-loading:opacity-75 rounded-lg py-1 px-2",
-        "text-sm font-semibold leading-6 text-white active:text-white/80",
+        "font-semibold leading-6",
         @class
       ]}
       {@rest}

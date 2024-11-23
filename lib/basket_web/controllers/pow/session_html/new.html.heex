@@ -47,9 +47,11 @@
       </:actions>
 
       <:actions>
-        <.button phx-disable-with="Signing in..." class="w-full">
-          Sign in <span aria-hidden="true">→</span>
-        </.button>
+        <div class="flex justify-center w-full">
+          <.button phx-disable-with="Signing in..." class="btn btn-primary px-4">
+            Sign in <span aria-hidden="true">→</span>
+          </.button>
+        </div>
       </:actions>
     </.simple_form>
   </div>

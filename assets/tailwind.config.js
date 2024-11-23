@@ -1,7 +1,7 @@
 // See the Tailwind configuration guide for advanced usage
 // https://tailwindcss.com/docs/configuration
 
-const colors = require('tailwindcss/colors')
+//const colors = require('tailwindcss/colors')
 const plugin = require("tailwindcss/plugin")
 const fs = require("fs")
 const path = require("path")
@@ -27,7 +27,7 @@ module.exports = {
   plugins: [
     require("@tailwindcss/typography"),
     require('daisyui'),
-    //require("@tailwindcss/forms"),
+    require("@tailwindcss/forms"),
     // Allows prefixing tailwind classes with LiveView classes to add rules
     // only when LiveView classes are applied, for example:
     //

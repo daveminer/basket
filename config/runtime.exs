@@ -31,8 +31,8 @@ config :basket, :news,
   sentiment_service_enabled: sentiment_service_enabled,
   sentiment_service_url: System.get_env("SENTIMENT_SERVICE_URL") || "http://localhost:8000",
   # Set this if calling back to a local server
-  sentiment_callback_url:
-    System.get_env("SENTIMENT_CALLBACK_URL") || Application.fetch_env!(:basket, :host)
+  sentiment_callback_host:
+    System.get_env("SENTIMENT_CALLBACK_HOST") || Application.fetch_env!(:basket, :host)
 
 if config_env() == :prod do
   database_url =

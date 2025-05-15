@@ -31,7 +31,7 @@ defmodule Basket.Http.Sentiment.Impl do
     encoded_text = text |> HtmlEntities.encode()
 
     case post(
-           "#{url()}/sentiment/new?callback_url=#{Application.fetch_env!(:basket, :host)}/sentiment/new/callback",
+           "#{url()}/sentiment/new?callback_url=#{callback_url()}/sentiment/new/callback",
            Jason.encode!([%{article_id: article_id, tags: tags, text: encoded_text}])
          ) do
       {:ok, %HTTPoison.Response{status_code: 201}} ->
@@ -59,5 +59,6 @@ defmodule Basket.Http.Sentiment.Impl do
     end
   end
 
+  defp callback_url, do: Application.fetch_env!(:basket, :news)[:sentiment_callback_url]
   defp url, do: Application.fetch_env!(:basket, :news)[:sentiment_service_url]
 end

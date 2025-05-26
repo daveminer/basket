@@ -94,7 +94,8 @@ defmodule Basket.MixProject do
       {:ex_machina, "~> 2.8.0", only: :test},
       {:oban, "~> 2.17"},
       {:html_entities, "~> 0.5.2"},
-      {:html_sanitize_ex, "~> 1.4"}    ]
+      {:html_sanitize_ex, "~> 1.4"}
+    ]
   end
 
   # Aliases are shortcuts or tasks specific to the current project.

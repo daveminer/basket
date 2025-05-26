@@ -34,6 +34,16 @@ config :basket, :news,
   sentiment_callback_host:
     System.get_env("SENTIMENT_CALLBACK_HOST") || Application.fetch_env!(:basket, :host)
 
+config :basket, :pow_assent,
+  providers: [
+    google: [
+      client_id: System.get_env("GOOGLE_CLIENT_ID"),
+      client_secret: System.get_env("GOOGLE_CLIENT_SECRET"),
+      strategy: Assent.Strategy.Google,
+      session_params: ["email", "name", "given_name", "family_name"]
+    ]
+  ]
+
 if config_env() == :prod do
   database_url =
     System.get_env("DATABASE_URL") ||
@@ -86,15 +96,6 @@ if config_env() == :prod do
     market_http_url: "https://api.alpaca.markets",
     market_ws_url: "wss://stream.data.alpaca.markets/v2/iex",
     news_ws_url: "wss://stream.data.alpaca.markets/v1beta1/news"
-
-  config :basket, :pow_assent,
-    providers: [
-      google: [
-        client_id: System.get_env("GOOGLE_CLIENT_ID"),
-        client_secret: System.get_env("GOOGLE_CLIENT_SECRET"),
-        strategy: Assent.Strategy.Google
-      ]
-    ]
 
   # ## SSL Support
   #

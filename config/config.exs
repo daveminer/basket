@@ -71,16 +71,6 @@ config :basket, :pow,
   controller_callbacks: Pow.Extension.Phoenix.ControllerCallbacks,
   mailer_backend: Basket.Pow.Mailer
 
-config :basket, :pow_assent,
-  providers: [
-    google: [
-      client_id: System.get_env("GOOGLE_CLIENT_ID"),
-      client_secret: System.get_env("GOOGLE_CLIENT_SECRET"),
-      strategy: Assent.Strategy.Google,
-      session_params: ["email", "name", "given_name", "family_name"]
-    ]
-  ]
-
 config :basket, Oban,
   engine: Oban.Engines.Basic,
   queues: [default: 10, news: 5],

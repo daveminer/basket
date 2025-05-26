@@ -87,6 +87,15 @@ if config_env() == :prod do
     market_ws_url: "wss://stream.data.alpaca.markets/v2/iex",
     news_ws_url: "wss://stream.data.alpaca.markets/v1beta1/news"
 
+  config :basket, :pow_assent,
+    providers: [
+      google: [
+        client_id: System.get_env("GOOGLE_CLIENT_ID"),
+        client_secret: System.get_env("GOOGLE_CLIENT_SECRET"),
+        strategy: Assent.Strategy.Google
+      ]
+    ]
+
   # ## SSL Support
   #
   # To get SSL working, you will need to add the `https` key

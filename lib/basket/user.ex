@@ -5,9 +5,10 @@ defmodule Basket.User do
 
   use Ecto.Schema
   use Pow.Ecto.Schema
+  use PowAssent.Ecto.Schema
 
   use Pow.Extension.Ecto.Schema,
-    extensions: [PowResetPassword, PowEmailConfirmation, PowInvitation]
+    extensions: [PowResetPassword, PowEmailConfirmation, PowInvitation, PowAssent]
 
   alias Basket.Repo
 

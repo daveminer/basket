@@ -1,58 +1,110 @@
-<div class="w-screen h-screen">
-  <.header class="text-center mb-3">
-    Welcome to Basket!
-  </.header>
+<div class="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-gray-50">
+  <div class="sm:mx-auto sm:w-full sm:max-w-md">
+    <img src={~p"/images/stock_basket.webp"} class="mx-auto w-full h-auto object-contain" />
+    <div class="text-center mt-6">
+      <.header class="text-4xl font-extrabold text-gray-900 tracking-tight">
+        Welcome to Basket
+      </.header>
+    </div>
+  </div>
 
-  <img src={~p"/images/stock_basket.webp"} width="216" class="mx-auto block" />
-
-  <div class="mx-auto w-1/2">
-    <.simple_form :let={f} for={@changeset} as={:user} action={@action} phx-update="ignore">
-      <.error :if={@changeset.action}>
-        Oops, something went wrong! Please check the errors below.
-      </.error>
-      <.input
-        field={f[Pow.Ecto.Schema.user_id_field(@changeset)]}
-        type={(Pow.Ecto.Schema.user_id_field(@changeset) == :email && "email") || "text"}
-        label={Phoenix.Naming.humanize(Pow.Ecto.Schema.user_id_field(@changeset))}
-        required
-      />
-      <.input field={f[:password]} type="password" label="Password" value={nil} required />
-
-      <:actions
-        :let={f}
-        :if={
-          Pow.Plug.extension_enabled?(@conn, PowPersistentSession) ||
-            Pow.Plug.extension_enabled?(@conn, PowResetPassword)
-        }
-      >
+  <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+    <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+      <.simple_form :let={f} for={@changeset} as={:user} action={@action} phx-update="ignore">
+        <.error :if={@changeset.action}>
+          Oops, something went wrong! Please check the errors below.
+        </.error>
         <.input
-          :if={Pow.Plug.extension_enabled?(@conn, PowPersistentSession)}
-          field={f[:persistent_session]}
-          type="checkbox"
-          label="Keep me logged in"
+          field={f[Pow.Ecto.Schema.user_id_field(@changeset)]}
+          type={(Pow.Ecto.Schema.user_id_field(@changeset) == :email && "email") || "text"}
+          label={Phoenix.Naming.humanize(Pow.Ecto.Schema.user_id_field(@changeset))}
+          required
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
         />
-        <.link
-          :if={Pow.Plug.extension_enabled?(@conn, PowResetPassword)}
-          href={
-            Pow.Phoenix.Routes.path_for(
-              @conn,
-              PowResetPassword.Phoenix.ResetPasswordController,
-              :new
-            )
-          }
-          class="text-sm font-semibold"
-        >
-          Forgot your password?
-        </.link>
-      </:actions>
+        <.input 
+          field={f[:password]} 
+          type="password" 
+          label="Password" 
+          value={nil} 
+          required
+          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+        />
 
-      <:actions>
-        <div class="flex justify-center w-full">
-          <.button phx-disable-with="Signing in..." class="btn btn-primary px-4">
-            Sign in <span aria-hidden="true">→</span>
-          </.button>
+        <:actions
+          :let={f}
+          :if={
+            Pow.Plug.extension_enabled?(@conn, PowPersistentSession) ||
+              Pow.Plug.extension_enabled?(@conn, PowResetPassword)
+          }
+        >
+          <div class="flex items-center justify-between">
+            <.input
+              :if={Pow.Plug.extension_enabled?(@conn, PowPersistentSession)}
+              field={f[:persistent_session]}
+              type="checkbox"
+              label="Keep me logged in"
+              class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+            />
+            <.link
+              :if={Pow.Plug.extension_enabled?(@conn, PowResetPassword)}
+              href={
+                Pow.Phoenix.Routes.path_for(
+                  @conn,
+                  PowResetPassword.Phoenix.ResetPasswordController,
+                  :new
+                )
+              }
+              class="text-sm font-medium text-indigo-600 hover:text-indigo-500"
+            >
+              Forgot your password?
+            </.link>
+          </div>
+        </:actions>
+
+        <:actions>
+          <div class="mt-6">
+            <.button phx-disable-with="Signing in..." class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+              Sign in
+            </.button>
+          </div>
+        </:actions>
+      </.simple_form>
+
+      <div class="mt-6">
+        <div class="relative">
+          <div class="absolute inset-0 flex items-center">
+            <div class="w-full border-t border-gray-300"></div>
+          </div>
+          <div class="relative flex justify-center text-sm">
+            <span class="px-2 bg-white text-gray-500">Or continue with</span>
+          </div>
         </div>
-      </:actions>
-    </.simple_form>
+
+        <div class="mt-6">
+          <PowAssent.Phoenix.HTML.CoreComponents.provider_links conn={@conn}>
+            <:authorization_link :let={provider}>
+              <div class="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                <%= if provider == "google" do %>
+                  <svg class="w-5 h-5" viewBox="0 0 24 24">
+                    <path
+                      fill="currentColor"
+                      d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z"
+                    />
+                  </svg>
+                <% end %>
+                <%= if provider == "facebook" do %>
+                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path
+                      d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"
+                    />
+                  </svg>
+                <% end %>
+                <span class="ml-2"><%= Phoenix.Naming.humanize(provider) %></span>
+              </div>
+            </:authorization_link>
+          </PowAssent.Phoenix.HTML.CoreComponents.provider_links>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

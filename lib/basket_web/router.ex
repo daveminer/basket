@@ -1,9 +1,10 @@
 defmodule BasketWeb.Router do
   use BasketWeb, :router
   use Pow.Phoenix.Router
+  use PowAssent.Phoenix.Router
 
   use Pow.Extension.Phoenix.Router,
-    extensions: [PowResetPassword, PowEmailConfirmation, PowPersistentSession]
+    extensions: [PowResetPassword, PowEmailConfirmation, PowPersistentSession, PowAssent]
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -41,6 +42,7 @@ defmodule BasketWeb.Router do
 
     pow_session_routes()
     pow_extension_routes()
+    pow_assent_routes()
   end
 
   scope "/", BasketWeb.PowInvitation, as: "pow_invitation" do
